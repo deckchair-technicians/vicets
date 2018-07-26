@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "target": "es6",
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outDir":"ts-build"
+  }
+}

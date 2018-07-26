@@ -1,0 +1,3 @@
+--recursive
+--exit
+--timeout 60000
