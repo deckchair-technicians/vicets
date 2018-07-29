@@ -8,37 +8,41 @@ function renameFunction(name, fn) {
         " () { return call(this, arguments) }; };");
     return (function2())(Function.apply.bind(fn));
 }
-
 export class Record {
-    constructor(values: object) {
-    }
+  constructor(values: object) {}
 }
 
-export function data(c: { new(values: object): {} }) {
-    let objectWithDefaults = new c({});
+export function data<T extends { new (...args: any[]): {} }>(constructor: T) {
 
-    let schema = schematize(objectWithDefaults);
+  let recordConstructor = class extends constructor {
+    constructor(...args: any[]) {
+      super(false, ...args);
 
-    let newConstructor = function (plainObject: object) {
-        let conformed = schema.conform(plainObject);
-        if(isError(conformed)) {
-            const e = new Error(`${conformed}`);
-            e['problems'] = conformed;
-            throw e;
-        }
-        for (let k in conformed) {
-            let value = conformed[k];
-            Object.seal(value);
-            Object.freeze(value);
-            this[k] = value;
-        }
-        Object.seal(this);
-        Object.freeze(this);
-    };
+      if(typeof args[0] === 'boolean' && !args[0]) return;
 
-    const decorated = renameFunction(c.name, newConstructor);
-    decorated.prototype = c.prototype;
-    return decorated;
+      let schema = schematize(this);
+      let conformed = schema.conform(args[0]);
+
+      if(isError(conformed)) {
+        const e = new Error(`Error constructing instance of ${constructor.name}: ${conformed}`);
+        e['problems'] = conformed;
+        throw e;
+      }
+      for (let k in conformed) {
+        let value = conformed[k];
+        Object.seal(value);
+        Object.freeze(value);
+        this[k] = value;
+      }
+      Object.seal(this);
+      Object.freeze(this);
+
+    }
+  };
+
+  // Object.defineProperty (recordConstructor, 'name', {value: constructor.name});
+  recordConstructor.prototype.constructor = constructor;
+  return recordConstructor;
 }
 
 export function build<T extends Record>(c: { new(...args: any[]): T }, values: object): T {
