@@ -40,7 +40,6 @@ export function data<T extends { new (...args: any[]): {} }>(constructor: T) {
     }
   };
 
-  // Object.defineProperty (recordConstructor, 'name', {value: constructor.name});
   recordConstructor.prototype.constructor = constructor;
   return recordConstructor;
 }
