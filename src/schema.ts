@@ -90,27 +90,27 @@ export function number(...additionalSchema: Schema[]): number {
 
 
 export function integer(): number {
-    return predicate((x) => Number.isInteger(x), "was not a whole number") as any as number;
+    return predicate((x) => Number.isInteger(x), "${x} was not a whole number") as any as number;
 }
 
 export function eq(y: number): number {
-    return predicate((x) => x === y, (x) => `was not ${y}`) as any as number;
+    return predicate((x) => x === y, (x) => `${x} must be ${y}`) as any as number;
 }
 
 export function gt(y: number): number {
-    return predicate((x) => x > y, (x) => `must be greater than ${y}`) as any as number;
+    return predicate((x) => x > y, (x) => `must be greater than ${y} but was ${x}`) as any as number;
 }
 
 export function lt(y: number): number {
-    return predicate((x) => x < y, (x) => `must be less than ${y}`) as any as number;
+    return predicate((x) => x < y, (x) => `must be less than ${y} but was ${x}`) as any as number;
 }
 
 export function gte(y: number): number {
-    return predicate((x) => x >= y, (x) => `was less than ${y}`) as any as number;
+    return predicate((x) => x >= y, (x) => `${x} is less than ${y}`) as any as number;
 }
 
 export function lte(y: number): number {
-    return predicate((x) => x <= y, (x) => `was more than ${y}`) as any as number;
+    return predicate((x) => x <= y, (x) => `${x} is more than ${y}`) as any as number;
 }
 
 export function schema<T>(conform: (value: any) => ValidationResult): T {

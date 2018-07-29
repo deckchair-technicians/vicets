@@ -9,31 +9,48 @@ function renameFunction(name, fn) {
     return (function2())(Function.apply.bind(fn));
 }
 
-export class Record {
-    constructor(values: object) {
-    }
+let VALIDATE = true;
+function suspendValidation<T>(f: () => T): T {
+    VALIDATE = false;
+    const result = f();
+    VALIDATE = true;
+    return result;
 }
 
-export function data(c: { new(values: object): {} }) {
-    let objectWithDefaults = new c({});
+export function data(c: { new(...args: any[]): {} }) {
+    let objectWithDefaults = suspendValidation(() => new c());
 
     let schema = schematize(objectWithDefaults);
 
-    let newConstructor = function (plainObject: object) {
-        let conformed = schema.conform(plainObject);
-        if(isError(conformed)) {
-            const e = new Error(`${conformed}`);
-            e['problems'] = conformed;
-            throw e;
+    let newConstructor = function (...args: any[]) {
+        if (BUILD_FROM_POJO === true) {
+            let conformed = schema.conform(args[0]);
+            if (isError(conformed)) {
+                const e = new Error(`${conformed}`);
+                e['problems'] = conformed;
+                throw e;
+            }
+            for (let k in conformed) {
+                let value = conformed[k];
+                Object.seal(value);
+                Object.freeze(value);
+                this[k] = value;
+            }
+        } else {
+            let instance = new c(...args);
+            if (VALIDATE === false) {
+                return instance;
+            }
+            let conformed = schema.conform(instance);
+            if (isError(conformed)) {
+                const e = new Error(`${conformed}`);
+                e['problems'] = conformed;
+                throw e;
+            }
+            for (let k in conformed) {
+                this[k] = conformed[k];
+            }
         }
-        for (let k in conformed) {
-            let value = conformed[k];
-            Object.seal(value);
-            Object.freeze(value);
-            this[k] = value;
-        }
-        Object.seal(this);
-        Object.freeze(this);
     };
 
     const decorated = renameFunction(c.name, newConstructor);
@@ -41,6 +58,10 @@ export function data(c: { new(values: object): {} }) {
     return decorated;
 }
 
-export function build<T extends Record>(c: { new(...args: any[]): T }, values: object): T {
-    return new c(values);
+let BUILD_FROM_POJO = false;
+export function build<T>(c: { new(...args: any[]): T }, values: object): T {
+    BUILD_FROM_POJO = true;
+    let instance = new c(values);
+    BUILD_FROM_POJO = false;
+    return instance;
 }

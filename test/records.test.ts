@@ -1,9 +1,9 @@
 import {expect} from "chai";
-import {build, data, Record} from "../src/records";
-import {gt, schema} from "../src/schema";
+import {build, data} from "../src/records";
+import {gt, gte, schema} from "../src/schema";
 
 @data
-class Test extends Record {
+class Test {
     greaterThan1: number = gt(1);
     coercedValue: number = schema((v) => "coerced");
 }
@@ -20,7 +20,7 @@ class Test extends Record {
 // Figure out how to cleanly have schema with dependencies
 
 @data
-class Parent extends Record {
+class Parent {
     parentField: number = gt(1);
 }
 
@@ -30,8 +30,14 @@ class Child extends Parent {
 }
 
 @data
-class NotARecord extends Record{
+class NotARecord {
     field: number = gt(1);
+}
+
+@data
+class FieldsInConstructor {
+    constructor(public field: number = gte(1)) {
+    }
 }
 
 describe('Records', () => {
@@ -45,8 +51,13 @@ describe('Records', () => {
             });
     });
 
+    it('Should allow fields to be defined in the constructor', () => {
+        expect(new FieldsInConstructor(1)).deep.equals({field: 1});
+        expect(() => new FieldsInConstructor(0)).to.throw(Error);
+    });
+
     it('Should apply schema when constructing', () => {
-        expect(new Test(
+        expect(build(Test,
             {
                 greaterThan1: 123,
                 coercedValue: "original value"
@@ -55,21 +66,26 @@ describe('Records', () => {
                 greaterThan1: 123,
                 coercedValue: "coerced"
             });
-        expect(() => new Test({greaterThan1: 0})).to.throw(Error);
+
     });
 
     it('Should cope with inheritance', () => {
-        expect(new Parent({parentField: 123})).deep.equals({parentField: 123});
-        expect(() => new Parent({parentField: 0})).to.throw(Error);
+        expect(build(Parent, {parentField: 123})).deep.equals({parentField: 123});
+        expect(() => build(Parent, {parentField: 0})).to.throw(Error);
 
-        expect(new Child({parentField: 123, childField: 456})).deep.equals({parentField: 123, childField: 456});
-        expect(() => new Child({parentField: 0, childField: 0})).to.throw(Error);
+        expect(build(Child, {parentField: 123, childField: 456})).deep.equals({parentField: 123, childField: 456});
+        expect(() => build(Child, {
+                parentField: 0,
+                childField:
+                    0
+            }
+        )).to.throw(Error);
     });
     it('Should cope with inheritance where parent is also data', () => {
-        expect(new Parent({parentField: 123})).deep.equals({parentField: 123});
-        expect(() => new Parent({parentField: 0})).to.throw(Error);
+        expect(build(Parent, {parentField: 123})).deep.equals({parentField: 123});
+        expect(() => build(Parent, {parentField: 0})).to.throw(Error);
 
-        expect(new Child({parentField: 123, childField: 456})).deep.equals({parentField: 123, childField: 456});
-        expect(() => new Child({parentField: 0, childField: 0})).to.throw(Error);
+        expect(build(Child, {parentField: 123, childField: 456})).deep.equals({parentField: 123, childField: 456});
+        expect(() => build(Child, {parentField: 0, childField: 0})).to.throw(Error);
     });
 });
