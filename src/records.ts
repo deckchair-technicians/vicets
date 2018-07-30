@@ -11,10 +11,12 @@ function renameFunction(name, fn) {
 
 let VALIDATE = true;
 function suspendValidation<T>(f: () => T): T {
-    VALIDATE = false;
-    const result = f();
-    VALIDATE = true;
-    return result;
+    try {
+        VALIDATE = false;
+        return f();
+    } finally {
+        VALIDATE = true;
+    }
 }
 
 export function data(c: { new(...args: any[]): {} }) {
@@ -59,9 +61,12 @@ export function data(c: { new(...args: any[]): {} }) {
 }
 
 let BUILD_FROM_POJO = false;
+
 export function build<T>(c: { new(...args: any[]): T }, values: object): T {
-    BUILD_FROM_POJO = true;
-    let instance = new c(values);
-    BUILD_FROM_POJO = false;
-    return instance;
+    try {
+        BUILD_FROM_POJO = true;
+        return new c(values);
+    } finally {
+        BUILD_FROM_POJO = false;
+    }
 }
