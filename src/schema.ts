@@ -80,7 +80,7 @@ export function record<T>(constructor: {new(...args:any[]):T}): RecordSchema<T> 
     return new RecordSchema(constructor);
 }
 
-export function eq<T>(y: T): Schema<T,T> {
+export function eq<T>(y: T): Schema<any,T> {
     return predicate<T>(
         (x) => x === y,
         (x) => `expected ${y} but got ${x}`);
