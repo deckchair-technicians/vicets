@@ -4,7 +4,7 @@ export abstract class BaseSchema<IN, OUT> implements Schema<IN, OUT> {
     constructor() {
     }
 
-    or<NEWIN extends IN, NEWOUT extends OUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
+    or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
         return new OrSchema(this, s)
     }
 
