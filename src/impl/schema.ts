@@ -1,74 +1,61 @@
-import {failure, isError, isSuccess, problems, Problems, Schema, schematize, ValidationResult} from "../schema";
+import {isError, isSuccess, Problems, Schema, schematize, ValidationResult} from "../schema";
 
-export class AndSchema implements Schema {
-    constructor(private readonly schemas: Schema[]) {
+export abstract class BaseSchema<IN, OUT> implements Schema<IN, OUT> {
+    constructor() {
     }
 
-    conform(value: any): ValidationResult {
-        let result = value;
-        for (let s of this.schemas) {
-            result = s.conform(result);
-            if (isError(result)) return result;
-        }
-        return result;
+    or<NEWIN extends IN, NEWOUT extends OUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
+        return new OrSchema(this, s)
     }
+
+    and<NEWOUT>(this: this, s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT> {
+        return new AndSchema(this, s)
+    }
+
+    abstract conform(value: IN): Problems | OUT;
 
 }
 
-export class OrSchema implements Schema {
-    constructor(private readonly schemas: Schema[]) {
+export class AndSchema<IN, INTERMEDIATE, OUT> extends BaseSchema<IN, OUT> {
+    constructor(private readonly first: Schema<IN, INTERMEDIATE>,
+                private readonly second: Schema<INTERMEDIATE, OUT>) {
+        super();
     }
 
-    conform(value: any): ValidationResult {
+    conform(value: IN): Problems | OUT {
+        let intermediate = this.first.conform(value);
+
+        if (intermediate instanceof Problems) return intermediate;
+
+        return this.second.conform(intermediate)
+    }
+}
+
+class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
+    constructor(private readonly first: Schema<IN, OUT1>,
+                private readonly second: Schema<IN, OUT2>) {
+        super();
+    }
+
+    conform(value: IN): Problems | (OUT1 | OUT2) {
         const failures: Problems[] = [];
-        for (let s of this.schemas) {
+        for (let s of [this.first, this.second]) {
             let result = s.conform(value);
 
             if (isSuccess(result)) return result;
 
-            failures.push(result);
+            failures.push(result as Problems);
         }
-        return problems().merge(...failures);
+        return failures.reduce((a: Problems | null, ps: Problems) => a ? a.merge(ps) : ps);
     }
 
 }
 
-export class NumberSchema implements Schema {
-    conform(value: any): ValidationResult {
-        switch (typeof value) {
-            case 'number':
-                return value;
-            case 'string':
-                let parsed = Number.parseFloat(value);
-                if (Number.isNaN(parsed)) return failure("must be a number");
-                return parsed;
-            default:
-                return failure("must be a number");
-        }
-    }
-}
-
-export class BetweenSchema implements Schema {
-    constructor(private readonly lower: number,
-                private readonly upper: number) {
-    }
-
-    conform(value: any): ValidationResult {
-        if (typeof value != 'number') return failure(`${value} is not a number`);
-        if (value < this.lower) return failure(`${value} should be greater or equal to ${this.lower}`);
-        if (value >= this.upper) return failure(`${value} should be less than ${this.upper}`);
-        return value;
-    }
-
-    toString(): string {
-        return `between ${this.lower} and ${this.upper}`
-    }
-}
-
-export class ObjectSchema implements Schema {
-    private readonly schemas: { [a: string]: Schema };
+export class ObjectSchema extends BaseSchema<object, object> {
+    private readonly schemas: { [a: string]: Schema<any, any> };
 
     constructor(object: object) {
+        super();
         this.schemas = {};
         for (let k in object) {
             this.schemas[k] = schematize(object[k]);
@@ -80,7 +67,7 @@ export class ObjectSchema implements Schema {
         let problems = new Problems([]);
 
         for (let k in this.schemas) {
-            const s: Schema = this.schemas[k];
+            const s: Schema<any,any> = this.schemas[k];
             const v: ValidationResult = s.conform(value[k]);
             if (isError(v))
                 problems = problems.merge((v as Problems).prefixPath([k]));
@@ -98,7 +85,12 @@ export class ObjectSchema implements Schema {
     }
 }
 
-export class DelegatingSchema implements Schema {
-    constructor(public readonly conform: (value: any) => ValidationResult) {
+export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
+    constructor(private readonly delegatedConform: (value: IN) => Problems | OUT) {
+        super();
+    }
+
+    conform(value: IN): Problems | OUT {
+        return this.delegatedConform(value);
     }
 }

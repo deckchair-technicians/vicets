@@ -1,11 +1,4 @@
-import {
-    AndSchema,
-    BetweenSchema,
-    DelegatingSchema,
-    NumberSchema,
-    ObjectSchema,
-    OrSchema
-} from "./impl/schema";
+import {DelegatingSchema, ObjectSchema} from "./impl/schema";
 
 export type Path = any[];
 
@@ -58,8 +51,8 @@ export function problem(message: string, path: Path = []) {
     return new Problem(path, message);
 }
 
-export function problems(...problems: Problem[]) {
-    return new Problems(problems);
+export function problems(problem: Problem, ...more: Problem[]) {
+    return new Problems([...[problem], ...more]);
 }
 
 export function failure(message: string, path: Path = []): Problems {
@@ -68,56 +61,29 @@ export function failure(message: string, path: Path = []): Problems {
 
 export type ValidationResult = Problems | any;
 
-export interface Schema {
-    conform(this: this, value: any): ValidationResult
+export interface Schema<IN, OUT> {
+    conform(this: this, value: IN): Problems | OUT
+
+    and<NEWOUT>(this: this, s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT>
+
+    or<NEWIN extends IN, NEWOUT extends OUT>(this: this, s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT>
 }
 
-export function between(lower: number, upper: number): number {
-    return new BetweenSchema(lower, upper) as any as number;
+export function def<IN, OUT>(s: Schema<IN, OUT>): OUT {
+    return s as any as OUT;
 }
 
-export function chain(...schemas: Schema[]): Schema {
-    return new AndSchema(schemas);
+export function eq<T>(y: T): Schema<T,T> {
+    return predicate<T>(
+        (x) => x === y,
+        (x) => `expected ${y} but got ${x}`);
 }
 
-export function first(...schemas: Schema[]): Schema {
-    return new OrSchema(schemas);
+export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {
+    return new DelegatingSchema<IN, OUT>(conform);
 }
 
-export function number(...additionalSchema: Schema[]): number {
-    return chain(...[new NumberSchema()], ...additionalSchema) as any as number;
-}
-
-
-export function integer(): number {
-    return predicate((x) => Number.isInteger(x), "${x} was not a whole number") as any as number;
-}
-
-export function eq(y: number): number {
-    return predicate((x) => x === y, (x) => `${x} must be ${y}`) as any as number;
-}
-
-export function gt(y: number): number {
-    return predicate((x) => x > y, (x) => `must be greater than ${y} but was ${x}`) as any as number;
-}
-
-export function lt(y: number): number {
-    return predicate((x) => x < y, (x) => `must be less than ${y} but was ${x}`) as any as number;
-}
-
-export function gte(y: number): number {
-    return predicate((x) => x >= y, (x) => `${x} is less than ${y}`) as any as number;
-}
-
-export function lte(y: number): number {
-    return predicate((x) => x <= y, (x) => `${x} is more than ${y}`) as any as number;
-}
-
-export function schema<T>(conform: (value: any) => ValidationResult): T {
-    return new DelegatingSchema(conform) as any as T;
-}
-
-function _buildPredicateMessageFunction(message: ((value: any) => string) | string | undefined, predicate: PredicateFunction): (value: any) => string {
+function _buildPredicateMessageFunction(message: ((value: any) => string) | string | undefined, predicate: (x: any) => boolean): (value: any) => string {
     switch (typeof  message) {
         case 'string':
             return (value: any) => message as string;
@@ -130,35 +96,33 @@ function _buildPredicateMessageFunction(message: ((value: any) => string) | stri
     }
 }
 
-export type PredicateFunction = (value: any) => boolean;
 
-
-export function predicate(predicate: PredicateFunction,
-                          failureMessage?: ((value: any) => string) | string): Schema {
+export function predicate<T>(predicate: (value: T) => boolean,
+                             failureMessage?: ((value: any) => string) | string): Schema<T, T> {
     let messageFn = _buildPredicateMessageFunction(failureMessage, predicate);
     return schema(
         (x) => predicate(x) === true ? x : failure(messageFn(x)))
 }
 
 
-export type Schemaish = Schema | PredicateFunction | object;
+export type Schemaish = { conform(x: any): any } | Function | object;
 
-export function schematize(x: Schemaish): Schema {
+export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
     let t = typeof x;
     if (t === "function")
-        return predicate(x as PredicateFunction);
+        return predicate(x as (x: any) => boolean);
 
     if (t === "object") {
         if ('conform' in x && typeof x.conform === "function")
-            return x as Schema;
+            return x as Schema<IN, OUT>;
         else
-            return new ObjectSchema(x)
+            return new ObjectSchema(x) as any as Schema<IN, OUT>;
     }
     throw Error(`Cannot build schema from ${x}`);
 }
 
-export function object<T extends object>(object: Object): T {
-    return new ObjectSchema(object) as any as T;
+export function object<T extends object>(object: Object): ObjectSchema {
+    return new ObjectSchema(object);
 }
 
 export function assertSchema(s: Schemaish, value: any): any {
