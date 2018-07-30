@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {build, data} from "../src/records";
-import {eq, def, schema} from "../src/schema";
+import {eq, def, schema, record} from "../src/schema";
 
 @data
 class Test {
@@ -8,11 +8,11 @@ class Test {
     coercedValue: number = def(schema((v) => 123));
 }
 
-// Schema and class are the same thing
+// Schema and class are defined in the same place
 // No decorators
 // Schema can be separated from the class, and created without a class
-// Type checking between def types and schema output < NOT QUITE DONE YET
-// Cannot create a class in an invalid state (class stands in for validity)
+// Type checking between field types and schema output
+// Cannot create a class in an invalid state without putting some effort in (class stands in for validity)
 
 
 // Generate OpenAPI/json schema
@@ -45,7 +45,20 @@ class ChildWithFieldsInConstructor extends FieldsInConstructor {
     }
 }
 
-describe('Records', () => {
+@data
+class Nested {
+    constructor(
+        public a: string = def(eq("valid"))) {
+    }
+}
+@data
+class HasNested {
+    constructor(
+        public nested: Nested = def(record(Nested))) {
+    }
+}
+
+describe('data', () => {
     it('Should allow fields to be defined in the constructor', () => {
         expect(new FieldsInConstructor(1)).deep.equals({field: 1});
         expect(() => new FieldsInConstructor(0)).to.throw(Error);
@@ -95,5 +108,13 @@ describe('Records', () => {
 
         expect(build(Child, {parentField: 1, childField: 1})).deep.equals({parentField: 1, childField: 1});
         expect(() => build(Child, {parentField: 0, childField: 0})).to.throw(Error);
+    });
+
+    it('Should cope with nesting', () => {
+        expect(new HasNested(new Nested("valid"))).deep.equals({nested:{a:"valid"}});
+        expect(() => new HasNested()).to.throw(Error);
+
+        expect(build(HasNested, {nested:{a: "valid"}})).deep.equals({nested:{a:"valid"}});
+        expect(() => build(HasNested, {nested:{a: "not valid"}})).to.throw(Error);
     });
 });

@@ -1,4 +1,6 @@
-import {isError, schematize} from "./schema";
+import {Problems, schematize} from "./schema";
+import {BaseSchema} from "./impl/schema";
+import * as util from "util";
 
 function renameFunction(name, fn) {
     // It seems like we should be able to
@@ -10,6 +12,7 @@ function renameFunction(name, fn) {
 }
 
 let VALIDATE = true;
+
 function suspendValidation<T>(f: () => T): T {
     try {
         VALIDATE = false;
@@ -19,6 +22,16 @@ function suspendValidation<T>(f: () => T): T {
     }
 }
 
+
+// Custom Error 1
+const ValidationError = function (problems: Problems) {
+    Error.captureStackTrace(this, this.constructor);
+    this.name = this.constructor.name;
+    this.message = `Validation failed: ${problems}`;
+    this.problems = problems;
+};
+util.inherits(ValidationError, Error);
+
 export function data(c: { new(...args: any[]): {} }) {
     let objectWithDefaults = suspendValidation(() => new c());
 
@@ -26,17 +39,15 @@ export function data(c: { new(...args: any[]): {} }) {
 
     let newConstructor = function (...args: any[]) {
         if (BUILD_FROM_POJO === true) {
-            let conformed = schema.conform(args[0]);
-            if (isError(conformed)) {
-                const e = new Error(`${conformed}`);
+            let values = args[0];
+            let conformed = schema.conform(values);
+            if (conformed instanceof Problems) {
+                const e = new ValidationError(conformed);
                 e['problems'] = conformed;
                 throw e;
             }
             for (let k in conformed) {
-                let value = conformed[k];
-                Object.seal(value);
-                Object.freeze(value);
-                this[k] = value;
+                this[k] = conformed[k];
             }
         } else {
             let instance = new c(...args);
@@ -44,8 +55,8 @@ export function data(c: { new(...args: any[]): {} }) {
                 return instance;
             }
             let conformed = schema.conform(instance);
-            if (isError(conformed)) {
-                const e = new Error(`${conformed}`);
+            if (conformed instanceof Problems) {
+                const e = new ValidationError(conformed);
                 e['problems'] = conformed;
                 throw e;
             }
@@ -69,4 +80,24 @@ export function build<T>(c: { new(...args: any[]): T }, values: object): T {
     } finally {
         BUILD_FROM_POJO = false;
     }
+}
+
+export class RecordSchema<T> extends BaseSchema<any, T> {
+    constructor(private readonly c: { new(...args: any[]): T }) {
+        super();
+    }
+
+    conform(value: any): Problems | T {
+        if(value instanceof this.c) return value;
+
+        try {
+            return new this.c(value);
+        } catch (e) {
+            if (e instanceof ValidationError) {
+                return e.problems;
+            }
+            throw e;
+        }
+    }
+
 }

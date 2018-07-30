@@ -1,4 +1,5 @@
 import {DelegatingSchema, ObjectSchema} from "./impl/schema";
+import {RecordSchema} from "./records";
 
 export type Path = any[];
 
@@ -71,6 +72,10 @@ export interface Schema<IN, OUT> {
 
 export function def<IN, OUT>(s: Schema<IN, OUT>): OUT {
     return s as any as OUT;
+}
+
+export function record<T>(constructor: {new(...args:any[]):T}): RecordSchema<T> {
+    return new RecordSchema(constructor);
 }
 
 export function eq<T>(y: T): Schema<T,T> {
