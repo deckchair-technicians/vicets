@@ -12,6 +12,10 @@ export abstract class BaseSchema<IN, OUT> implements Schema<IN, OUT> {
         return new AndSchema(this, s)
     }
 
+    def(this: this): OUT {
+        return this as any as OUT;
+    }
+
     abstract conform(value: IN): Problems | OUT;
 
 }

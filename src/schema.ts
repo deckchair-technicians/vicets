@@ -67,7 +67,9 @@ export interface Schema<IN, OUT> {
 
     and<NEWOUT>(this: this, s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT>
 
-    or<NEWIN extends IN, NEWOUT extends OUT>(this: this, s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT>
+    or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT>
+
+    def(this: this): OUT
 }
 
 export function def<IN, OUT>(s: Schema<IN, OUT>): OUT {
