@@ -1,11 +1,11 @@
 import {expect} from "chai";
 import {build, data} from "../src/records";
-import {def, eq, record, schema} from "../src/schema";
+import {__, eq, record, schema} from "../src/schema";
 
 @data
 class Test {
-    equals1: number = def(eq(1));
-    coercedValue: number = def(schema((v) => 123));
+    equals1: number = __(eq(1));
+    coercedValue: number = __(schema((_) => 123));
 }
 
 // Schema and class are defined in the same place
@@ -21,23 +21,23 @@ class Test {
 
 @data
 class Parent {
-    parentField: number = def(eq(1));
+    parentField: number = __(eq(1));
 }
 
 @data
 class Child extends Parent {
-    childField: number = def(eq(1));
+    childField: number = __(eq(1));
 }
 
 @data
 class FieldsInConstructor {
-    constructor(public field: number = def(eq(1))) {
+    constructor(public field: number = __(eq(1))) {
     }
 }
 
 @data
 class ChildWithFieldsInConstructor extends FieldsInConstructor {
-    constructor(public childField: number = def(eq(1)),
+    constructor(public childField: number = __(eq(1)),
                 field: number) {
 
         super(field);
@@ -46,13 +46,13 @@ class ChildWithFieldsInConstructor extends FieldsInConstructor {
 
 @data
 class Nested {
-    constructor(public a: string = def(eq("valid"))) {
+    constructor(public a: string = __(eq("valid"))) {
     }
 }
 
 @data
 class HasNested {
-    constructor(public nested: Nested = def(record(Nested))) {
+    constructor(public nested: Nested = __(record(Nested))) {
     }
 }
 
@@ -60,10 +60,10 @@ class HasNested {
 class Union {
     constructor(
         public union: string | number
-            = eq("valid").or(eq(1)).def(),
+            = eq("valid").or(eq(1)).__(),
 
         public single: string
-            = eq("valid").or(eq("also valid")).def()) {
+            = eq("valid").or(eq("also valid")).__()) {
     }
 }
 
@@ -78,9 +78,9 @@ describe('data', () => {
             "valid object")
             .deep.equals({field: 1, childField: 1});
         expect(() => build(ChildWithFieldsInConstructor, {childField: 1, field: 0}),
-            "invalid parent def").to.throw(Error);
+            "invalid parent __").to.throw(Error);
         expect(() => build(ChildWithFieldsInConstructor, {childField: 0, field: 1}),
-            "invalid child def").to.throw(Error);
+            "invalid child __").to.throw(Error);
 
         expect(new ChildWithFieldsInConstructor(1, 1)).deep.equals({field: 1, childField: 1});
         expect(() => new ChildWithFieldsInConstructor(1, 0)).to.throw(Error);
