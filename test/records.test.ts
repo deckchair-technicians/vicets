@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {build, data} from "../src/records";
-import {eq, def, schema, record} from "../src/schema";
+import {def, eq, record, schema} from "../src/schema";
 
 @data
 class Test {
@@ -37,9 +37,8 @@ class FieldsInConstructor {
 
 @data
 class ChildWithFieldsInConstructor extends FieldsInConstructor {
-    constructor(
-        public childField: number = def(eq(1)),
-        field: number) {
+    constructor(public childField: number = def(eq(1)),
+                field: number) {
 
         super(field);
     }
@@ -47,14 +46,24 @@ class ChildWithFieldsInConstructor extends FieldsInConstructor {
 
 @data
 class Nested {
-    constructor(
-        public a: string = def(eq("valid"))) {
+    constructor(public a: string = def(eq("valid"))) {
     }
 }
+
 @data
 class HasNested {
+    constructor(public nested: Nested = def(record(Nested))) {
+    }
+}
+
+@data
+class Union {
     constructor(
-        public nested: Nested = def(record(Nested))) {
+        public union: string | number
+            = eq("valid").or(eq(1)).def(),
+
+        public single: string
+            = eq("valid").or(eq("also valid")).def()) {
     }
 }
 
@@ -65,12 +74,12 @@ describe('data', () => {
     });
 
     it('Should allow fields to be defined in the constructor, and work with inheritance', () => {
-        expect(build(ChildWithFieldsInConstructor, {childField:1, field: 1}),
+        expect(build(ChildWithFieldsInConstructor, {childField: 1, field: 1}),
             "valid object")
             .deep.equals({field: 1, childField: 1});
-        expect(() => build(ChildWithFieldsInConstructor, {childField:1, field: 0}),
+        expect(() => build(ChildWithFieldsInConstructor, {childField: 1, field: 0}),
             "invalid parent def").to.throw(Error);
-        expect(() => build(ChildWithFieldsInConstructor, {childField:0, field: 1}),
+        expect(() => build(ChildWithFieldsInConstructor, {childField: 0, field: 1}),
             "invalid child def").to.throw(Error);
 
         expect(new ChildWithFieldsInConstructor(1, 1)).deep.equals({field: 1, childField: 1});
@@ -111,10 +120,20 @@ describe('data', () => {
     });
 
     it('Should cope with nesting', () => {
-        expect(new HasNested(new Nested("valid"))).deep.equals({nested:{a:"valid"}});
+        expect(new HasNested(new Nested("valid"))).deep.equals({nested: {a: "valid"}});
         expect(() => new HasNested()).to.throw(Error);
 
-        expect(build(HasNested, {nested:{a: "valid"}})).deep.equals({nested:{a:"valid"}});
-        expect(() => build(HasNested, {nested:{a: "not valid"}})).to.throw(Error);
+        expect(build(HasNested, {nested: {a: "valid"}})).deep.equals({nested: {a: "valid"}});
+        expect(() => build(HasNested, {nested: {a: "not valid"}})).to.throw(Error);
+    });
+    it('Should support union types', () => {
+        expect(new Union(1, "also valid")).deep.equals({union:1, single:"also valid"});
+        expect(() => new Union(2, "valid")).to.throw(Error);
+        expect(() => new Union(1, "not valid")).to.throw(Error);
+
+        expect(build(Union, {union: 1, single: "also valid"})).deep.equals({union: 1, single: "also valid"});
+        expect(build(Union, {union: "valid", single: "valid"})).deep.equals({union: "valid", single: "valid"});
+        expect(() => build(Union, {union: "not valid", single: "valid"})).to.throw(Error);
+        expect(() => build(Union, {union: "valid", single: "not valid"})).to.throw(Error);
     });
 });
