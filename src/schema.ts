@@ -69,11 +69,11 @@ export interface Schema<IN, OUT> {
 
   or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT>
 
-    __(this: this): OUT
+  __<FAKED extends OUT>(this: this): FAKED
 }
 
-export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
-    return s as any as OUT;
+export function __<IN, OUT, FAKED extends OUT>(s: Schema<IN, OUT>): FAKED {
+  return s.__();
 }
 
 export function record<T>(constructor: { new(...args: any[]): T }): Schema<any, T> {
