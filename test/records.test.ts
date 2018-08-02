@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {build, data} from "../src/records";
-import {__, eq, record, schema} from "../src/schema";
+import {__, discriminated, eq, record, schema} from "../src/schema";
 
 @data
 class Test {
@@ -65,9 +65,26 @@ class Union {
   }
 }
 
-        public single: string
-            = eq("valid").or(eq("also valid")).__()) {
-    }
+@data
+class DiscriminatedUnion1 {
+  discriminator = eq(1).__();
+}
+
+@data
+class DiscriminatedUnion2 {
+  discriminator = eq(2).__()
+}
+
+@data
+class DiscriminatedUnion3 {
+  discriminator = eq(3).__()
+}
+
+type DiscriminatedUnion = DiscriminatedUnion1 | DiscriminatedUnion2 | DiscriminatedUnion3
+
+@data
+class HasDiscriminatedUnionField {
+  field: DiscriminatedUnion = discriminated(DiscriminatedUnion1, DiscriminatedUnion2, DiscriminatedUnion3).__()
 }
 
 describe('data', () => {
@@ -138,5 +155,19 @@ describe('data', () => {
     expect(build(Union, {union: "valid", single: "valid"})).deep.equals({union: "valid", single: "valid"});
     expect(() => build(Union, {union: "not valid", single: "valid"})).to.throw(Error);
     expect(() => build(Union, {union: "valid", single: "not valid"})).to.throw(Error);
+  });
+  it('should support discriminated unions', () => {
+    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 1}})).deep.equals({field: {discriminator: 1}});
+    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 1}})).deep.equals({field: {discriminator: 1}});
+
+    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 2}}).field).instanceOf(DiscriminatedUnion2);
+
+    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 3}}).field);
+  });
+  xit('should complain if subclasses redefine fields', () => {
+  });
+  xit('should support optional fields', () => {
+  });
+  xit('should support adding additional methods', () => {
   });
 });

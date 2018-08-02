@@ -1,4 +1,4 @@
-import {DelegatingSchema, ObjectSchema} from "./impl/schema";
+import {DelegatingSchema, ObjectSchema, OrSchema} from "./impl/schema";
 import {RecordSchema} from "./records";
 
 export type Path = any[];
@@ -85,6 +85,27 @@ export function eq<T>(y: T): Schema<any, T> {
     (x) => x === y,
     (x) => `expected ${y} but got ${x}`);
 }
+
+export function discriminated<A, B>(a: { new(...args: any[]): A },
+                                    b: { new(...args: any[]): B }): Schema<any, A | B>;
+export function discriminated<A, B, C>(a: { new(...args: any[]): A },
+                                       b: { new(...args: any[]): B },
+                                       c: { new(...args: any[]): C }): Schema<any, A | B | C>;
+export function discriminated<A, B, C, D>(a: { new(...args: any[]): A },
+                                          b: { new(...args: any[]): B },
+                                          c: { new(...args: any[]): C },
+                                          d: { new(...args: any[]): D }): Schema<any, A | B | C | D>;
+export function discriminated<A, B, C, D, E>(a: { new(...args: any[]): A },
+                                             b: { new(...args: any[]): B },
+                                             c: { new(...args: any[]): C },
+                                             d: { new(...args: any[]): D },
+                                             e: { new(...args: any[]): E }): Schema<any, A | B | C | D | E>;
+export function discriminated(...args: any[]) {
+  return args.reduce((acc:any, ctor) => {
+    return acc ? new OrSchema(acc, record(ctor)) : record(ctor)
+  }, null);
+}
+
 }
 
 export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {

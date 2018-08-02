@@ -35,7 +35,7 @@ export class AndSchema<IN, INTERMEDIATE, OUT> extends BaseSchema<IN, OUT> {
     }
 }
 
-class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
+export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
     constructor(private readonly first: Schema<IN, OUT1>,
                 private readonly second: Schema<IN, OUT2>) {
         super();
