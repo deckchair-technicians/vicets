@@ -2,19 +2,19 @@ import {isSuccess, Problems, Schema} from "../";
 import {failure} from "../problems";
 
 export abstract class BaseSchema<IN, OUT> implements Schema<IN, OUT> {
-    or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
-        return new OrSchema(this, s)
-    }
+  or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
+    return new OrSchema(this, s)
+  }
 
-    and<NEWOUT>(this: this, s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT> {
-        return new AndSchema(this, s)
-    }
+  and<NEWOUT>(this: this, s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT> {
+    return new AndSchema(this, s)
+  }
 
-    __<FAKED extends OUT>(this: this): FAKED {
-        return this as any as FAKED;
-    }
+  __<FAKED extends OUT>(this: this): FAKED {
+    return this as any as FAKED;
+  }
 
-    abstract conform(value: IN): Problems | OUT;
+  abstract conform(value: IN): Problems | OUT;
 
 }
 
@@ -55,30 +55,30 @@ export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
 
 export abstract class StringSchema extends BaseSchema<any, string> {
   conform(value: any): Problems | string {
-    if(typeof value === 'string' || value instanceof String)
+    if (typeof value === 'string' || value instanceof String)
       return this.conformString(value as string);
     return failure('expected a string');
   }
 
-  abstract conformString(value: string) : Problems | string;
+  abstract conformString(value: string): Problems | string;
 }
 
 export abstract class NumberSchema extends BaseSchema<any, number> {
   conform(value: any): Problems | number {
-    if(typeof value === 'number' || value instanceof Number)
+    if (typeof value === 'number' || value instanceof Number)
       return this.conformNumber(value as number);
     return failure('expected a number');
   }
 
-  abstract conformNumber(value: number) : Problems | number;
+  abstract conformNumber(value: number): Problems | number;
 }
 
 export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
-    constructor(private readonly delegatedConform: (value: IN) => Problems | OUT) {
-        super();
-    }
+  constructor(private readonly delegatedConform: (value: IN) => Problems | OUT) {
+    super();
+  }
 
-    conform(value: IN): Problems | OUT {
-        return this.delegatedConform(value);
-    }
+  conform(value: IN): Problems | OUT {
+    return this.delegatedConform(value);
+  }
 }

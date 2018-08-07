@@ -7,10 +7,7 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {
-  buildPredicateMessageFunction,
-  detectDiscriminator
-} from "./impl/util";
+import {buildPredicateMessageFunction, detectDiscriminator} from "./impl/util";
 
 export type ValidationResult = Problems | any;
 
@@ -51,7 +48,7 @@ export function isstring(): Schema<any, string> {
     (x) => `expected a string but got ${x}`);
 }
 
-export function matches(r:RegExp): Schema<any, string> {
+export function matches(r: RegExp): Schema<any, string> {
   return new RegExpSchema(r);
 }
 
@@ -61,7 +58,7 @@ export function isboolean(): Schema<any, boolean> {
     (x) => `expected a boolean but got ${x}`);
 }
 
-export function isin<T>(...values:T[]): Schema<any, T> {
+export function isin<T>(...values: T[]): Schema<any, T> {
   return new InSchema<T>(values);
 }
 

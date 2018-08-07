@@ -1,9 +1,8 @@
-import {isin, object, Problems, isdata, Schema} from "../";
-import {isPrimitive} from "./util";
+import {isdata, isin, object, Problems, Schema} from "../";
+import {entries, isPrimitive, primitive} from "./util";
 import {ObjectSchema} from "./obj";
 import {EqualsSchema} from "./eq";
 import {BaseSchema} from "./index";
-import {entries, primitive} from "./util";
 
 export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
   private schema: Schema<any, T>;
@@ -24,7 +23,7 @@ export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
     this.schema = validDiscriminator.and(Array.from(ctors).map(isdata).reduce((prev, curr) => prev.or(curr)));
   }
 
-  static discriminatorValues<T>(ctors: { new(...args: any[]): T }[]) : { [k: string]: primitive[] } {
+  static discriminatorValues<T>(ctors: { new(...args: any[]): T }[]): { [k: string]: primitive[] } {
     return ctors.map(ctor => ctor['schema']).reduce(DiscriminatedUnionSchema.possibleDiscriminators, {});
   }
 
