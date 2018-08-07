@@ -15,7 +15,7 @@ class Test {
 
 
 // Generate OpenAPI/json schema
-// Generate test isdata
+// Generate test data
 // Figure out how to cleanly have schema with dependencies
 
 @data
@@ -131,7 +131,7 @@ describe('data', () => {
       }
     )).to.throw(Error);
   });
-  it('Should cope with inheritance where parent is also isdata', () => {
+  it('Should cope with inheritance where parent is also data', () => {
     expect(build(Parent, {parentField: 1})).deep.equals({parentField: 1});
     expect(() => build(Parent, {parentField: 0})).to.throw(Error);
 
