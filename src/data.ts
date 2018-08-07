@@ -1,14 +1,13 @@
-import {Problems, schematize} from "./schema";
+import {Problems, schematize} from "./index";
 import {BaseSchema} from "./impl/schema";
-import * as util from "util";
 
-function renameFunction(name, fn) {
-    // It seems like we should be able to
-    // Object.defineProperty("name" ...
-    // But in practise this doesn't seem to work- the debugger still lists the original name.
-    let function2 = new Function("return function (call) { return function " + name +
-        " () { return call(this, arguments) }; };");
-    return (function2())(Function.apply.bind(fn));
+function renameFunction(name: string, fn: (...args: any[]) => any) {
+  // It seems like we should be able to
+  // Object.defineProperty("name" ...
+  // But in practise this doesn't seem to work- the debugger still lists the original name.
+  let function2 = new Function("return function (call) { return function " + name +
+    " () { return call(this, arguments) }; };");
+  return (function2())(Function.apply.bind(fn));
 }
 
 let VALIDATE = true;
@@ -23,16 +22,13 @@ function suspendValidation<T>(f: () => T): T {
 }
 
 
-// Custom Error 1
-const ValidationError = function (problems: Problems) {
-    Error.captureStackTrace(this, this.constructor);
-    this.name = this.constructor.name;
-    this.message = `Validation failed: ${problems}`;
-    this.problems = problems;
-};
-util.inherits(ValidationError, Error);
+class ValidationError extends Error {
+  constructor(public readonly problems: Problems) {
+      super(`Validation failed: ${problems}`);
+  }
+}
 
-export function data(c: { new(...args: any[]): {} }) {
+export function data<T extends Object>(c: { new(...args: any[]): T }) {
     let objectWithDefaults = suspendValidation(() => new c());
 
     let schema = schematize(objectWithDefaults);
@@ -42,9 +38,7 @@ export function data(c: { new(...args: any[]): {} }) {
             let values = args[0];
             let conformed = schema.conform(values);
             if (conformed instanceof Problems) {
-                const e = new ValidationError(conformed);
-                e['problems'] = conformed;
-                throw e;
+              throw new ValidationError(conformed);
             }
             for (let k in conformed) {
                 this[k] = conformed[k];
@@ -56,9 +50,7 @@ export function data(c: { new(...args: any[]): {} }) {
             }
             let conformed = schema.conform(instance);
             if (conformed instanceof Problems) {
-                const e = new ValidationError(conformed);
-                e['problems'] = conformed;
-                throw e;
+                throw new ValidationError(conformed);
             }
             for (let k in conformed) {
                 this[k] = conformed[k];
@@ -68,6 +60,7 @@ export function data(c: { new(...args: any[]): {} }) {
 
     const decorated = renameFunction(c.name, newConstructor);
     decorated.prototype = c.prototype;
+    decorated.schema = schema;
     return decorated;
 }
 

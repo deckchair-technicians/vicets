@@ -1,64 +1,16 @@
-import {DelegatingSchema, ObjectSchema, OrSchema} from "./impl/schema";
-import {RecordSchema} from "./records";
-
-export type Path = any[];
-
-export class Problem {
-  constructor(readonly path: Path, readonly message: string) {
-  }
-
-  prefixPath(p: Path): Problem {
-    return new Problem([...p, ...this.path], this.message);
-  }
-
-  toString(): string {
-    return `[${this.path.join(' ').trimRight()}] : ${this.message}`
-  }
-}
-
-export class Problems {
-  constructor(readonly problems: Problem[]) {
-  }
-
-  prefixPath(p: Path): Problems {
-    return new Problems(this.problems.map(e => e.prefixPath(p)));
-
-  }
-
-  merge(...ps: Problems[]): Problems {
-    return ps.reduce((acc: Problems, next: Problems) => acc.append(...next.problems), this);
-
-  }
-
-  append(...ps: Problem[]): Problems {
-    return new Problems([...this.problems, ...ps]);
-
-  }
-
-  toString(): string {
-    return this.problems.map(e => e.toString()).join("\r\n")
-  }
-}
-
-export function isError(x: Problems | any): boolean {
-  return x != null && x instanceof Problems;
-}
-
-export function isSuccess(x: Problems | any): boolean {
-  return !isError(x);
-}
-
-export function problem(message: string, path: Path = []) {
-  return new Problem(path, message);
-}
-
-export function problems(problem: Problem, ...more: Problem[]) {
-  return new Problems([...[problem], ...more]);
-}
-
-export function failure(message: string, path: Path = []): Problems {
-  return problems(problem(message, path));
-}
+import {DelegatingSchema} from "./impl/schema";
+import {RecordSchema} from "./data";
+import {ObjectSchema} from "./impl/obj";
+import {EqualsSchema} from "./impl/eq";
+import {InSchema} from "./impl/isin";
+import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
+import {failure, Problems} from "./problems";
+import {RegExpSchema} from "./impl/regexp";
+import {IsURLOptions, UrlSchema} from "./impl/url";
+import {
+  buildPredicateMessageFunction,
+  detectDiscriminator
+} from "./impl/util";
 
 export type ValidationResult = Problems | any;
 
@@ -76,89 +28,80 @@ export function __<IN, OUT, FAKED extends OUT>(s: Schema<IN, OUT>): FAKED {
   return s.__();
 }
 
-export function record<T>(constructor: { new(...args: any[]): T }): Schema<any, T> {
+export function isdata<T>(constructor: { new(...args: any[]): T }): Schema<any, T> {
   return new RecordSchema(constructor);
 }
 
-export function eq<T>(y: T): Schema<any, T> {
-  return predicate<T>(
-    (x) => x === y,
-    (x) => `expected ${y} but got ${x}`);
+export function eq<T>(value: T): Schema<any, T> {
+  return new EqualsSchema(value);
 }
 
-export function discriminated<A, B>(a: { new(...args: any[]): A },
-                                    b: { new(...args: any[]): B }): Schema<any, A | B>;
-export function discriminated<A, B, C>(a: { new(...args: any[]): A },
-                                       b: { new(...args: any[]): B },
-                                       c: { new(...args: any[]): C }): Schema<any, A | B | C>;
-export function discriminated<A, B, C, D>(a: { new(...args: any[]): A },
-                                          b: { new(...args: any[]): B },
-                                          c: { new(...args: any[]): C },
-                                          d: { new(...args: any[]): D }): Schema<any, A | B | C | D>;
-export function discriminated<A, B, C, D, E>(a: { new(...args: any[]): A },
-                                             b: { new(...args: any[]): B },
-                                             c: { new(...args: any[]): C },
-                                             d: { new(...args: any[]): D },
-                                             e: { new(...args: any[]): E }): Schema<any, A | B | C | D | E>;
-export function discriminated(...args: any[]) {
-  return args.reduce((acc:any, ctor) => {
-    return acc ? new OrSchema(acc, record(ctor)) : record(ctor)
-  }, null);
+export function discriminated<T>(...ctors: { new(...args: any[]): T }[]): Schema<object, T> {
+  return discriminatedby(detectDiscriminator(ctors), ctors);
 }
 
+export function discriminatedby<T>(discriminator: keyof T,
+                                   ctors: { new(...args: any[]): T }[],): Schema<object, T> {
+  return new DiscriminatedUnionSchema<T>(ctors, discriminator);
 }
 
-export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {
-  return new DelegatingSchema<IN, OUT>(conform);
+export function isstring(): Schema<any, string> {
+  return predicate<any>(
+    (x) => x instanceof String || typeof x === "string",
+    (x) => `expected a string but got ${x}`);
 }
 
-function _buildPredicateMessageFunction(message: ((value: any) => string) | string | undefined, predicate: (x: any) => boolean): (value: any) => string {
-  switch (typeof  message) {
-    case 'string':
-      return (value: any) => message as string;
-    case 'function':
-      return message as (value: any) => string;
-    case 'undefined':
-      return (value: any) => predicate.toString();
-    default:
-      throw new Error(`Not a valid message ${message}`);
-  }
+export function matches(r:RegExp): Schema<any, string> {
+  return new RegExpSchema(r);
 }
 
-
-export function predicate<T>(predicate: (value: T) => boolean,
-                             failureMessage?: ((value: any) => string) | string): Schema<T, T> {
-  let messageFn = _buildPredicateMessageFunction(failureMessage, predicate);
-  return schema(
-    (x) => predicate(x) === true ? x : failure(messageFn(x)))
+export function isboolean(): Schema<any, boolean> {
+  return predicate<any>(
+    (x) => x instanceof Boolean || typeof x === "boolean",
+    (x) => `expected a boolean but got ${x}`);
 }
 
+export function isin<T>(...values:T[]): Schema<any, T> {
+  return new InSchema<T>(values);
+}
 
-export type Schemaish = { conform(x: any): any } | Function | object;
-
-export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
-  let t = typeof x;
-  if (t === "function")
-    return predicate(x as (x: any) => boolean);
-
-  if (t === "object") {
-    if ('conform' in x && typeof x.conform === "function")
-      return x as Schema<IN, OUT>;
-    else
-      return new ObjectSchema(x) as any as Schema<IN, OUT>;
-  }
-  throw Error(`Cannot build schema from ${x}`);
+export function isurl(opts?: IsURLOptions): Schema<any, string> {
+  return new UrlSchema(opts || {});
 }
 
 export function object<T extends object>(object: Object): Schema<object, object> {
   return new ObjectSchema(object);
 }
 
-export function assertSchema(s: Schemaish, value: any): any {
-  const result = schematize(s).conform(value);
-  if (isSuccess(result)) return result;
+export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {
+  return new DelegatingSchema<IN, OUT>(conform);
+}
 
-  let e = new Error(`${result}`);
-  e['problems'] = result;
-  throw e;
+
+export function predicate<T>(predicate: (value: T) => boolean,
+                             failureMessage?: ((value: any) => string) | string): Schema<T, T> {
+  let messageFn = buildPredicateMessageFunction(failureMessage, predicate);
+  return schema(
+    (x) => predicate(x) === true ? x : failure(messageFn(x)))
+}
+
+export type Schemaish = Schema<any, any> | Function | number | string | boolean | object;
+
+export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
+  switch (typeof x) {
+    case "function":
+      return predicate(x as (x: any) => boolean);
+    case "string":
+    case "number":
+    case "boolean":
+      return eq(x)  as any as Schema<IN, OUT>;
+    case "object":
+      let obj = (x as object);
+      if ('conform' in obj && typeof x['conform'] === "function")
+        return x as Schema<IN, OUT>;
+      else
+        return new ObjectSchema(obj) as any as Schema<IN, OUT>;
+    default:
+      throw Error(`Cannot build schema from ${x}`);
+  }
 }

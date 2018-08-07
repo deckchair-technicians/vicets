@@ -1,6 +1,5 @@
 import {expect} from "chai";
-import {build, data} from "../src/records";
-import {__, discriminated, eq, record, schema} from "../src/schema";
+import {__, discriminated, eq, isdata, schema, build, data} from "../src";
 
 @data
 class Test {
@@ -16,7 +15,7 @@ class Test {
 
 
 // Generate OpenAPI/json schema
-// Generate test data
+// Generate test isdata
 // Figure out how to cleanly have schema with dependencies
 
 @data
@@ -52,7 +51,7 @@ class Nested {
 
 @data
 class HasNested {
-  constructor(public nested: Nested = __(record(Nested))) {
+  constructor(public nested: Nested = __(isdata(Nested))) {
   }
 }
 
@@ -67,17 +66,17 @@ class Union {
 
 @data
 class DiscriminatedUnion1 {
-  discriminator = eq(1).__();
+  discriminator = 1;
 }
 
 @data
 class DiscriminatedUnion2 {
-  discriminator = eq(2).__()
+  discriminator = 2
 }
 
 @data
 class DiscriminatedUnion3 {
-  discriminator = eq(3).__()
+  discriminator = 3
 }
 
 type DiscriminatedUnion = DiscriminatedUnion1 | DiscriminatedUnion2 | DiscriminatedUnion3
@@ -86,6 +85,7 @@ type DiscriminatedUnion = DiscriminatedUnion1 | DiscriminatedUnion2 | Discrimina
 class HasDiscriminatedUnionField {
   field: DiscriminatedUnion = discriminated(DiscriminatedUnion1, DiscriminatedUnion2, DiscriminatedUnion3).__()
 }
+
 
 describe('data', () => {
   it('Should allow fields to be defined in the constructor', () => {
@@ -131,7 +131,7 @@ describe('data', () => {
       }
     )).to.throw(Error);
   });
-  it('Should cope with inheritance where parent is also data', () => {
+  it('Should cope with inheritance where parent is also isdata', () => {
     expect(build(Parent, {parentField: 1})).deep.equals({parentField: 1});
     expect(() => build(Parent, {parentField: 0})).to.throw(Error);
 
@@ -162,7 +162,17 @@ describe('data', () => {
 
     expect(build(HasDiscriminatedUnionField, {field: {discriminator: 2}}).field).instanceOf(DiscriminatedUnion2);
 
-    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 3}}).field);
+    expect(isdata(HasDiscriminatedUnionField).conform({field: {discriminator: 4}})).deep.equals({
+      problems: [
+        {
+          message: "expected one of [1, 2, 3]",
+          path: [
+            "field",
+            "discriminator"
+          ]
+        }
+      ]
+    });
   });
   xit('should complain if subclasses redefine fields', () => {
   });
@@ -171,3 +181,5 @@ describe('data', () => {
   xit('should support adding additional methods', () => {
   });
 });
+
+
