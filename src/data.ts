@@ -1,5 +1,5 @@
 import {Problems, schematize} from "./index";
-import {BaseSchema} from "./impl/schema";
+import {BaseSchema} from "./impl/index";
 
 function renameFunction(name: string, fn: (...args: any[]) => any) {
   // It seems like we should be able to

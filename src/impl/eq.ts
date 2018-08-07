@@ -1,5 +1,5 @@
 import {failure, Problems} from "../";
-import {BaseSchema} from "./schema";
+import {BaseSchema} from "./index";
 
 export class EqualsSchema<T> extends BaseSchema<any, T> {
   constructor(public readonly expected: T) {

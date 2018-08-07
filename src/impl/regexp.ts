@@ -1,4 +1,4 @@
-import {StringSchema} from "./schema";
+import {StringSchema} from "./index";
 import {Problems} from "../";
 import {failure} from "../problems";
 

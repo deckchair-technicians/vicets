@@ -1,5 +1,5 @@
 import {failure, Problems} from "../";
-import {BaseSchema} from "./schema";
+import {BaseSchema} from "./index";
 
 export class InSchema<T> extends BaseSchema<any, T> {
   private readonly values: Set<T>;

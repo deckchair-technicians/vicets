@@ -2,7 +2,7 @@ import {isin, object, Problems, isdata, Schema} from "../";
 import {isPrimitive} from "./util";
 import {ObjectSchema} from "./obj";
 import {EqualsSchema} from "./eq";
-import {BaseSchema} from "./schema";
+import {BaseSchema} from "./index";
 import {entries, primitive} from "./util";
 
 export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {

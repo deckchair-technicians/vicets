@@ -53,9 +53,24 @@ export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
 
 }
 
+export abstract class StringSchema extends BaseSchema<any, string> {
+  conform(value: any): Problems | string {
+    if(typeof value === 'string' || value instanceof String)
+      return this.conformString(value as string);
+    return failure('expected a string');
+  }
 
+  abstract conformString(value: string) : Problems | string;
+}
 
+export abstract class NumberSchema extends BaseSchema<any, number> {
+  conform(value: any): Problems | number {
+    if(typeof value === 'number' || value instanceof Number)
+      return this.conformNumber(value as number);
+    return failure('expected a number');
+  }
 
+  abstract conformNumber(value: number) : Problems | number;
 }
 
 export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {

@@ -1,4 +1,4 @@
-import {DelegatingSchema} from "./impl/schema";
+import {DelegatingSchema} from "./impl/index";
 import {RecordSchema} from "./data";
 import {ObjectSchema} from "./impl/obj";
 import {EqualsSchema} from "./impl/eq";

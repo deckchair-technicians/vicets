@@ -1,5 +1,5 @@
 import {isError, Problems, Schema, schematize, ValidationResult} from "../";
-import {BaseSchema} from "./schema";
+import {BaseSchema} from "./index";
 
 export class ObjectSchema extends BaseSchema<object, object> {
   public readonly schemas: { [k: string]: Schema<any, any> };
