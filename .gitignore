@@ -63,7 +63,7 @@ typings/
 .yarn-integrity
 
 # Compiled typescript
-ts-build/
+dist/
 
 .idea/
 *.iml

@@ -1,0 +1,36 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8.8.1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Node dependencies
+          command: npm install
+      - run:
+          name: Testing
+          command: npm run test
+      - run:
+          name: Set build number
+          command: npm --no-git-tag-version version "0.0.$CIRCLE_BUILD_NUM"
+      - run:
+          name: Build typescript
+          command: ./node_modules/.bin/tsc
+      - run:
+          name: Create .npmrc file
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+      - run:
+          name: Deploy to NPM
+          command: npm publish
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build
