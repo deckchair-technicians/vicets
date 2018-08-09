@@ -1,14 +1,8 @@
-import {Problems, schematize} from "./index";
+import {Problems} from "./";
 import {BaseSchema} from "./impl";
-
-function renameFunction(name: string, fn: (...args: any[]) => any) {
-  // It seems like we should be able to
-  // Object.defineProperty("name" ...
-  // But in practise this doesn't seem to work- the debugger still lists the original name.
-  let function2 = new Function("return function (call) { return function " + name +
-    " () { return call(this, arguments) }; };");
-  return (function2())(Function.apply.bind(fn));
-}
+import {ObjectSchema} from "./impl/obj";
+import {Constructor, renameFunction} from "./impl/util";
+import {ValidationError} from "./problems";
 
 let VALIDATE = true;
 
@@ -22,16 +16,12 @@ function suspendValidation<T>(f: () => T): T {
 }
 
 
-class ValidationError extends Error {
-  constructor(public readonly problems: Problems) {
-    super(`Validation failed: ${problems}`);
-  }
-}
+export const SCHEMA_SYMBOL = Symbol('schema');
 
-export function data<T extends Object>(c: { new(...args: any[]): T }) {
+export function data<T extends Object>(c: Constructor<T>) {
   let objectWithDefaults = suspendValidation(() => new c());
 
-  let schema = schematize(objectWithDefaults);
+  let schema = new ObjectSchema(objectWithDefaults);
 
   let newConstructor = function (...args: any[]) {
     if (BUILD_FROM_POJO === true) {
@@ -60,13 +50,13 @@ export function data<T extends Object>(c: { new(...args: any[]): T }) {
 
   const decorated = renameFunction(c.name, newConstructor);
   decorated.prototype = c.prototype;
-  decorated.schema = schema;
+  decorated[SCHEMA_SYMBOL] = schema;
   return decorated;
 }
 
 let BUILD_FROM_POJO = false;
 
-export function build<T>(c: { new(...args: any[]): T }, values: object): T {
+export function build<T>(c: Constructor<T>, values: object): T {
   try {
     BUILD_FROM_POJO = true;
     return new c(values);
@@ -75,8 +65,8 @@ export function build<T>(c: { new(...args: any[]): T }, values: object): T {
   }
 }
 
-export class RecordSchema<T> extends BaseSchema<any, T> {
-  constructor(private readonly c: { new(...args: any[]): T }) {
+export class DataSchema<T> extends BaseSchema<any, T> {
+  constructor(private readonly c: Constructor<T>) {
     super();
   }
 

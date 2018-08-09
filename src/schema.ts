@@ -1,5 +1,5 @@
-import {DelegatingSchema} from "./impl/index";
-import {RecordSchema} from "./data";
+import {DelegatingSchema} from "./impl";
+import {DataSchema} from "./data";
 import {ObjectSchema} from "./impl/obj";
 import {EqualsSchema} from "./impl/eq";
 import {InSchema} from "./impl/isin";
@@ -7,7 +7,7 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, detectDiscriminator} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor, detectDiscriminator} from "./impl/util";
 
 export type ValidationResult = Problems | any;
 
@@ -25,20 +25,20 @@ export function __<IN, OUT, FAKED extends OUT>(s: Schema<IN, OUT>): FAKED {
   return s.__();
 }
 
-export function isdata<T>(constructor: { new(...args: any[]): T }): Schema<any, T> {
-  return new RecordSchema(constructor);
+export function isdata<T>(constructor: Constructor<T>): Schema<any, T> {
+  return new DataSchema(constructor);
 }
 
 export function eq<T>(value: T): Schema<any, T> {
   return new EqualsSchema(value);
 }
 
-export function discriminated<T>(...ctors: { new(...args: any[]): T }[]): Schema<object, T> {
+export function discriminated<T>(...ctors: Constructor<T>[]): Schema<object, T> {
   return discriminatedby(detectDiscriminator(ctors), ctors);
 }
 
 export function discriminatedby<T>(discriminator: keyof T,
-                                   ctors: { new(...args: any[]): T }[],): Schema<object, T> {
+                                   ctors: Constructor<T>[],): Schema<object, T> {
   return new DiscriminatedUnionSchema<T>(ctors, discriminator);
 }
 
@@ -88,17 +88,26 @@ export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
   switch (typeof x) {
     case "function":
       return predicate(x as (x: any) => boolean);
+
     case "string":
     case "number":
     case "boolean":
       return eq(x)  as any as Schema<IN, OUT>;
+
     case "object":
       let obj = (x as object);
+
       if ('conform' in obj && typeof x['conform'] === "function")
         return x as Schema<IN, OUT>;
-      else
+
+      else if(Object.getPrototypeOf(x) === Object.prototype)
         return new ObjectSchema(obj) as any as Schema<IN, OUT>;
+
+      else
+        throw Error(`Cannot build schema from non-plain object ${Object.getPrototypeOf(x).name}`);
+
     default:
-      throw Error(`Cannot build schema from ${x}`);
+      throw Error(`Cannot build schema from ${typeof x}: ${x}`);
   }
 }
+

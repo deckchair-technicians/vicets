@@ -1,14 +1,14 @@
 import {isError, Problems, Schema, schematize, ValidationResult} from "../";
 import {BaseSchema} from "./index";
+import {failure} from "../problems";
 
 export class ObjectSchema extends BaseSchema<object, object> {
-  public readonly schemas: { [k: string]: Schema<any, any> };
+  public readonly schemas: Map<string,Schema<any, any>> = new Map<string, Schema<any, any>>();
 
   constructor(object: object) {
     super();
-    this.schemas = {};
     for (const k in object) {
-      this.schemas[k] = schematize(object[k]);
+      this.schemas.set(k, schematize(object[k]));
     }
   }
 
@@ -16,8 +16,18 @@ export class ObjectSchema extends BaseSchema<object, object> {
     const result = {};
     let problems = new Problems([]);
 
-    for (let k in this.schemas) {
-      const s: Schema<any, any> = this.schemas[k];
+    if(value === undefined || value === null)
+      return failure('no value');
+
+    if(typeof value !== 'object')
+      return failure(`expected an object but got ${typeof value}`);
+
+    for (const [k,s] of this.schemas.entries()) {
+      if(!(k in value)){
+        problems = problems.merge(failure("No value", [k]));
+        continue;
+      }
+
       const v: ValidationResult = s.conform(value[k]);
       if (isError(v))
         problems = problems.merge((v as Problems).prefixPath([k]));
