@@ -74,6 +74,44 @@ describe('Defining fields in constructor', () => {
     expect(() => new ChildWithFieldsInConstructor(0, 1)).to.throw(Error);
   });
 
+
+
+  it('Should cope with nesting', () => {
+    expect(new HasNested(new Nested("valid"))).deep.equals({nested: {a: "valid"}});
+    expect(() => new HasNested()).to.throw(Error);
+
+    expect(build(HasNested, {nested: {a: "valid"}})).deep.equals({nested: {a: "valid"}});
+    expect(() => build(HasNested, {nested: {a: "not valid"}})).to.throw(Error);
+  });
+  it('Should support union types', () => {
+    expect(new Union(1, "also valid")).deep.equals({union: 1, single: "also valid"});
+    expect(() => new Union(2, "valid")).to.throw(Error);
+    expect(() => new Union(1, "not valid")).to.throw(Error);
+
+    expect(build(Union, {union: 1, single: "also valid"})).deep.equals({union: 1, single: "also valid"});
+    expect(build(Union, {union: "valid", single: "valid"})).deep.equals({union: "valid", single: "valid"});
+    expect(() => build(Union, {union: "not valid", single: "valid"})).to.throw(Error);
+    expect(() => build(Union, {union: "valid", single: "not valid"})).to.throw(Error);
+  });
+  xit('should support custom constructors(?)', () => {
+  });
+  xit('should complain if subclasses redefine fields', () => {
+  });
+  xit('should provide indication of field requirements if a field is missing', () => {
+  });
+  xit('should support optional fields', () => {
+  });
+  xit('missing fields', () => {
+  });
+  xit('additional fields', () => {
+  });
+  xit('nice error message for fields missing schema', () => {
+  });
+  xit('should support adding additional methods', () => {
+  });
+});
+
+describe('', ()=>{
   it('Should apply schema when constructing', () => {
     expect(build(Test,
       {
