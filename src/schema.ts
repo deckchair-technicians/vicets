@@ -7,7 +7,8 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor, detectDiscriminator} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor} from "./impl/util";
+import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 
 export type ValidationResult = Problems | any;
 
@@ -34,11 +35,11 @@ export function eq<T>(value: T): Schema<any, T> {
 }
 
 export function discriminated<T>(...ctors: Constructor<T>[]): Schema<object, T> {
-  return discriminatedby(detectDiscriminator(ctors), ctors);
+  return discriminatedBy(detectDiscriminator(ctors), ...ctors);
 }
 
-export function discriminatedby<T>(discriminator: keyof T,
-                                   ctors: Constructor<T>[],): Schema<object, T> {
+export function discriminatedBy<T>(discriminator: keyof T,
+                                   ...ctors: Constructor<T>[]): Schema<object, T> {
   return new DiscriminatedUnionSchema<T>(ctors, discriminator);
 }
 

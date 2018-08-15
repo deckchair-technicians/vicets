@@ -8,7 +8,7 @@ export class EqualsSchema<T> extends BaseSchema<any, T> {
 
   conform(value: any): Problems | T {
     if (value !== this.expected)
-      return failure(`expected ${this.expected} but got ${value}`);
+      return failure(`expected '${this.expected}' but got '${value}'`);
     return value;
   }
 

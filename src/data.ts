@@ -2,7 +2,8 @@ import {Problems} from "./";
 import {BaseSchema} from "./impl";
 import {ObjectSchema} from "./impl/obj";
 import {Constructor, renameFunction} from "./impl/util";
-import {ValidationError} from "./problems";
+import {failure, ValidationError} from "./problems";
+import {schema, Schema} from "./schema";
 
 let VALIDATE = true;
 
@@ -17,6 +18,16 @@ function suspendValidation<T>(f: () => T): T {
 
 
 export const SCHEMA_SYMBOL = Symbol('schema');
+
+export function extractSchema<T>(ctor: Constructor<T>): ObjectSchema {
+  if (!(SCHEMA_SYMBOL in ctor))
+    throw new Error(`No 'schema' on ${ctor.name}- not annotated with @data?`);
+  return ctor[SCHEMA_SYMBOL];
+}
+
+export function fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
+  return Array.from(extractSchema(ctor).fieldSchemas.entries());
+}
 
 export function data<T extends Object>(c: Constructor<T>) {
   let objectWithDefaults = suspendValidation(() => new c());
@@ -72,9 +83,10 @@ export class DataSchema<T> extends BaseSchema<any, T> {
 
   conform(value: any): Problems | T {
     if (value instanceof this.c) return value;
+    if (typeof value !== 'object') return failure(`Expected an object but got a ${typeof value}`);
 
     try {
-      return new this.c(value);
+      return build(this.c, value);
     } catch (e) {
       if (e instanceof ValidationError) {
         return e.problems;
@@ -84,3 +96,4 @@ export class DataSchema<T> extends BaseSchema<any, T> {
   }
 
 }
+

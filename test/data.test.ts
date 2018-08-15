@@ -29,21 +29,6 @@ class Child extends Parent {
 }
 
 @data
-class FieldsInConstructor {
-  constructor(public field: number = __(eq(1))) {
-  }
-}
-
-@data
-class ChildWithFieldsInConstructor extends FieldsInConstructor {
-  constructor(public childField: number = __(eq(1)),
-              field: number) {
-
-    super(field);
-  }
-}
-
-@data
 class Nested {
   constructor(public a: string = __(eq("valid"))) {
   }
@@ -64,34 +49,26 @@ class Union {
   }
 }
 
-@data
-class DiscriminatedUnion1 {
-  discriminator = 1;
-}
+describe('Defining fields in constructor', () => {
+  @data
+  class FieldsInConstructor {
+    constructor(public field: number = __(eq(1))) {
+    }
+  }
 
-@data
-class DiscriminatedUnion2 {
-  discriminator = 2
-}
-
-@data
-class DiscriminatedUnion3 {
-  discriminator = 3
-}
-
-type DiscriminatedUnion = DiscriminatedUnion1 | DiscriminatedUnion2 | DiscriminatedUnion3
-
-@data
-class HasDiscriminatedUnionField {
-  field: DiscriminatedUnion = discriminated(DiscriminatedUnion1, DiscriminatedUnion2, DiscriminatedUnion3).__()
-}
-
-
-describe('data', () => {
   it('Should allow fields to be defined in the constructor', () => {
     expect(new FieldsInConstructor(1)).deep.equals({field: 1});
-    expect(() => new FieldsInConstructor(0)).to.throw(Error);
+    expect(() => new FieldsInConstructor(0)).to.throw();
   });
+
+  @data
+  class ChildWithFieldsInConstructor extends FieldsInConstructor {
+    constructor(public childField: number = __(eq(1)),
+                field: number) {
+
+      super(field);
+    }
+  }
 
   it('Should allow fields to be defined in the constructor, and work with inheritance', () => {
     expect(build(ChildWithFieldsInConstructor, {childField: 1, field: 1}),
@@ -137,48 +114,6 @@ describe('data', () => {
 
     expect(build(Child, {parentField: 1, childField: 1})).deep.equals({parentField: 1, childField: 1});
     expect(() => build(Child, {parentField: 0, childField: 0})).to.throw(Error);
-  });
-
-  it('Should cope with nesting', () => {
-    expect(new HasNested(new Nested("valid"))).deep.equals({nested: {a: "valid"}});
-    expect(() => new HasNested()).to.throw(Error);
-
-    expect(build(HasNested, {nested: {a: "valid"}})).deep.equals({nested: {a: "valid"}});
-    expect(() => build(HasNested, {nested: {a: "not valid"}})).to.throw(Error);
-  });
-  it('Should support union types', () => {
-    expect(new Union(1, "also valid")).deep.equals({union: 1, single: "also valid"});
-    expect(() => new Union(2, "valid")).to.throw(Error);
-    expect(() => new Union(1, "not valid")).to.throw(Error);
-
-    expect(build(Union, {union: 1, single: "also valid"})).deep.equals({union: 1, single: "also valid"});
-    expect(build(Union, {union: "valid", single: "valid"})).deep.equals({union: "valid", single: "valid"});
-    expect(() => build(Union, {union: "not valid", single: "valid"})).to.throw(Error);
-    expect(() => build(Union, {union: "valid", single: "not valid"})).to.throw(Error);
-  });
-  it('should support discriminated unions', () => {
-    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 1}})).deep.equals({field: {discriminator: 1}});
-    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 1}})).deep.equals({field: {discriminator: 1}});
-
-    expect(build(HasDiscriminatedUnionField, {field: {discriminator: 2}}).field).instanceOf(DiscriminatedUnion2);
-
-    expect(isdata(HasDiscriminatedUnionField).conform({field: {discriminator: 4}})).deep.equals({
-      problems: [
-        {
-          message: "expected one of [1, 2, 3]",
-          path: [
-            "field",
-            "discriminator"
-          ]
-        }
-      ]
-    });
-  });
-  xit('should complain if subclasses redefine fields', () => {
-  });
-  xit('should support optional fields', () => {
-  });
-  xit('should support adding additional methods', () => {
   });
 });
 

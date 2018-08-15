@@ -3,12 +3,12 @@ import {BaseSchema} from "./index";
 import {failure} from "../problems";
 
 export class ObjectSchema extends BaseSchema<object, object> {
-  public readonly schemas: Map<string,Schema<any, any>> = new Map<string, Schema<any, any>>();
+  public readonly fieldSchemas: Map<string,Schema<any, any>> = new Map<string, Schema<any, any>>();
 
   constructor(object: object) {
     super();
     for (const k in object) {
-      this.schemas.set(k, schematize(object[k]));
+      this.fieldSchemas.set(k, schematize(object[k]));
     }
   }
 
@@ -22,7 +22,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
     if(typeof value !== 'object')
       return failure(`expected an object but got ${typeof value}`);
 
-    for (const [k,s] of this.schemas.entries()) {
+    for (const [k,s] of this.fieldSchemas.entries()) {
       if(!(k in value)){
         problems = problems.merge(failure("No value", [k]));
         continue;
@@ -41,6 +41,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
   }
 
   toString(): string {
-    return this.schemas.toString();
+    return this.fieldSchemas.toString();
   }
 }
+
