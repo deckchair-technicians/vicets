@@ -7,16 +7,6 @@ class Test {
   coercedValue: number = __(schema((_) => 123));
 }
 
-// Schema and class are defined in the same place
-// No decorators
-// Schema can be separated from the class, and created without a class
-// Type checking between field types and schema output
-// Cannot create a class in an invalid state without putting some effort in (class stands in for validity)
-
-
-// Generate OpenAPI/json schema
-// Generate test data
-// Figure out how to cleanly have schema with dependencies
 
 @data
 class Parent {
