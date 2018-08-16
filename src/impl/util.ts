@@ -1,5 +1,3 @@
-import {BaseSchema} from "./index";
-
 export function buildPredicateMessageFunction(message: ((value: any) => string) | string | undefined, predicate: (x: any) => boolean): (value: any) => string {
   switch (typeof  message) {
     case 'string':
@@ -17,10 +15,6 @@ export type PrimitiveValue = string | number | boolean;
 
 export function isPrimitive(value: any): boolean {
   return (typeof value !== 'object' && typeof value !== 'function') || value === null
-}
-
-export function isSchema(value: any): boolean {
-  return value instanceof BaseSchema;
 }
 
 export function renameFunction(name: string, fn: (...args: any[]) => any) {

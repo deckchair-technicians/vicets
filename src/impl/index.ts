@@ -1,6 +1,6 @@
-import {isSuccess, Problems, Schema} from "../";
-import {failure} from "../problems";
+import {failure, isSuccess, Problems} from "../problems";
 import {typeDescription} from "./util";
+import {Schema} from "../schema";
 
 export abstract class BaseSchema<IN=any, OUT=any> implements Schema<IN, OUT> {
   or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
@@ -82,4 +82,8 @@ export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
   conform(value: IN): Problems | OUT {
     return this.delegatedConform(value);
   }
+}
+
+export function isSchema(value: any): boolean {
+  return value instanceof BaseSchema;
 }

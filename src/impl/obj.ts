@@ -1,6 +1,7 @@
-import {isError, Problems, Schema, schematize, ValidationResult} from "../";
 import {BaseSchema} from "./index";
-import {failure} from "../problems";
+import {failure, isError, Problems, ValidationResult} from "../problems";
+import {Schema} from "../schema";
+import {typeDescription} from "./util";
 
 export class ObjectSchema extends BaseSchema<object, object> {
   public readonly fieldSchemas: Map<string,Schema<any, any>> = new Map<string, Schema<any, any>>();
@@ -8,7 +9,11 @@ export class ObjectSchema extends BaseSchema<object, object> {
   constructor(object: object) {
     super();
     for (const k in object) {
-      this.fieldSchemas.set(k, schematize(object[k]));
+      let s = object[k];
+      if(!('conform' in s))
+        throw new Error(`${k} was a ${typeDescription(s)}. Expected a schema`);
+
+      this.fieldSchemas.set(k, s);
     }
   }
 

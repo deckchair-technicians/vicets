@@ -1,8 +1,6 @@
 import {StringSchema} from "./index";
-import {Problems} from "../";
-import {failure} from "../problems";
-
-const validator = require("validator");
+import {failure, Problems} from "../problems";
+import validator from "validator";
 
 export interface IsURLOptions {
   protocols?: string[];

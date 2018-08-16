@@ -65,3 +65,5 @@ export class ValidationError extends Error {
     super(`Validation failed:${os.EOL}${problems}`);
   }
 }
+
+export type ValidationResult = Problems | any;

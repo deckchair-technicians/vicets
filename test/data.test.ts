@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, discriminated, eq, isdata, schema, build, data} from "../src";
+import {__, eq, isdata, schema, build, data} from "../";
 
 @data
 class Test {

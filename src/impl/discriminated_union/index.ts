@@ -1,9 +1,9 @@
-import {Problems} from "../../index";
 import {Constructor, mapValues, PrimitiveValue} from "../util";
 import {BaseSchema} from "../index";
-import {failure} from "../../problems";
-import {isdata, Schema} from "../../schema";
+import {failure, Problems} from "../../problems";
+import {isdata} from "../../schemas";
 import {discriminatorReports} from "./find_discriminators";
+import {Schema} from "../../schema";
 
 export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
   private readonly discriminator: keyof T;

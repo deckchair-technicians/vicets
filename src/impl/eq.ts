@@ -1,4 +1,4 @@
-import {failure, Problems} from "../";
+import {failure, Problems} from "../problems";
 import {BaseSchema} from "./index";
 import {typeDescription} from "./util";
 

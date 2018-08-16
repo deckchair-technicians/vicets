@@ -1,9 +1,10 @@
-import {Problems} from "./";
-import {BaseSchema} from "./impl";
+import {Problems} from "../";
+import {BaseSchema, isSchema} from "./impl";
 import {ObjectSchema} from "./impl/obj";
-import {Constructor, isPrimitive, isSchema, renameFunction, typeDescription} from "./impl/util";
+import {Constructor, isPrimitive, renameFunction, typeDescription} from "./impl/util";
 import {failure, ValidationError} from "./problems";
-import {schema, Schema} from "./schema";
+import {object, schema} from "./schemas";
+import {Schema} from "./schema";
 
 let VALIDATE = true;
 
@@ -39,7 +40,7 @@ export function data<T extends Object>(c: Constructor<T>) {
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
 
-  let schema = new ObjectSchema(objectWithDefaults);
+  let schema = object(objectWithDefaults);
 
   let newConstructor = function (...args: any[]) {
     if (BUILD_FROM_POJO === true) {
