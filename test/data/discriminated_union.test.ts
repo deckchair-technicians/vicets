@@ -44,7 +44,7 @@ describe('discriminated unions', () => {
       .deep.equals({
       problems: [
         {
-          message: "expected 'valid value' but got 'not valid'",
+          message: "expected 'valid value' but got string: \"not valid\"",
           path: [
             "someOtherField"
           ]
@@ -139,7 +139,7 @@ describe('detecting discriminator fields', () => {
         .deep.equals({
         problems: [
           {
-            message: "expected '1' but got 'not valid'",
+            message: "expected '1' but got string: \"not valid\"",
             path: [
               "discriminator"
             ]
