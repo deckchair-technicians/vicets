@@ -60,7 +60,8 @@ export function failure(message: string, path: Path = []): Problems {
 }
 
 export class ValidationError extends Error {
-  constructor(public readonly problems: Problems) {
+  constructor(public readonly value: any,
+              public readonly problems: Problems) {
     super(`Validation failed:${os.EOL}${problems}`);
   }
 }

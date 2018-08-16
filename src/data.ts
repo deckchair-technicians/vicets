@@ -1,7 +1,7 @@
 import {Problems} from "./";
 import {BaseSchema} from "./impl";
 import {ObjectSchema} from "./impl/obj";
-import {Constructor, renameFunction} from "./impl/util";
+import {Constructor, isPrimitive, isSchema, renameFunction, typeDescription} from "./impl/util";
 import {failure, ValidationError} from "./problems";
 import {schema, Schema} from "./schema";
 
@@ -30,7 +30,14 @@ export function fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>
 }
 
 export function data<T extends Object>(c: Constructor<T>) {
-  let objectWithDefaults = suspendValidation(() => new c());
+  // suspendValidation is required to allow calling parent constructor
+  let objectWithDefaults = suspendValidation(()=>new c());
+
+  for (let k of Object.keys(objectWithDefaults)) {
+    let v = objectWithDefaults[k];
+    if(!(isSchema(v) || isPrimitive(v)))
+      throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
+  }
 
   let schema = new ObjectSchema(objectWithDefaults);
 
@@ -39,19 +46,23 @@ export function data<T extends Object>(c: Constructor<T>) {
       let values = args[0];
       let conformed = schema.conform(values);
       if (conformed instanceof Problems) {
-        throw new ValidationError(conformed);
+        throw new ValidationError(values, conformed);
       }
       for (let k in conformed) {
         this[k] = conformed[k];
       }
     } else {
       let instance = new c(...args);
-      if (VALIDATE === false) {
+      if(!VALIDATE)
         return instance;
+
+      for (let k of Object.keys(instance)) {
+        if(isSchema(instance[k]))
+          instance[k] = undefined;
       }
       let conformed = schema.conform(instance);
       if (conformed instanceof Problems) {
-        throw new ValidationError(conformed);
+        throw new ValidationError(instance, conformed);
       }
       for (let k in conformed) {
         this[k] = conformed[k];

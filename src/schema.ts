@@ -7,12 +7,12 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 
 export type ValidationResult = Problems | any;
 
-export interface Schema<IN, OUT> {
+export interface Schema<IN=any, OUT=any> {
   conform(this: this, value: IN): Problems | OUT
 
   and<NEWOUT>(this: this, s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT>
@@ -46,7 +46,7 @@ export function discriminatedBy<T>(discriminator: keyof T,
 export function isstring(): Schema<any, string> {
   return predicate<any>(
     (x) => x instanceof String || typeof x === "string",
-    (x) => `expected a string but got ${x}`);
+    (x) => `expected a string but got ${typeDescription(x)}`);
 }
 
 export function matches(r: RegExp): Schema<any, string> {

@@ -48,7 +48,13 @@ describe('Defining fields in constructor', () => {
 
   it('Should allow fields to be defined in the constructor', () => {
     expect(new FieldsInConstructor(1)).deep.equals({field: 1});
-    expect(() => new FieldsInConstructor(0)).to.throw();
+    expect(() => new FieldsInConstructor(0)).to.throw(/expected '1'/);
+  });
+
+  it('Does not keep constructor defaults if not overridden in constructor arguments', () => {
+    // Without removing field values that are schemas, this would be complaining that field
+    // is an EqualsSchema
+    expect(() => new FieldsInConstructor()).to.throw(/expected '1' but got undefined/);
   });
 
   @data
@@ -108,6 +114,8 @@ describe('Defining fields in constructor', () => {
   xit('nice error message for fields missing schema', () => {
   });
   xit('should support adding additional methods', () => {
+  });
+  xit('supports recursion', () => {
   });
 });
 

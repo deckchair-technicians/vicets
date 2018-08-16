@@ -1,7 +1,8 @@
 import {isSuccess, Problems, Schema} from "../";
 import {failure} from "../problems";
+import {typeDescription} from "./util";
 
-export abstract class BaseSchema<IN, OUT> implements Schema<IN, OUT> {
+export abstract class BaseSchema<IN=any, OUT=any> implements Schema<IN, OUT> {
   or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
     return new OrSchema(this, s)
   }
@@ -57,7 +58,7 @@ export abstract class StringSchema extends BaseSchema<any, string> {
   conform(value: any): Problems | string {
     if (typeof value === 'string' || value instanceof String)
       return this.conformString(value as string);
-    return failure('expected a string');
+    return failure(`expected a string but got ${typeDescription(value)}`);
   }
 
   abstract conformString(value: string): Problems | string;
