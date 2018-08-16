@@ -13,7 +13,7 @@ import {
   schema,
   Schema,
   schematize
-} from "../src/";
+} from "../";
 import {fail} from "assert";
 import {ObjectSchema} from "../src/impl/obj";
 import {EqualsSchema} from "../src/impl/eq";

@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --require ts-node/register test/**/*.test.ts"
+    "test": "./node_modules/.bin/mocha --require ts-node/register \"test/**/*.test.ts\""
   },
   "homepage": "https://github.com/deckchair-technicians/vicets",
   "bugs": { "url" : "https://github.com/deckchair-technicians/vicets/issues"},

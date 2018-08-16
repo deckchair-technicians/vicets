@@ -65,5 +65,7 @@ typings/
 # Compiled typescript
 dist/
 
+scratch/
+
 .idea/
 *.iml
