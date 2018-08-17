@@ -86,7 +86,7 @@ describe('discriminated unions', () => {
   })
 });
 
-describe('detecting discriminator fields', () => {
+describe('Detecting discriminator fields', () => {
   @data
   class Duplicate_Value_A {
     type = 1;
@@ -98,7 +98,7 @@ describe('detecting discriminator fields', () => {
     type = 1
   }
 
-  it('nice error messages for failed discriminator fields', () => {
+  it('shows nice error messages for failed discriminator fields', () => {
 
     expect(() => discriminated(Duplicate_Value_A, Duplicate_Value_B))
       .to.throw(/.*type: value '1' is repeated in: Duplicate_Value_A, Duplicate_Value_B/);
@@ -107,34 +107,34 @@ describe('detecting discriminator fields', () => {
       .to.throw(/notInAllClasses: field is not present in all classes/);
   });
 
-  @data
-  class MultipleDiscriminators_A {
-    type = 1;
-    discriminator = 1;
-  }
+  describe('Multiple possible discriminators', () => {
+    @data
+    class MultipleDiscriminators_A {
+      type = 1;
+      discriminator = 1;
+    }
 
-  @data
-  class MultipleDiscriminators_B {
-    type = 2;
-    discriminator = 2;
-  }
+    @data
+    class MultipleDiscriminators_B {
+      type = 2;
+      discriminator = 2;
+    }
 
-  it('nice error message when multiple discriminators are found', () => {
-    expect(() => discriminated(MultipleDiscriminators_A, MultipleDiscriminators_B))
-      .to.throw('Multiple possible discriminator fields: [type, discriminator]');
-  });
+    it('shows nice error message when multiple discriminators are found', () => {
+      expect(() => discriminated(MultipleDiscriminators_A, MultipleDiscriminators_B))
+        .to.throw('Multiple possible discriminator fields: [type, discriminator]');
+    });
 
-  describe('allows disambiguating discriminator using discriminatedBy', () => {
     const explicitlyDiscriminated = discriminatedBy("type", MultipleDiscriminators_A, MultipleDiscriminators_B);
 
-    it('works', ()=>{
+    it('can be disambiguated using discriminatedBy', ()=>{
       expect(explicitlyDiscriminated.conform({type: 1, discriminator: 1}))
         .deep.equals({type: 1, discriminator: 1}).instanceOf(MultipleDiscriminators_A);
 
       expect(explicitlyDiscriminated.conform({type: 2, discriminator: 2}))
         .deep.equals({type: 2, discriminator: 2}).instanceOf(MultipleDiscriminators_B);
     });
-    it('fails as expected', ()=>{
+    it('schema from discriminatedBy fails as expected', ()=>{
       expect(explicitlyDiscriminated.conform({type:1, discriminator: "not valid"}))
         .deep.equals({
         problems: [
