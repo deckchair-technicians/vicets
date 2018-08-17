@@ -48,9 +48,11 @@ export function first<T>(coll:Iterable<T>) : T | undefined{
 }
 
 export function typeDescription(x: any): string {
-  const t = typeof x;
-  if (t !== 'object')
-    return t;
+  if(x===null)
+    return 'null';
+
+  let t = typeof x;
+  if(t!=='object')return t;
 
   const p = Object.getPrototypeOf(x);
   if (p !== Object.prototype)
