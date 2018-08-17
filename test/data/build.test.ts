@@ -2,7 +2,7 @@ import {expect} from "chai";
 import {__, build, data, eq, isdata} from "../../index";
 
 
-describe('@data decorator', () => {
+describe('Using build() on @data classes', () => {
   describe('Inheritance', () => {
     @data
     class Parent {
