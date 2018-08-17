@@ -25,7 +25,7 @@ describe('@data decorator', () => {
       expect(() => build(Child, {childField: "some bad value", parentField: "valid"})).to.throw(/some bad value/);
     });
   });
-  describe('nesting', () => {
+  describe('Nesting', () => {
     @data
     class Nested {
       a: string = __(eq("valid"));

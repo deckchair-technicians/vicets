@@ -1,7 +1,7 @@
 import {__, build, data, discriminated, discriminatedBy, eq, isdata} from "../../";
 import {expect} from "chai";
 
-describe('discriminated unions', () => {
+describe('discriminated', () => {
   @data
   class DiscriminatedUnion1 {
     discriminator = 1;
@@ -84,57 +84,65 @@ describe('discriminated unions', () => {
       ]
     });
   })
-});
 
-describe('Detecting discriminator fields', () => {
-  @data
-  class Duplicate_Value_A {
-    type = 1;
-    notInAllClasses = 1;
-  }
-
-  @data
-  class Duplicate_Value_B {
-    type = 1
-  }
-
-  it('shows nice error messages for failed discriminator fields', () => {
-
-    expect(() => discriminated(Duplicate_Value_A, Duplicate_Value_B))
-      .to.throw(/.*type: value '1' is repeated in: Duplicate_Value_A, Duplicate_Value_B/);
-
-    expect(() => discriminated(Duplicate_Value_A, Duplicate_Value_B))
-      .to.throw(/notInAllClasses: field is not present in all classes/);
-  });
-
-  describe('Multiple possible discriminators', () => {
+  describe('Detecting discriminator fields', () => {
     @data
-    class MultipleDiscriminators_A {
+    class Duplicate_Value_A {
       type = 1;
-      discriminator = 1;
+      notInAllClasses = 1;
     }
 
     @data
-    class MultipleDiscriminators_B {
-      type = 2;
-      discriminator = 2;
+    class Duplicate_Value_B {
+      type = 1
     }
 
+    it('shows nice error messages for failed discriminator fields', () => {
+
+      expect(() => discriminated(Duplicate_Value_A, Duplicate_Value_B))
+        .to.throw(/.*type: value '1' is repeated in: Duplicate_Value_A, Duplicate_Value_B/);
+
+      expect(() => discriminated(Duplicate_Value_A, Duplicate_Value_B))
+        .to.throw(/notInAllClasses: field is not present in all classes/);
+    });
+  })
+});
+describe('discriminatedBy', () => {
+  @data
+  class MultipleDiscriminators_A {
+    type = 1;
+    discriminator = 1;
+  }
+
+  @data
+  class MultipleDiscriminators_B {
+    type = 2;
+    discriminator = 2;
+  }
+
+  describe('Using discriminated() on classes with ambiguous discriminators', ()=>{
     it('shows nice error message when multiple discriminators are found', () => {
       expect(() => discriminated(MultipleDiscriminators_A, MultipleDiscriminators_B))
         .to.throw('Multiple possible discriminator fields: [type, discriminator]');
     });
+  });
 
+  describe('Using discriminatedBy', ()=>{
     const explicitlyDiscriminated = discriminatedBy("type", MultipleDiscriminators_A, MultipleDiscriminators_B);
 
-    it('can be disambiguated using discriminatedBy', ()=>{
+    it('allows selecting discriminator field', ()=>{
       expect(explicitlyDiscriminated.conform({type: 1, discriminator: 1}))
         .deep.equals({type: 1, discriminator: 1}).instanceOf(MultipleDiscriminators_A);
 
       expect(explicitlyDiscriminated.conform({type: 2, discriminator: 2}))
         .deep.equals({type: 2, discriminator: 2}).instanceOf(MultipleDiscriminators_B);
     });
-    it('schema from discriminatedBy fails as expected', ()=>{
+    it('produces a useful error message if field does not exist', ()=>{
+      expect(()=>discriminatedBy("notOnClasses" as keyof MultipleDiscriminators_A, MultipleDiscriminators_A))
+        .to.throw(/notOnClasses/)
+
+    });
+    it('schema fails as expected', ()=>{
       expect(explicitlyDiscriminated.conform({type:1, discriminator: "not valid"}))
         .deep.equals({
         problems: [
