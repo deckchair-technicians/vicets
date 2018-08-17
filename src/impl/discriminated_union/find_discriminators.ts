@@ -5,9 +5,19 @@ import {Schema} from "../../schema";
 import {extractSchema} from "../../data";
 
 class CandidateDiscriminators<T> {
-
   private readonly constructors: Constructor<T>[] = [];
   private readonly fields = new Map<keyof T, Map<PrimitiveValue, Constructor<T>[]>>();
+
+  constructor(ctors: Constructor<T>[]) {
+    this.constructors = [...ctors];
+    for (let ctor of this.constructors) {
+      for (let [fieldName, value] of CandidateDiscriminators.fieldsWithPrimitiveEquals(ctor)) {
+        const result = this.fields.get(fieldName) || new Map();
+        result.set(value, (result.get(value) || []).concat([ctor]));
+        this.fields.set(fieldName, result)
+      }
+    }
+  }
 
   keys() : IterableIterator<keyof T>{
     return this.fields.keys();
@@ -25,17 +35,6 @@ class CandidateDiscriminators<T> {
     }
     if (values.size !== this.constructors.length)
       return 'field is not present in all classes';
-  }
-
-  addConstructor(ctor: Constructor<T>): CandidateDiscriminators<T> {
-    this.constructors.push(ctor);
-    let fieldsWithPrimitiveEquals = CandidateDiscriminators.fieldsWithPrimitiveEquals(ctor);
-    for (let [fieldName, value] of fieldsWithPrimitiveEquals) {
-      const result = this.fields.get(fieldName) || new Map();
-      result.set(value, (result.get(value) || []).concat([ctor]));
-      this.fields.set(fieldName, result)
-    }
-    return this;
   }
 
   private static fieldsWithPrimitiveEquals<T>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
@@ -85,10 +84,7 @@ export function detectDiscriminator<T>(ctors: Constructor<T>[]): keyof T {
 }
 
 export function discriminatorReports<T>(ctors: Constructor<T>[]): DiscriminatorReport<T> {
-  const candidates = new CandidateDiscriminators<T>();
-  for (let c of ctors) {
-    candidates.addConstructor(c);
-  }
+  const candidates = new CandidateDiscriminators<T>(ctors);
   const report = new DiscriminatorReport<T>();
   for (const k of candidates.keys()) {
     const problem = candidates.problemWithDiscriminator(k);
