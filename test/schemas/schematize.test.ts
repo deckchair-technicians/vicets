@@ -2,7 +2,9 @@ import "reflect-metadata";
 import {expect} from 'chai';
 import {fail} from "assert";
 
-import {eq, failure, Schema, schematize} from "../../";
+import {eq, schematize} from "../../src/schemas";
+import {Schema} from "../../src/schema";
+import {failure} from "../../src/problems";
 import {ObjectSchema} from "../../src/impl/obj";
 import {EqualsSchema} from "../../src/impl/eq";
 
