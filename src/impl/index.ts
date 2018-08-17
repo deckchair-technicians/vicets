@@ -3,15 +3,15 @@ import {typeDescription} from "./util";
 import {Schema} from "../schema";
 
 export abstract class BaseSchema<IN=any, OUT=any> implements Schema<IN, OUT> {
-  or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<NEWIN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
-    return new OrSchema(this, s)
+  or<NEWIN extends IN, NEWOUT>(s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
+    return new OrSchema<IN, OUT, NEWOUT>(this, s);
   }
 
-  and<NEWOUT>(this: this, s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT> {
+  and<NEWOUT>(s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT> {
     return new AndSchema(this, s)
   }
 
-  __<FAKED extends OUT>(this: this): FAKED {
+  __<FAKED extends OUT>(): FAKED {
     return this as any as FAKED;
   }
 
