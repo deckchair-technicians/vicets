@@ -1,91 +1,73 @@
-import {Problems} from "../";
 import {BaseSchema, isSchema} from "./impl";
 import {ObjectSchema} from "./impl/obj";
-import {Constructor, isPrimitive, renameFunction, typeDescription} from "./impl/util";
-import {failure, ValidationError} from "./problems";
+import {Constructor, entries, isPrimitive} from "./impl/util";
+import {failure, ValidationError, Problems} from "./problems";
 import {object, schema} from "./schemas";
-import {Schema} from "./schema";
 
-let VALIDATE = true;
+let BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
 
-function suspendValidation<T>(f: () => T): T {
+function buildSchemaUsingDefaultFieldValues<T>(f: () => T): T {
   try {
-    VALIDATE = false;
+    BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = true;
     return f();
   } finally {
-    VALIDATE = true;
+    BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
   }
 }
 
-
-export const SCHEMA_SYMBOL = Symbol('schema');
+const SCHEMA_SYMBOL = Symbol('schema');
 
 export function extractSchema<T>(ctor: Constructor<T>): ObjectSchema {
-  if (!(SCHEMA_SYMBOL in ctor))
-    throw new Error(`No 'schema' on ${ctor.name}- not annotated with @data?`);
-  return ctor[SCHEMA_SYMBOL];
+  let schema = Object.getOwnPropertyDescriptor(ctor, SCHEMA_SYMBOL);
+  if (schema === undefined)
+    throw new Error(`No schema on ${ctor.name}- not annotated with @data?`);
+  return schema.value;
 }
 
-export function fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
-  return Array.from(extractSchema(ctor).fieldSchemas.entries());
-}
+export function data<C extends { new(...args: any[]): any }>(c: C): C {
+  // buildSchemaUsingDefaultFieldValues is required to allow calling parent constructor
+  let objectWithDefaults = buildSchemaUsingDefaultFieldValues(() => new c());
 
-export function data<T extends Object>(c: Constructor<T>) {
-  // suspendValidation is required to allow calling parent constructor
-  let objectWithDefaults = suspendValidation(()=>new c());
-
-  for (let k of Object.keys(objectWithDefaults)) {
-    let v = objectWithDefaults[k];
-    if(!(isSchema(v) || isPrimitive(v)))
+  for (const [k,v] of entries(objectWithDefaults)) {
+    if (!(isSchema(v) || isPrimitive(v)))
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
 
-  let schema = object(objectWithDefaults);
+  let schema = object(objectWithDefaults) as ObjectSchema;
 
-  let newConstructor = function (...args: any[]) {
-    if (BUILD_FROM_POJO === true) {
-      let values = args[0];
-      let conformed = schema.conform(values);
-      if (conformed instanceof Problems) {
-        throw new ValidationError(values, conformed);
-      }
-      for (let k in conformed) {
-        this[k] = conformed[k];
-      }
-    } else {
-      let instance = new c(...args);
-      if(!VALIDATE)
-        return instance;
+  const hackClassName = {};
+  hackClassName[c.name] = class extends c {
+    constructor(...args: any[]) {
+      super(...args);
+      if (BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES)
+        return;
 
-      for (let k of Object.keys(instance)) {
-        if(isSchema(instance[k]))
-          instance[k] = undefined;
+      for (const [k,v] of entries(this)) {
+        if (isSchema(v))
+          this[k] = undefined;
       }
-      let conformed = schema.conform(instance);
+      let conformed = schema.conformInPlace(this);
       if (conformed instanceof Problems) {
-        throw new ValidationError(instance, conformed);
+        throw new ValidationError(this, conformed);
       }
-      for (let k in conformed) {
-        this[k] = conformed[k];
-      }
-    }
+    };
   };
 
-  const decorated = renameFunction(c.name, newConstructor);
-  decorated.prototype = c.prototype;
-  decorated[SCHEMA_SYMBOL] = schema;
+  const decorated = hackClassName[c.name];
+  Object.defineProperty(decorated, SCHEMA_SYMBOL, {value: schema, writable: false});
   return decorated;
 }
 
-let BUILD_FROM_POJO = false;
-
-export function build<T>(c: Constructor<T>, values: object): T {
-  try {
-    BUILD_FROM_POJO = true;
-    return new c(values);
-  } finally {
-    BUILD_FROM_POJO = false;
+export function build<T>(c: Constructor<T>, values: {}): T {
+  let s = extractSchema(c);
+  let conformed = s.conform(values);
+  if (conformed instanceof Problems) {
+    throw new ValidationError(values, conformed);
   }
+  // Skip the constructor
+  let instance = Object.create(c.prototype);
+  Object.assign(instance, conformed);
+  return instance;
 }
 
 export class DataSchema<T> extends BaseSchema<any, T> {

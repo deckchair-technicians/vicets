@@ -1,7 +1,8 @@
 import {Constructor, first, isPrimitive, mapKeyValue, PrimitiveValue, unsafeCast} from "../util";
-import {fieldSchemas} from "../../data";
 import {EqualsSchema} from "../eq";
 import * as os from "os";
+import {Schema} from "../../schema";
+import {extractSchema} from "../../data";
 
 class CandidateDiscriminators<T> {
 
@@ -38,12 +39,16 @@ class CandidateDiscriminators<T> {
   }
 
   private static fieldsWithPrimitiveEquals<T>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
-    let fieldSchemas2 = fieldSchemas(ctor);
-    return fieldSchemas2
+    return CandidateDiscriminators.fieldSchemas(ctor)
       .map(([field, schema]) => schema instanceof EqualsSchema && isPrimitive(schema.expected) ? [field, schema.expected] : undefined)
       .filter((x) => x)
       .map((x) => unsafeCast(x))
   }
+  private static fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
+    return Array.from(extractSchema(ctor).fieldSchemas.entries());
+  }
+
+
 }
 
 class DiscriminatorReport<T> {

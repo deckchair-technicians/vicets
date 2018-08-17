@@ -3,6 +3,25 @@ import {__, build, data, eq, isdata} from "../../index";
 
 
 describe('Using build() on @data classes', () => {
+  describe('Basics', () => {
+    @data
+    class A {
+      field: string = __(eq("valid"));
+    }
+
+    it('sets the right values', () => {
+      expect(build(A, {field: "valid"})).deep.equals({field: "valid"});
+    });
+    it('returns the right type', () => {
+      expect(build(A, {field: "valid"})).instanceOf(A);
+    });
+    it('has the right constructor name', () => {
+      expect(Object.getPrototypeOf(build(A, {field: "valid"})).constructor.name).equals('A');
+    });
+    it('returns errors', () => {
+      expect(() => build(A, {field: "some bad value"})).to.throw(/some bad value/);
+    });
+  });
   describe('Inheritance', () => {
     @data
     class Parent {
@@ -23,6 +42,12 @@ describe('Using build() on @data classes', () => {
     });
     it('returns errors from child schema', () => {
       expect(() => build(Child, {childField: "some bad value", parentField: "valid"})).to.throw(/some bad value/);
+    });
+  });
+  describe('Invalid inputs', () => {
+    it('gives useful exception when asked to build a non-@data class', () => {
+      class NotData{}
+      expect(()=>build(NotData, {})).to.throw(/No schema/);
     });
   });
   describe('Nesting', () => {

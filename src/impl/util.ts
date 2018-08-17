@@ -17,15 +17,6 @@ export function isPrimitive(value: any): boolean {
   return (typeof value !== 'object' && typeof value !== 'function') || value === null
 }
 
-export function renameFunction(name: string, fn: (...args: any[]) => any) {
-  // It seems like we should be able to
-  // Object.defineProperty("name" ...
-  // But in practise this doesn't seem to work- the debugger still lists the original name.
-  let function2 = new Function("return function (call) { return function " + name +
-    " () { return call(this, arguments) }; };");
-  return (function2())(Function.apply.bind(fn));
-}
-
 export type Constructor<T={}> =  new(...args: any[]) => T ;
 
 export function unsafeCast<T>(x: any): T {
@@ -66,4 +57,8 @@ export function typeDescription(x: any): string {
     return p.constructor.name;
 
   return t
+}
+
+export function entries(x:{}) : [string, any][] {
+  return Object.keys(x).map((k:string):[string,any]=>[k,x[k]]);
 }

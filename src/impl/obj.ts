@@ -18,31 +18,35 @@ export class ObjectSchema extends BaseSchema<object, object> {
   }
 
   conform(value: any): ValidationResult {
-    const result = {};
-    let problems = new Problems([]);
-
     if(value === undefined || value === null)
       return failure('no value');
 
     if(typeof value !== 'object')
       return failure(`expected an object but got ${typeof value}`);
 
+    const instance = {};
+    Object.assign(instance, value);
+    const problems = this.conformInPlace(instance);
+    return problems ? problems : instance;
+  }
+
+  conformInPlace(result: {}): Problems | undefined {
+    let problems = new Problems([]);
+
     for (const [k,s] of this.fieldSchemas.entries()) {
-      if(!(k in value)){
+      if(!(k in result)){
         problems = problems.merge(failure("No value", [k]));
         continue;
       }
 
-      const v: ValidationResult = s.conform(value[k]);
+      const v: ValidationResult = s.conform(result[k]);
       if (isError(v))
         problems = problems.merge((v as Problems).prefixPath([k]));
-      result[k] = v;
+      else
+        result[k] = v;
     }
 
-    if (problems.problems.length > 0)
-      return problems;
-
-    return result;
+    return problems.problems.length > 0 ? problems : undefined;
   }
 
   toString(): string {
