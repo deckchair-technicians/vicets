@@ -7,5 +7,5 @@ export interface Schema<IN=any, OUT=any> {
 
   or<NEWIN extends IN, NEWOUT>(this: this, s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT>
 
-  __<FAKED extends OUT>(this: this): FAKED
+  __(this: this): OUT
 }

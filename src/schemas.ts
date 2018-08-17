@@ -11,7 +11,7 @@ import {buildPredicateMessageFunction, Constructor, typeDescription} from "./imp
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
 
-export function __<IN, OUT, FAKED extends OUT>(s: Schema<IN, OUT>): FAKED {
+export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
 }
 
