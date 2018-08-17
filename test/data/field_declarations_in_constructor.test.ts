@@ -20,7 +20,7 @@ describe('Defining fields in constructor', () => {
     });
 
     it('has the right constructor name', () => {
-      let fieldsInConstructor = new FieldsInConstructor(1);
+      const fieldsInConstructor = new FieldsInConstructor(1);
       expect(Object.getPrototypeOf(fieldsInConstructor).constructor.name).equals('FieldsInConstructor');
     });
 

@@ -10,8 +10,8 @@ class CandidateDiscriminators<T> {
 
   constructor(ctors: Constructor<T>[]) {
     this.constructors = [...ctors];
-    for (let ctor of this.constructors) {
-      for (let [fieldName, value] of CandidateDiscriminators.fieldsWithPrimitiveEquals(ctor)) {
+    for (const ctor of this.constructors) {
+      for (const [fieldName, value] of CandidateDiscriminators.fieldsWithPrimitiveEquals(ctor)) {
         const result = this.fields.get(fieldName) || new Map();
         result.set(value, (result.get(value) || []).concat([ctor]));
         this.fields.set(fieldName, result)
@@ -29,7 +29,7 @@ class CandidateDiscriminators<T> {
 
   problemWithDiscriminator(field: keyof T): string | undefined {
     const values = this.fields.get(field)!;
-    for (let [value, ctors] of values) {
+    for (const [value, ctors] of values) {
       if (ctors.length > 1)
         return `value '${value}' is repeated in: ${ctors.map((c) => c.name).join(", ")}`;
     }
@@ -74,12 +74,12 @@ export function detectDiscriminator<T>(ctors: Constructor<T>[]): keyof T {
   if (report.validFields.size === 0 && report.problems.size === 0)
     throw new Error(`No discriminator fields found in: [${ctors.map((c) => c.name).join(', ')}]`);
 
-  let k = first(report.validFields.keys());
+  const k = first(report.validFields.keys());
   if (k !== undefined) {
     return k;
   }
 
-  let listOfFieldProblems = Array.from(report.problems.entries()).map(([k,problem]) => `${k}: ${problem}`);
+  const listOfFieldProblems = Array.from(report.problems.entries()).map(([k,problem]) => `${k}: ${problem}`);
   throw new Error(`No discriminator field found. Considered:${os.EOL}${listOfFieldProblems.join(os.EOL)}`);
 }
 

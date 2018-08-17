@@ -9,7 +9,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
   constructor(object: object) {
     super();
     for (const k in object) {
-      let s = object[k];
+      const s = object[k];
       if(!('conform' in s))
         throw new Error(`${k} was a ${typeDescription(s)}. Expected a schema`);
 

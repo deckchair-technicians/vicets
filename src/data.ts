@@ -18,7 +18,7 @@ function buildSchemaUsingDefaultFieldValues<T>(f: () => T): T {
 const SCHEMA_SYMBOL = Symbol('schema');
 
 export function extractSchema<T>(ctor: Constructor<T>): ObjectSchema {
-  let schema = Object.getOwnPropertyDescriptor(ctor, SCHEMA_SYMBOL);
+  const schema = Object.getOwnPropertyDescriptor(ctor, SCHEMA_SYMBOL);
   if (schema === undefined)
     throw new Error(`No schema on ${ctor.name}- not annotated with @data?`);
   return schema.value;
@@ -26,14 +26,14 @@ export function extractSchema<T>(ctor: Constructor<T>): ObjectSchema {
 
 export function data<C extends { new(...args: any[]): any }>(c: C): C {
   // buildSchemaUsingDefaultFieldValues is required to allow calling parent constructor
-  let objectWithDefaults = buildSchemaUsingDefaultFieldValues(() => new c());
+  const objectWithDefaults = buildSchemaUsingDefaultFieldValues(() => new c());
 
   for (const [k,v] of entries(objectWithDefaults)) {
     if (!(isSchema(v) || isPrimitive(v)))
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
 
-  let schema = object(objectWithDefaults) as ObjectSchema;
+  const schema = object(objectWithDefaults) as ObjectSchema;
 
   const hackClassName = {};
   hackClassName[c.name] = class extends c {
@@ -46,7 +46,7 @@ export function data<C extends { new(...args: any[]): any }>(c: C): C {
         if (isSchema(v))
           this[k] = undefined;
       }
-      let conformed = schema.conformInPlace(this);
+      const conformed = schema.conformInPlace(this);
       if (conformed instanceof Problems) {
         throw new ValidationError(this, conformed);
       }
@@ -59,15 +59,12 @@ export function data<C extends { new(...args: any[]): any }>(c: C): C {
 }
 
 export function build<T>(c: Constructor<T>, values: {}): T {
-  let s = extractSchema(c);
-  let conformed = s.conform(values);
+  const conformed = extractSchema(c).conform(values);
   if (conformed instanceof Problems) {
     throw new ValidationError(values, conformed);
   }
   // Skip the constructor
-  let instance = Object.create(c.prototype);
-  Object.assign(instance, conformed);
-  return instance;
+  return Object.assign(Object.create(c.prototype), conformed);
 }
 
 export class DataSchema<T> extends BaseSchema<any, T> {

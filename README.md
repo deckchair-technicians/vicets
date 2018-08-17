@@ -27,6 +27,7 @@
 * ...
 * Async schema
 * Seal and freeze data?
+* Easy override of failure messages
 
 ## Version > 1.0
 

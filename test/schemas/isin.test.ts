@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {isin, Schema} from "../../";
 
 describe('isin', () => {
-  let s :Schema<any,string>= isin('a', 'b', 'c');
+  const s :Schema<any,string>= isin('a', 'b', 'c');
   it('passes through valid values', ()=>{
     expect(s.conform("a")).to.equal('a');
     expect(s.conform("b")).to.equal('b');

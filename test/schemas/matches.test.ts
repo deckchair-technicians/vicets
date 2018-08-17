@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {matches, Schema} from "../../index";
 
 describe('matches', () => {
-  let s :Schema<any,string>= matches(/.*abc.*/);
+  const s :Schema<any,string>= matches(/.*abc.*/);
   it('passes through valid values', ()=>{
     expect(s.conform("123abc456")).to.equal('123abc456');
     expect(s.conform("abcabc")).to.equal('abcabc');

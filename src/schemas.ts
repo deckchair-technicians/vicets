@@ -7,7 +7,7 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor, typeDescription} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor, entries, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
 
@@ -58,8 +58,8 @@ export function isurl(opts?: IsURLOptions): Schema<any, string> {
 
 export function object<T extends object>(object: Object): Schema<object, object> {
   const fixed = {};
-  for (let k of Object.keys(object)) {
-    fixed[k] = schematize(object[k]);
+  for (const [k,v] of entries(object)) {
+    fixed[k] = schematize(v);
   }
   return new ObjectSchema(fixed);
 }
@@ -71,7 +71,7 @@ export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<
 
 export function predicate<T>(predicate: (value: T) => boolean,
                              failureMessage?: ((value: any) => string) | string): Schema<T, T> {
-  let messageFn = buildPredicateMessageFunction(failureMessage, predicate);
+  const messageFn = buildPredicateMessageFunction(failureMessage, predicate);
   return schema(
     (x) => predicate(x) === true ? x : failure(messageFn(x)))
 }
@@ -89,7 +89,7 @@ export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
       return eq(x)  as any as Schema<IN, OUT>;
 
     case "object":
-      let obj = (x as object);
+      const obj = (x as object);
 
       if ('conform' in obj && typeof x['conform'] === "function")
         return x as Schema<IN, OUT>;

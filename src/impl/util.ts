@@ -25,7 +25,7 @@ export function unsafeCast<T>(x: any): T {
 
 export function mapKeyValue<K,V, NEWK, NEWV>(f:(k:K,v:V)=>[NEWK,NEWV], m:Map<K,V>):Map<NEWK,NEWV>{
   const result = new Map<NEWK,NEWV>();
-  for (let [k, v] of m.entries()) {
+  for (const [k, v] of m.entries()) {
     const [nk,nv] = f(k,v);
     result.set(nk,nv);
   }
@@ -42,7 +42,7 @@ export function mapValues<K,V,NEWV>(f:(v:V)=>NEWV, m:Map<K,V>):Map<K,NEWV>{
 
 export function first<T>(coll:Iterable<T>) : T | undefined{
   // noinspection LoopStatementThatDoesntLoopJS
-  for (let v of coll) {
+  for (const v of coll) {
     return v;
   }
 }
@@ -52,7 +52,7 @@ export function typeDescription(x: any): string {
   if (t !== 'object')
     return t;
 
-  let p = Object.getPrototypeOf(x);
+  const p = Object.getPrototypeOf(x);
   if (p !== Object.prototype)
     return p.constructor.name;
 

@@ -26,7 +26,7 @@ export class AndSchema<IN, INTERMEDIATE, OUT> extends BaseSchema<IN, OUT> {
   }
 
   conform(value: IN): Problems | OUT {
-    let intermediate = this.first.conform(value);
+    const intermediate = this.first.conform(value);
 
     if (intermediate instanceof Problems) return intermediate;
 
@@ -42,8 +42,8 @@ export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
 
   conform(value: IN): Problems | (OUT1 | OUT2) {
     const failures: Problems[] = [];
-    for (let s of [this.first, this.second]) {
-      let result = s.conform(value);
+    for (const s of [this.first, this.second]) {
+      const result = s.conform(value);
 
       if (isSuccess(result)) return result;
 

@@ -19,7 +19,7 @@ export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
     if (schemasByValue === undefined)
       throw new Error(`Discriminator '${discriminator}' is not valid: ${report.problems.get(discriminator) || 'not found in classes'}.`);
 
-    this.schemasByDiscriminatorValue = mapValues((v)=>isdata(v), schemasByValue);
+    this.schemasByDiscriminatorValue = mapValues((v) => isdata(v), schemasByValue);
   }
 
   conform(value: object): Problems | T {
@@ -28,8 +28,7 @@ export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
         "no value",
         [this.discriminator]);
 
-    let discriminatorValue = value[this.discriminator as string | symbol];
-    let schema = this.schemasByDiscriminatorValue.get(discriminatorValue);
+    const schema = this.schemaFor(value);
     if (schema === undefined)
       return failure(
         `expected one of [${Array.from(this.schemasByDiscriminatorValue.keys()).join(", ")}]`,
@@ -38,5 +37,9 @@ export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
     return schema.conform(value);
   }
 
+  private schemaFor(value: object): Schema<any, T> | undefined {
+    const discriminatorValue = value[this.discriminator as string | symbol];
+    return this.schemasByDiscriminatorValue.get(discriminatorValue);
+  }
 }
 
