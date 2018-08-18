@@ -13,6 +13,7 @@ import {Schema} from "./schema";
 import {ArraySchema} from "./impl/array";
 import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
+import {IsInstanceSchema} from "./impl/isinstance";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -73,6 +74,10 @@ export function isstring(): Schema<any, string> {
   return predicate<any>(
     (x) => x instanceof String || typeof x === "string",
     (x) => `expected a string but got ${typeDescription(x)}`);
+}
+
+export function isinstance<T>(c:Constructor<T>): Schema<any, T> {
+  return new IsInstanceSchema(c);
 }
 
 export function matches(r: RegExp): Schema<any, string> {
