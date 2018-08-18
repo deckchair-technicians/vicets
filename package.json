@@ -8,23 +8,24 @@
     "test": "./node_modules/.bin/mocha --require ts-node/register \"test/**/*.test.ts\""
   },
   "homepage": "https://github.com/deckchair-technicians/vicets",
-  "bugs": { "url" : "https://github.com/deckchair-technicians/vicets/issues"},
+  "bugs": {
+    "url": "https://github.com/deckchair-technicians/vicets/issues"
+  },
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "mocha": "^5.2.0",
-    "ts-node": "^7.0.0",
+    "ts-node": "^7.0.1",
     "typescript": "^2.9.2"
   },
   "dependencies": {
     "@types/chai": "^4.1.4",
     "@types/js-yaml": "^3.11.2",
     "@types/mocha": "^5.2.4",
-    "@types/node": "^10.5.2",
+    "@types/node": "^10.7.1",
+    "google-libphonenumber": "^3.1.6",
     "node-yaml": "^3.1.1",
     "reflect-metadata": "^0.1.12",
-
-    "google-libphonenumber": "^3.1.6",
     "validator": "10.4.0"
   }
 }
