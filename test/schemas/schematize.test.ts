@@ -2,11 +2,8 @@ import "reflect-metadata";
 import {expect} from 'chai';
 import {fail} from "assert";
 
-import {eq, schematize} from "../../src/schemas";
-import {Schema} from "../../src/schema";
-import {failure} from "../../src/problems";
-import {ObjectSchema} from "../../src/impl/obj";
-import {EqualsSchema} from "../../src/impl/eq";
+import {eq, schematize, Schema, failure} from "../../";
+import {typeDescription} from "../../src/impl/util";
 
 describe('schematize', () => {
   it('Treats functions as predicates, with function body as failure message', () => {
@@ -25,12 +22,12 @@ describe('schematize', () => {
 
   it('Turns plain objects into ObjectSchema', () => {
     const s = schematize({a: eq(1)});
-    expect(s).instanceOf(ObjectSchema);
+    expect(typeDescription(s)).to.equal('ObjectSchema');
   });
 
   it('Turns primitives into EqualsSchema', () => {
-    expect(schematize(1)).instanceOf(EqualsSchema);
-    expect(schematize('something')).instanceOf(EqualsSchema);
-    expect(schematize(true)).instanceOf(EqualsSchema);
+    expect(typeDescription(schematize(1))).to.equal('EqualsSchema');
+    expect(typeDescription(schematize('something'))).to.equal('EqualsSchema');
+    expect(typeDescription(schematize(true))).to.equal('EqualsSchema');
   });
 });
