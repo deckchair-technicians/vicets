@@ -19,7 +19,7 @@ describe('enumvalue', () => {
       expect(s.conform('a')).deep.equals({
         problems: [
           {
-            message: "expected one of [a value, b value]",
+            message: 'expected one of ["a value", "b value"]',
             path: []
           }
         ]
@@ -69,7 +69,7 @@ describe('enumvalue', () => {
         .deep.equals({
         problems: [
           {
-            message: "expected one of [0, 2, c value]",
+            message: 'expected one of [0, 2, "c value"]',
             path: []
           }
         ]
@@ -145,6 +145,42 @@ describe('enumvalue', () => {
       };
       expect(() => enumvalue(ReverseLookupForMissingKey)).to.throw('Not a proper enum. e["0"] = "a" but e["a"] = undefined');
     });
+    describe('Weird enums', () => {
+      it('are supported in typescript', () => {
+        enum WeirdEnum {
+          a = 0,
+          'b' = '0'
+        }
+
+        const s = enumvalue(WeirdEnum);
+        expect(s.conform(0)).to.equal(WeirdEnum.a);
+        expect(s.conform('a')).deep.equals({
+          problems: [
+            {
+              message: 'expected one of [0, "0"]',
+              path: []
+            }
+          ]
+        });
+      });
+      it("here's what's going on underneath", () => {
+        const WeirdFakeEnum = {
+          a: 0,
+          '0': 'a',
+          'b': '0'
+        };
+        const s = enumvalue(WeirdFakeEnum);
+        expect(s.conform(0)).to.equal(WeirdFakeEnum.a);
+        expect(s.conform('a')).deep.equals({
+          problems: [
+            {
+              message: 'expected one of [0, "0"]',
+              path: []
+            }
+          ]
+        });
+      })
+    })
   });
 
 });

@@ -15,7 +15,7 @@ enum EntryType {
   Invalid
 }
 
-export class EnumSchema<T extends object> extends BaseSchema<any, T> {
+export class EnumValueSchema<T extends object> extends BaseSchema<any, T> {
   private readonly enumValues: Set<any>;
   private readonly enumType: EnumType;
   private failureMessage: string;
@@ -60,7 +60,7 @@ export class EnumSchema<T extends object> extends BaseSchema<any, T> {
       someStringMembers ? EnumType.Mixed :
         EnumType.InitializedIntegers;
 
-    this.failureMessage = `expected one of [${Array.from(this.enumValues).join(', ')}]`;
+    this.failureMessage = `expected one of [${Array.from(this.enumValues).map((v)=>JSON.stringify(v)).join(', ')}]`;
   }
 
   conform(value: any): Problems | T {
