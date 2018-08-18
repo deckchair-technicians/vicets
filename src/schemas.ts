@@ -26,6 +26,18 @@ export function eq<T>(value: T): Schema<any, T> {
   return new EqualsSchema(value);
 }
 
+export function isnull(): Schema<any, null> {
+  return eq(null);
+}
+
+export function isundefined(): Schema<any, undefined> {
+  return eq(undefined);
+}
+
+export function isany(): Schema<any, any> {
+  return schema((x)=>x);
+}
+
 export function arrayof<T>(schema: Schema<any,T>): Schema<any, T[]> {
   return new ArraySchema(schema);
 }
