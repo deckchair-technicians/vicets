@@ -14,9 +14,6 @@ describe('schematize', () => {
     expect(isEven.conform(1)).deep.equals(failure("(x) => x % 2 === 0"));
   });
 
-  xit('Returns EnumSchema for enums', () => {
-    fail('Not implemented')
-  });
   xit('Returns InstanceOfSchema for classes', () => {
     fail('Not implemented')
   });
