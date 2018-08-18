@@ -52,17 +52,17 @@ describe('enumvalue', () => {
   });
 
   describe('Enums with mixed initializers', () => {
-    enum NumericValues {
+    enum MixedValues {
       a,
       b = 2,
       c = 'c value'
     }
 
-    const s = enumvalue(NumericValues);
+    const s = enumvalue(MixedValues);
     it('accepts values', () => {
-      expect(s.conform(0)).to.equals(NumericValues.a);
-      expect(s.conform(2)).to.equals(NumericValues.b);
-      expect(s.conform('c value')).to.equals(NumericValues.c);
+      expect(s.conform(0)).to.equals(MixedValues.a);
+      expect(s.conform(2)).to.equals(MixedValues.b);
+      expect(s.conform('c value')).to.equals(MixedValues.c);
     });
     it('fails for invalid input, including keys', () => {
       expect(s.conform('a'))
