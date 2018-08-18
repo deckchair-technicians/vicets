@@ -1,8 +1,8 @@
 import {BaseSchema, isSchema} from "./impl";
 import {ObjectSchema} from "./impl/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
-import {failure, ValidationError, Problems} from "./problems";
-import {object, schema} from "./schemas";
+import {failure, Problems, ValidationError} from "./problems";
+import {isstring, object, schema} from "./schemas";
 
 let BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
 
@@ -67,6 +67,18 @@ export function build<T>(c: Constructor<T>, values: {}): T {
   return Object.assign(Object.create(c.prototype), conformed);
 }
 
+/**
+ * Call this instead of build() when constructing data instances
+ * by specifying fields in code. The compiler will complain if
+ * fields are missing.
+ *
+ * `construct(A, {})` will cause the compiler to complain that
+ * `{}` is missing whatever fields A requires.
+ */
+export function construct<T>(c: Constructor<T>, value: T): T {
+  return build(c, value);
+}
+
 export class DataSchema<T> extends BaseSchema<any, T> {
   constructor(private readonly c: Constructor<T>) {
     super();
@@ -87,4 +99,3 @@ export class DataSchema<T> extends BaseSchema<any, T> {
   }
 
 }
-
