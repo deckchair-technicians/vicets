@@ -7,7 +7,7 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor, entries, typeDescription} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor, entries, mapKeyValue, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
 import {ArraySchema} from "./impl/array";
@@ -32,6 +32,16 @@ export function arrayof<T>(schema: Schema<any,T>): Schema<any, T[]> {
 
 export function enumvalue<T extends object>(e: T): Schema<any, T[keyof T]> {
   return new EnumValueSchema(e);
+}
+
+export function enumkey<T extends object>(e: T): Schema<any, T[keyof T]> {
+  const stringKeysOnly = {};
+  for (let [k, v] of entries(e)) {
+    if(isNaN(Number(k)))
+      stringKeysOnly[k] = v;
+  }
+
+  return lookup(stringKeysOnly);
 }
 
 export function lookup<T extends object>(e: T): Schema<any, T[keyof T]> {
