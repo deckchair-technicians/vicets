@@ -7,13 +7,14 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor, entries, mapKeyValue, typeDescription} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor, entries, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
 import {ArraySchema} from "./impl/array";
 import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
+import {DeferredSchema} from "./impl/deferred";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -145,5 +146,9 @@ export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
     default:
       throw Error(`Cannot build schema from ${typeof x}: ${x}`);
   }
+}
+
+export function defer<IN, OUT>(factory: () => Schema<IN, OUT>): Schema<IN, OUT> {
+  return new DeferredSchema(factory);
 }
 
