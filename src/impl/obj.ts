@@ -34,16 +34,16 @@ export class ObjectSchema extends BaseSchema<object, object> {
     let problems = new Problems([]);
 
     for (const [k,s] of this.fieldSchemas.entries()) {
-      if(!(k in result)){
-        problems = problems.merge(failure("No value", [k]));
-        continue;
-      }
-
       const v: ValidationResult = s.conform(result[k]);
-      if (isError(v))
+
+      if (isError(v)){
+        if(!(k in result))
+          problems = problems.merge(failure("No value", [k]));
         problems = problems.merge((v as Problems).prefixPath([k]));
+      }
       else
-        result[k] = v;
+        if(k in result)
+          result[k] = v;
     }
 
     return problems.problems.length > 0 ? problems : undefined;

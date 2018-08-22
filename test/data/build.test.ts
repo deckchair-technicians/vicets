@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, build, data, eq, isdata} from "../../index";
+import {__, build, data, eq, isdata, isundefined} from "../..";
 
 
 describe('Using build() on @data classes', () => {
@@ -68,6 +68,29 @@ describe('Using build() on @data classes', () => {
     it('works for invalid input', () => {
       expect(() => build(HasNested, {nested: {a: "not a valid value"}}))
         .to.throw(/not a valid value/);
+    });
+  });
+
+  describe('Optional fields', () => {
+    @data
+    class OptionalFields {
+      optional?: string = __(eq("valid").or(isundefined()));
+    }
+
+    const p = Object.getOwnPropertyDescriptor(OptionalFields, "optional");
+    let m = build(OptionalFields, {optional: "valid", notoptional: "valid"});
+
+    it('works when field is present', () => {
+      expect(build(OptionalFields, {optional: "valid"}))
+        .deep.equals({optional: "valid"});
+    });
+    it('works when field is not present', () => {
+      expect(build(OptionalFields, {}))
+        .deep.equals({});
+    });
+    it('works for invalid input', () => {
+      expect(() => build(OptionalFields, {optional: "moomin"}))
+        .to.throw(/moomin/);
     });
   });
 
