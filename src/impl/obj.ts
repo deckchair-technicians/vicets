@@ -1,20 +1,26 @@
-import {BaseSchema} from "./index";
-import {failure, isError, Problems, ValidationResult} from "../problems";
+import {failure, ValidationResult} from "../problems";
 import {Schema} from "../schema";
-import {entries, merge, typeDescription} from "./util";
+import {merge} from "./util";
+import {AssociativeSchema, AssociativeStrategies} from "./associative";
 
-export class ObjectSchema extends BaseSchema<object, object> {
-  public readonly fieldSchemas: { [k: string]: Schema<any, any> };
+class ObjectStrategies implements AssociativeStrategies<object> {
+  set(result: {}, k: any, v: any): {} {
+    result[k] = v;
+    return result
+  }
 
-  constructor(object: object) {
-    super();
-    for (const k in object) {
-      const s = object[k];
-      if (!('conform' in s))
-        throw new Error(`${k} was a ${typeDescription(s)}. Expected a schema`);
+  has(result: {}, k: any): boolean {
+    return k in result;
+  }
 
-    }
-    this.fieldSchemas = {...object};
+  get(result: {}, k: any): any {
+    return result[k];
+  }
+}
+
+export class ObjectSchema extends AssociativeSchema<object> {
+  constructor(fieldSchemas: object) {
+    super(fieldSchemas, new ObjectStrategies());
   }
 
   conform(value: any): ValidationResult<object> {
@@ -30,52 +36,11 @@ export class ObjectSchema extends BaseSchema<object, object> {
     return problems ? problems : instance;
   }
 
-  conformInPlace(result: {}): ValidationResult<{}> {
-    let problems = new Problems([]);
-
-    for (const [k, s] of entries(this.fieldSchemas)) {
-      if (!(k in result)) {
-        if (!isOptionalField(s))
-          problems = problems.merge(failure("No value", [k]));
-        continue;
-      }
-
-      const v: ValidationResult<any> = s.conform(result[k]);
-
-      if (isError(v)) {
-        problems = problems.merge((v as Problems).prefixPath([k]));
-      }
-      else
-        result[k] = v;
-    }
-
-    return problems.problems.length > 0 ? problems : result;
-  }
-
-  toString(): string {
-    return this.fieldSchemas.toString();
-  }
-
-  intersect(other: ObjectSchema): ObjectSchema {
-    return new ObjectSchema(merge(this.fieldSchemas, other.fieldSchemas, (a: Schema, b: Schema) => a.and(b)));
+  intersect(other: this): this {
+    const mergedSchemas = merge(this.fieldSchemas, other.fieldSchemas, (a: Schema, b: Schema) => a.and(b));
+    return new ObjectSchema(mergedSchemas) as this;
   }
 }
 
-const optionalField = Symbol("optionalField");
 
-function isOptionalField(s: Schema): boolean {
-  return s[optionalField] === true;
-}
 
-export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined> {
-  [optionalField] = true;
-
-  constructor(private readonly subschema: Schema<IN, OUT>) {
-    super();
-  }
-
-  conform(value: IN): Problems | OUT | undefined {
-    return value === undefined ? undefined : this.subschema.conform(value);
-  }
-
-}

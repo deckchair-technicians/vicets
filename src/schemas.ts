@@ -1,6 +1,6 @@
 import {DelegatingSchema} from "./impl";
 import {DataSchema} from "./data";
-import {ObjectSchema, TagSchemaAsOptional} from "./impl/obj";
+import {ObjectSchema} from "./impl/obj";
 import {EqualsSchema} from "./impl/eq";
 import {InSchema} from "./impl/isin";
 import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
@@ -15,6 +15,8 @@ import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
+import {TagSchemaAsOptional} from "./impl/associative";
+import {MapSchema} from "./impl/map";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -103,12 +105,20 @@ export function isurl(opts?: IsURLOptions): Schema<any, string> {
   return new UrlSchema(opts || {});
 }
 
-export function object<T extends object>(object: Object): Schema<object, object> {
+function schematizeEntries(object: Object) {
   const fixed = {};
-  for (const [k,v] of entries(object)) {
+  for (const [k, v] of entries(object)) {
     fixed[k] = schematize(v);
   }
-  return new ObjectSchema(fixed);
+  return fixed;
+}
+
+export function object<T extends object>(object: Object): Schema<any, object> {
+  return new ObjectSchema(schematizeEntries(object));
+}
+
+export function map<K,V>(object: Object): Schema<any, Map<K,V>> {
+  return new MapSchema<K,V>(schematizeEntries(object));
 }
 
 export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {
