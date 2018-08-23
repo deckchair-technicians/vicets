@@ -1,4 +1,4 @@
-import {failure, isSuccess, Problems} from "../problems";
+import {failure, isSuccess, Problems, ValidationResult} from "../problems";
 import {typeDescription} from "./util";
 import {Schema} from "../schema";
 
@@ -15,7 +15,7 @@ export abstract class BaseSchema<IN=any, OUT=any> implements Schema<IN, OUT> {
     return this as any as FAKED;
   }
 
-  abstract conform(value: IN): Problems | OUT;
+  abstract conform(value: IN): ValidationResult<OUT>;
 
 }
 
@@ -25,7 +25,7 @@ export class AndSchema<IN, INTERMEDIATE, OUT> extends BaseSchema<IN, OUT> {
     super();
   }
 
-  conform(value: IN): Problems | OUT {
+  conform(value: IN): ValidationResult<OUT> {
     const intermediate = this.first.conform(value);
 
     if (intermediate instanceof Problems) return intermediate;
@@ -40,7 +40,7 @@ export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
     super();
   }
 
-  conform(value: IN): Problems | (OUT1 | OUT2) {
+  conform(value: IN): ValidationResult<OUT1 | OUT2> {
     const failures: Problems[] = [];
     for (const s of [this.first, this.second]) {
       const result = s.conform(value);
@@ -55,23 +55,23 @@ export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
 }
 
 export abstract class StringSchema extends BaseSchema<any, string> {
-  conform(value: any): Problems | string {
+  conform(value: any): ValidationResult<string> {
     if (typeof value === 'string' || value instanceof String)
       return this.conformString(value as string);
     return failure(`expected a string but got ${typeDescription(value)}`);
   }
 
-  abstract conformString(value: string): Problems | string;
+  abstract conformString(value: string): ValidationResult<string>;
 }
 
 export abstract class NumberSchema extends BaseSchema<any, number> {
-  conform(value: any): Problems | number {
+  conform(value: any): ValidationResult<number> {
     if (typeof value === 'number' || value instanceof Number)
       return this.conformNumber(value as number);
     return failure('expected a number');
   }
 
-  abstract conformNumber(value: number): Problems | number;
+  abstract conformNumber(value: number): ValidationResult<number>;
 }
 
 export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
@@ -79,7 +79,7 @@ export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
     super();
   }
 
-  conform(value: IN): Problems | OUT {
+  conform(value: IN): ValidationResult<OUT> {
     return this.delegatedConform(value);
   }
 }

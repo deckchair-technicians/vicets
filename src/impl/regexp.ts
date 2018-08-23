@@ -1,12 +1,12 @@
 import {StringSchema} from "./index";
-import {failure, Problems} from "../problems";
+import {failure, Problems, ValidationResult} from "../problems";
 
 export class RegExpSchema extends StringSchema {
   constructor(private readonly r: RegExp) {
     super();
   }
 
-  conformString(value: string): Problems | string {
+  conformString(value: string): ValidationResult<string> {
     return this.r.test(value) ? value : failure(`did not match ${this.r}`);
   }
 }

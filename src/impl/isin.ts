@@ -1,4 +1,4 @@
-import {failure, Problems} from "../problems";
+import {failure, Problems, ValidationResult} from "../problems";
 import {BaseSchema} from "./index";
 
 export class InSchema<T> extends BaseSchema<any, T> {
@@ -9,7 +9,7 @@ export class InSchema<T> extends BaseSchema<any, T> {
     this.values = new Set(values);
   }
 
-  conform(value: any): Problems | T {
+  conform(value: any): ValidationResult<T> {
     if (!this.values.has(value))
       return failure(`expected one of [${Array.from(this.values).join(', ')}]`);
     return value;

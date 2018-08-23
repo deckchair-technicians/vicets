@@ -1,5 +1,5 @@
 import {StringSchema} from "./index";
-import {failure, Problems} from "../problems";
+import {failure, Problems, ValidationResult} from "../problems";
 import validator from "validator";
 
 export interface IsURLOptions {
@@ -19,7 +19,7 @@ export class UrlSchema extends StringSchema {
     super();
   }
 
-  conformString(value: string): Problems | string {
+  conformString(value: string): ValidationResult<string> {
     if (validator.isURL(value, this.opts)) return value;
     return failure(`not a valid url: ${value}`)
   }

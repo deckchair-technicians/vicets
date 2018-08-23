@@ -66,4 +66,4 @@ export class ValidationError extends Error {
   }
 }
 
-export type ValidationResult = Problems | any;
+export type ValidationResult<T> = Problems | T;

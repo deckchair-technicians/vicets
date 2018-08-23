@@ -1,5 +1,5 @@
 import {BaseSchema} from "./index";
-import {failure, Problems} from "../problems";
+import {failure, Problems, ValidationResult} from "../problems";
 import {Schema} from "../schema";
 import {typeDescription} from "./util";
 
@@ -7,7 +7,7 @@ export class ArraySchema<T> extends BaseSchema<any,T[]> {
   constructor(private readonly itemSchema: Schema<any,T>){
     super();
   }
-  conform(value: any): Problems | T[] {
+  conform(value: any): ValidationResult<T[]> {
     if(!(value instanceof Array))
       return failure(`${typeDescription(value)} was not an Array`);
 

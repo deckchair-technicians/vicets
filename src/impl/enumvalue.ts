@@ -1,5 +1,5 @@
 import {BaseSchema} from "./index";
-import {failure, Problems} from "../problems";
+import {failure, Problems, ValidationResult} from "../problems";
 import {entries, typeDescription} from "./util";
 
 enum EnumType {
@@ -63,7 +63,7 @@ export class EnumValueSchema<T extends object> extends BaseSchema<any, T[keyof T
     this.failureMessage = `expected one of [${Array.from(this.enumValues).map((v)=>JSON.stringify(v)).join(', ')}]`;
   }
 
-  conform(value: any): Problems | T[keyof T] {
+  conform(value: any): ValidationResult<T[keyof T]> {
     if (this.enumValues.has(value))
       return value;
 

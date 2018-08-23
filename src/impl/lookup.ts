@@ -1,5 +1,5 @@
 import {BaseSchema} from "./index";
-import {failure, Problems} from "../problems";
+import {failure, Problems, ValidationResult} from "../problems";
 import {typeDescription} from "./util";
 
 export class LookupSchema<T extends object,V> extends BaseSchema<any, T[keyof T]> {
@@ -7,7 +7,7 @@ export class LookupSchema<T extends object,V> extends BaseSchema<any, T[keyof T]
     super();
   }
 
-  conform(value: any): Problems | T[keyof T] {
+  conform(value: any): ValidationResult<T[keyof T]>  {
     if(typeof value !== 'string')
       return failure(`expected a string but got ${typeDescription(value)}`);
 

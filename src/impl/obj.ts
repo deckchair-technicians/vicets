@@ -17,7 +17,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
     this.fieldSchemas = {...object};
   }
 
-  conform(value: any): ValidationResult {
+  conform(value: any): ValidationResult<object> {
     if (value === undefined || value === null)
       return failure('no value');
 
@@ -30,7 +30,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
     return problems ? problems : instance;
   }
 
-  conformInPlace(result: {}): Problems | undefined {
+  conformInPlace(result: {}): ValidationResult<{}> {
     let problems = new Problems([]);
 
     for (const [k, s] of entries(this.fieldSchemas)) {
@@ -40,7 +40,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
         continue;
       }
 
-      const v: ValidationResult = s.conform(result[k]);
+      const v: ValidationResult<any> = s.conform(result[k]);
 
       if (isError(v)) {
         problems = problems.merge((v as Problems).prefixPath([k]));
@@ -49,7 +49,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
         result[k] = v;
     }
 
-    return problems.problems.length > 0 ? problems : undefined;
+    return problems.problems.length > 0 ? problems : result;
   }
 
   toString(): string {
