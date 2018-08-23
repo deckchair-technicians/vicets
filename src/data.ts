@@ -22,6 +22,32 @@ export function extractSchema<T>(ctor: Constructor<T>): ObjectSchema {
   if (schema === undefined)
     throw new Error(`No schema on ${ctor.name}- not annotated with @data?`);
   return schema.value;
+// TODO: add generic constraints to IN/OUT on Schema?
+export function hasSchema(schema: ObjectSchema): <C extends { new(...args: any[]): object }>(c: C) => C {
+  return function <C extends { new(...args: any[]): object }>(c: C): C {
+    const hackClassName = {};
+    hackClassName[c.name] = class extends c {
+      constructor(...args: any[]) {
+        super(...args);
+        if (BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES)
+          return;
+
+        for (const [k, v] of entries(this)) {
+          if (isSchema(v))
+            this[k] = undefined;
+        }
+        const conformed = schema.conformInPlace(this);
+        if (conformed instanceof Problems) {
+          throw new ValidationError(this, conformed);
+        }
+      };
+    };
+
+    const decorated = hackClassName[c.name];
+    Object.defineProperty(decorated, SCHEMA_SYMBOL, {value: schema, writable: false});
+    Object.defineProperty(c, SCHEMA_SYMBOL, {value: schema, writable: false});
+    return decorated;
+  }
 }
 
 export function data<C extends { new(...args: any[]): any }>(c: C): C {
@@ -34,29 +60,7 @@ export function data<C extends { new(...args: any[]): any }>(c: C): C {
   }
 
   const schema = object(objectWithDefaults) as ObjectSchema;
-
-  const hackClassName = {};
-  hackClassName[c.name] = class extends c {
-    constructor(...args: any[]) {
-      super(...args);
-      if (BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES)
-        return;
-
-      for (const [k,v] of entries(this)) {
-        if (isSchema(v))
-          this[k] = undefined;
-      }
-      const conformed = schema.conformInPlace(this);
-      if (conformed instanceof Problems) {
-        throw new ValidationError(this, conformed);
-      }
-    };
-  };
-
-  const decorated = hackClassName[c.name];
-  Object.defineProperty(decorated, SCHEMA_SYMBOL, {value: schema, writable: false});
-  Object.defineProperty(c, SCHEMA_SYMBOL, {value: schema, writable: false});
-  return decorated;
+  return hasSchema(schema)(c);
 }
 
 export function conform<T>(c: Constructor<T>, values: {}): Problems | T {
