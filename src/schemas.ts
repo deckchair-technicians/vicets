@@ -1,6 +1,6 @@
 import {DelegatingSchema} from "./impl";
 import {DataSchema} from "./data";
-import {ObjectSchema} from "./impl/obj";
+import {ObjectSchema, TagSchemaAsOptional} from "./impl/obj";
 import {EqualsSchema} from "./impl/eq";
 import {InSchema} from "./impl/isin";
 import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
@@ -18,6 +18,10 @@ import {DeferredSchema} from "./impl/deferred";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
+}
+
+export function __opt<IN, OUT>(s: Schema<IN, OUT>): OUT | undefined {
+  return new TagSchemaAsOptional(s) as any as OUT | undefined;
 }
 
 export function isdata<T>(constructor: Constructor<T>): Schema<any, T> {

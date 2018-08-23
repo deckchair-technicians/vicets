@@ -34,16 +34,19 @@ export class ObjectSchema extends BaseSchema<object, object> {
     let problems = new Problems([]);
 
     for (const [k,s] of this.fieldSchemas.entries()) {
+      if(!(k in result)){
+        if(!isOptionalField(s))
+          problems = problems.merge(failure("No value", [k]));
+        continue;
+      }
+
       const v: ValidationResult = s.conform(result[k]);
 
       if (isError(v)){
-        if(!(k in result))
-          problems = problems.merge(failure("No value", [k]));
         problems = problems.merge((v as Problems).prefixPath([k]));
       }
       else
-        if(k in result)
-          result[k] = v;
+        result[k] = v;
     }
 
     return problems.problems.length > 0 ? problems : undefined;
@@ -54,3 +57,20 @@ export class ObjectSchema extends BaseSchema<object, object> {
   }
 }
 
+const optionalField = Symbol("optionalField");
+
+function isOptionalField(s:Schema) : boolean {
+  return s[optionalField] === true;
+}
+export class TagSchemaAsOptional<IN,OUT> extends BaseSchema<IN, OUT | undefined>{
+  [optionalField] = true;
+
+  constructor(private readonly subschema : Schema<IN, OUT>){
+    super();
+  }
+
+  conform(value: IN): Problems | OUT | undefined {
+    return value === undefined ? undefined : this.subschema.conform(value);
+  }
+
+}

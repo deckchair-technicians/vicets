@@ -1,5 +1,8 @@
 import {expect} from "chai";
 import {__, build, data, eq, isdata, isundefined} from "../..";
+import {__opt, schema} from "../../src/schemas";
+import {failure} from "../../src/problems";
+import {conform} from "../../src/data";
 
 
 describe('Using build() on @data classes', () => {
@@ -20,6 +23,10 @@ describe('Using build() on @data classes', () => {
     });
     it('returns errors', () => {
       expect(() => build(A, {field: "some bad value"})).to.throw(/some bad value/);
+    });
+    it('complains when field is missing', () => {
+      expect(conform(A, {}))
+        .deep.equals(failure("No value", ["field"]));
     });
   });
   describe('Inheritance', () => {
@@ -74,11 +81,8 @@ describe('Using build() on @data classes', () => {
   describe('Optional fields', () => {
     @data
     class OptionalFields {
-      optional?: string = __(eq("valid").or(isundefined()));
+      optional?: string = __opt(eq("valid"));
     }
-
-    const p = Object.getOwnPropertyDescriptor(OptionalFields, "optional");
-    let m = build(OptionalFields, {optional: "valid", notoptional: "valid"});
 
     it('works when field is present', () => {
       expect(build(OptionalFields, {optional: "valid"}))
@@ -91,6 +95,16 @@ describe('Using build() on @data classes', () => {
     it('works for invalid input', () => {
       expect(() => build(OptionalFields, {optional: "moomin"}))
         .to.throw(/moomin/);
+    });
+
+    it('does not add field to class, even if the schema conforms undefined into a value', () => {
+      @data
+      class WeirdOptionalField {
+        optional?: string = __opt(schema((x)=>"schema conforms undefined to some value"));
+      }
+
+      expect(build(WeirdOptionalField, {}))
+        .deep.equals({});
     });
   });
 
