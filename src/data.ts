@@ -2,7 +2,7 @@ import {BaseSchema, isSchema} from "./impl";
 import {ObjectSchema} from "./impl/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError} from "./problems";
-import {isstring, object, schema} from "./schemas";
+import {object, schema} from "./schemas";
 
 let BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
 
@@ -28,7 +28,7 @@ export function data<C extends { new(...args: any[]): any }>(c: C): C {
   // buildSchemaUsingDefaultFieldValues is required to allow calling parent constructor
   const objectWithDefaults = buildSchemaUsingDefaultFieldValues(() => new c());
 
-  for (const [k,v] of entries(objectWithDefaults)) {
+  for (const [k, v] of entries(objectWithDefaults)) {
     if (!(isSchema(v) || isPrimitive(v)))
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }

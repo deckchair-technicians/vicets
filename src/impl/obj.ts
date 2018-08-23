@@ -10,7 +10,7 @@ export class ObjectSchema extends BaseSchema<object, object> {
     super();
     for (const k in object) {
       const s = object[k];
-      if(!('conform' in s))
+      if (!('conform' in s))
         throw new Error(`${k} was a ${typeDescription(s)}. Expected a schema`);
 
       this.fieldSchemas.set(k, s);
@@ -18,10 +18,10 @@ export class ObjectSchema extends BaseSchema<object, object> {
   }
 
   conform(value: any): ValidationResult {
-    if(value === undefined || value === null)
+    if (value === undefined || value === null)
       return failure('no value');
 
-    if(typeof value !== 'object')
+    if (typeof value !== 'object')
       return failure(`expected an object but got ${typeof value}`);
 
     const instance = {};
@@ -33,16 +33,16 @@ export class ObjectSchema extends BaseSchema<object, object> {
   conformInPlace(result: {}): Problems | undefined {
     let problems = new Problems([]);
 
-    for (const [k,s] of this.fieldSchemas.entries()) {
-      if(!(k in result)){
-        if(!isOptionalField(s))
+    for (const [k, s] of entries(this.fieldSchemas)) {
+      if (!(k in result)) {
+        if (!isOptionalField(s))
           problems = problems.merge(failure("No value", [k]));
         continue;
       }
 
       const v: ValidationResult = s.conform(result[k]);
 
-      if (isError(v)){
+      if (isError(v)) {
         problems = problems.merge((v as Problems).prefixPath([k]));
       }
       else
@@ -59,13 +59,14 @@ export class ObjectSchema extends BaseSchema<object, object> {
 
 const optionalField = Symbol("optionalField");
 
-function isOptionalField(s:Schema) : boolean {
+function isOptionalField(s: Schema): boolean {
   return s[optionalField] === true;
 }
-export class TagSchemaAsOptional<IN,OUT> extends BaseSchema<IN, OUT | undefined>{
+
+export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined> {
   [optionalField] = true;
 
-  constructor(private readonly subschema : Schema<IN, OUT>){
+  constructor(private readonly subschema: Schema<IN, OUT>) {
     super();
   }
 
