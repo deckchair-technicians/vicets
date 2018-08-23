@@ -5,7 +5,7 @@ import {isdata} from "../../schemas";
 import {discriminatorReports} from "./find_discriminators";
 import {Schema} from "../../schema";
 
-export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
+export class DiscriminatedUnionSchema<T> extends BaseSchema<any, T> {
   private readonly discriminator: keyof T;
   private readonly schemasByDiscriminatorValue: Map<PrimitiveValue, Schema<any, T>>;
 
@@ -23,6 +23,9 @@ export class DiscriminatedUnionSchema<T> extends BaseSchema<object, T> {
   }
 
   conform(value: object): Problems | T {
+    if (typeof value !== 'object')
+      return failure(`expected an object but got ${typeof value}`);
+
     if (!(this.discriminator in value))
       return failure(
         "no value",

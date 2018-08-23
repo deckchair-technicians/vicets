@@ -1,4 +1,4 @@
-import {__, build, data, discriminated, discriminatedBy, eq, isdata} from "../../";
+import {__, build, data, discriminated, discriminatedBy, eq, isdata, failure} from "../../";
 import {expect} from "chai";
 
 describe('discriminated', () => {
@@ -54,14 +54,13 @@ describe('discriminated', () => {
   });
 
   it('provides nice message on invalid discriminator value', () => {
-    expect(discriminatedUnionSchema.conform({discriminator: 4})).deep.equals({
-      problems: [
-        {
-          message: "expected one of [1, 2, 3]",
-          path: ["discriminator"]
-        }
-      ]
-    })
+    expect(discriminatedUnionSchema.conform({discriminator: 4}))
+      .deep.equals(failure("expected one of [1, 2, 3]", ["discriminator"]));
+  });
+
+  it('provides nice message when passed a non-object', () => {
+    expect(discriminatedUnionSchema.conform("a string"))
+      .deep.equals(failure("expected an object but got string", []))
   });
 
   @data
@@ -83,7 +82,7 @@ describe('discriminated', () => {
         }
       ]
     });
-  })
+  });
 
   describe('Detecting discriminator fields', () => {
     @data

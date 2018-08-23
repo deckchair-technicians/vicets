@@ -1,4 +1,4 @@
-import {Constructor, first, isPrimitive, mapKeyValue, PrimitiveValue, unsafeCast} from "../util";
+import {Constructor, entries, first, isPrimitive, mapKeyValue, PrimitiveValue, unsafeCast} from "../util";
 import {EqualsSchema} from "../eq";
 import * as os from "os";
 import {Schema} from "../../schema";
@@ -44,7 +44,7 @@ class CandidateDiscriminators<T> {
       .map((x) => unsafeCast(x))
   }
   private static fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
-    return Array.from(extractSchema(ctor).fieldSchemas.entries());
+    return Array.from(entries(extractSchema(ctor).fieldSchemas));
   }
 
 

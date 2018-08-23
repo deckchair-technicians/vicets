@@ -66,12 +66,12 @@ export function lookup<T extends object>(e: T): Schema<any, T[keyof T]> {
   return new LookupSchema(e);
 }
 
-export function discriminated<T>(...ctors: Constructor<T>[]): Schema<object, T> {
+export function discriminated<T>(...ctors: Constructor<T>[]): Schema<any, T> {
   return discriminatedBy(detectDiscriminator(ctors), ...ctors);
 }
 
 export function discriminatedBy<T>(discriminator: keyof T,
-                                   ...ctors: Constructor<T>[]): Schema<object, T> {
+                                   ...ctors: Constructor<T>[]): Schema<any, T> {
   return new DiscriminatedUnionSchema<T>(ctors, discriminator);
 }
 
