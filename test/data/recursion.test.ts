@@ -1,6 +1,5 @@
 import {expect} from 'chai';
-import {__, data, failure, isdata} from "../../";
-import {arrayof} from "../../src/schemas";
+import {__, arrayof, data, failure, isdata} from "../../";
 
 describe('Recursion', () => {
   @data
