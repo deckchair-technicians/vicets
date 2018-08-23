@@ -1,10 +1,10 @@
 import {BaseSchema} from "./index";
 import {failure, isError, Problems, ValidationResult} from "../problems";
 import {Schema} from "../schema";
-import {typeDescription} from "./util";
+import {entries, merge, typeDescription} from "./util";
 
 export class ObjectSchema extends BaseSchema<object, object> {
-  public readonly fieldSchemas: Map<string,Schema<any, any>> = new Map<string, Schema<any, any>>();
+  public readonly fieldSchemas: { [k: string]: Schema<any, any> };
 
   constructor(object: object) {
     super();
@@ -13,8 +13,8 @@ export class ObjectSchema extends BaseSchema<object, object> {
       if (!('conform' in s))
         throw new Error(`${k} was a ${typeDescription(s)}. Expected a schema`);
 
-      this.fieldSchemas.set(k, s);
     }
+    this.fieldSchemas = {...object};
   }
 
   conform(value: any): ValidationResult {
@@ -54,6 +54,10 @@ export class ObjectSchema extends BaseSchema<object, object> {
 
   toString(): string {
     return this.fieldSchemas.toString();
+  }
+
+  intersect(other: ObjectSchema): ObjectSchema {
+    return new ObjectSchema(merge(this.fieldSchemas, other.fieldSchemas, (a: Schema, b: Schema) => a.and(b)));
   }
 }
 

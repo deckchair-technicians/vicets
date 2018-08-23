@@ -61,6 +61,23 @@ export function typeDescription(x: any): string {
   return t
 }
 
-export function entries(x:{}) : [string, any][] {
-  return Object.keys(x).map((k:string):[string,any]=>[k,x[k]]);
+export function entries(x: {}): [string, any][] {
+  return Object.keys(x).map((k: string): [string, any] => [k, x[k]]);
+}
+
+export function merge<A extends object, B extends object>(a: A, b: B, conflictFn: (a, b) => any): A & B {
+  const result = {};
+  for (const k in a) {
+    result[k.toString()] = a[k];
+  }
+  for (const k in b) {
+    if (k in result) {
+      const kk = k as any as keyof A & keyof B;
+      result[k.toString()] = conflictFn(a[kk], b[kk]);
+    }
+    else {
+      result[k.toString()] = b[k];
+    }
+  }
+  return result as any as A & B;
 }

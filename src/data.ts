@@ -18,10 +18,14 @@ function buildSchemaUsingDefaultFieldValues<T>(f: () => T): T {
 const SCHEMA_SYMBOL = Symbol('schema');
 
 export function extractSchema<T>(ctor: Constructor<T>): ObjectSchema {
-  const schema = Object.getOwnPropertyDescriptor(ctor, SCHEMA_SYMBOL);
-  if (schema === undefined)
-    throw new Error(`No schema on ${ctor.name}- not annotated with @data?`);
-  return schema.value;
+  for (let search: Function = ctor; search; search = Object.getPrototypeOf(search)) {
+    const pd = Object.getOwnPropertyDescriptor(search, SCHEMA_SYMBOL);
+    if (pd !== undefined)
+      return pd.value;
+  }
+  throw new Error(`No schema on ${ctor.name}- not annotated with @data?`);
+}
+
 // TODO: add generic constraints to IN/OUT on Schema?
 export function hasSchema(schema: ObjectSchema): <C extends { new(...args: any[]): object }>(c: C) => C {
   return function <C extends { new(...args: any[]): object }>(c: C): C {
