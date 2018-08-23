@@ -20,8 +20,8 @@ export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
 }
 
-export function __opt<IN, OUT>(s: Schema<any, OUT>): OUT | undefined {
-  return new TagSchemaAsOptional(s) as any as OUT | undefined;
+export function opt<IN, OUT>(s: Schema<any, OUT>): Schema<any, OUT | undefined> {
+  return new TagSchemaAsOptional(s);
 }
 
 export function isdata<T>(constructor: Constructor<T>): Schema<any, T> {

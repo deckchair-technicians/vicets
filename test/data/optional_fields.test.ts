@@ -1,10 +1,11 @@
-import {build, data, eq, __opt, schema} from "../..";
+import {build, data, eq, schema} from "../..";
 import {expect} from "chai";
+import {__, opt} from "../../src/schemas";
 
 describe('Optional fields', () => {
   @data
   class OptionalFields {
-    optional?: string = __opt(eq("valid"));
+    optional?: string = __(opt(eq("valid")));
   }
 
   it('works when field is present', () => {
@@ -23,7 +24,7 @@ describe('Optional fields', () => {
   it('does not add field to class, even if the schema conforms undefined into a value', () => {
     @data
     class WeirdOptionalField {
-      optional?: string = __opt(schema((x)=>"schema conforms undefined to some value"));
+      optional?: string = __(opt(schema((x)=>"schema conforms undefined to some value")));
     }
 
     expect(build(WeirdOptionalField, {}))
