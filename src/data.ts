@@ -59,13 +59,20 @@ export function data<C extends { new(...args: any[]): any }>(c: C): C {
   return decorated;
 }
 
-export function build<T>(c: Constructor<T>, values: {}): T {
+export function conform<T>(c: Constructor<T>, values: {}): Problems | T {
   const conformed = extractSchema(c).conform(values);
+  if (conformed instanceof Problems) {
+    return conformed;
+  }
+  return Object.assign(Object.create(c.prototype), conformed);
+}
+
+export function build<T>(c: Constructor<T>, values: {}): T {
+  const conformed = conform(c, values);
   if (conformed instanceof Problems) {
     throw new ValidationError(values, conformed);
   }
-  // Skip the constructor
-  return Object.assign(Object.create(c.prototype), conformed);
+  return conformed;
 }
 
 /**
