@@ -17,6 +17,7 @@ import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
 import {TagSchemaAsOptional} from "./impl/associative";
 import {MapSchema} from "./impl/map";
+import {OverrideSchema} from "./impl/override";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -164,5 +165,13 @@ export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
 
 export function defer<IN, OUT>(factory: () => Schema<IN, OUT>): Schema<IN, OUT> {
   return new DeferredSchema(factory);
+}
+
+export interface SchemaOverrides<IN, OUT> {
+  failure?: string | ((value: IN) => Problems);
+}
+
+export function override<IN, OUT>(s: Schema<IN, OUT>, o: SchemaOverrides<IN, OUT>) {
+  return new OverrideSchema(s, o);
 }
 
