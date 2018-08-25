@@ -1,6 +1,5 @@
-import {build, data, eq, schema} from "../..";
+import {build, data, eq, schema, __, opt} from "../..";
 import {expect} from "chai";
-import {__, opt} from "../../src/schemas";
 
 describe('Optional fields', () => {
   @data
