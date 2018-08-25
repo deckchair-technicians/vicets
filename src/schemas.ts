@@ -18,6 +18,7 @@ import {DeferredSchema} from "./impl/deferred";
 import {TagSchemaAsOptional} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
 import {OverrideSchema} from "./impl/override";
+import {TupleSchema} from "./impl/associative/tuple";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -121,6 +122,14 @@ export function object<T extends object>(fieldSchemas: Object): Schema<any, obje
 export function map<K,V>(entrySchemas: Object | Map<K,Schema<any,V>>): Schema<any, Map<K,V>> {
   return new MapSchema<K,V>(entrySchemas instanceof Map ? entrySchemas : toMap(schematizeEntries(entrySchemas)));
 }
+
+export function tuple<A>(a:Schema<any,A>) : Schema<any, [A]>;
+export function tuple<A,B>(a:Schema<any,A>, b:Schema<any,B>,) : Schema<any, [A, B]>;
+export function tuple<A,B, C>(a:Schema<any,A>, b:Schema<any,B>, c:Schema<any,C>) : Schema<any, [A, B, C]>;
+export function tuple<A,B, C, D>(a:Schema<any,A>, b:Schema<any,B>, c:Schema<any,C>, d:Schema<any,D>) : Schema<any, [A, B, C, D]>;
+export function tuple<A,B, C, D, E>(a:Schema<any,A>, b:Schema<any,B>, c:Schema<any,C>, d:Schema<any,D>, e:Schema<any,E>) : Schema<any, [A, B, C, D ,E]>;
+export function tuple<T extends any[]>(...s: Schema[]) : Schema<any, T>{
+  return new TupleSchema(s);
 }
 
 export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {
