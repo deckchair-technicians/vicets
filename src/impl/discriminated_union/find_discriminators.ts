@@ -44,7 +44,7 @@ class CandidateDiscriminators<T> {
       .map((x) => unsafeCast(x))
   }
   private static fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
-    return Array.from(entries(extractSchema(ctor).fieldSchemas));
+    return extractSchema(ctor).fieldSchemaArray;
   }
 
 

@@ -65,6 +65,16 @@ export function entries(x: {}): [string, any][] {
   return Object.keys(x).map((k: string): [string, any] => [k, x[k]]);
 }
 
+export function toMap<K, V>(x: {}): Map<K, V> {
+  const result = new Map<K, V>();
+  for (let [k, v] of entries(x)) {
+    result.set(
+      k as any as K,
+      v as any as V);
+  }
+  return result;
+}
+
 export function merge<A extends object, B extends object>(a: A, b: B, conflictFn: (a, b) => any): A & B {
   const result = {};
   for (const k in a) {
@@ -80,4 +90,20 @@ export function merge<A extends object, B extends object>(a: A, b: B, conflictFn
     }
   }
   return result as any as A & B;
+}
+
+export function mergeMaps<K, V>(a: Map<K, V>, b: Map<K, V>, conflictFn: (a: V, b: V) => V): Map<K, V> {
+  const result = new Map<K, V>();
+  for (const [k, v] of a.entries()) {
+    result.set(k, v);
+  }
+  for (const [k, v] of b.entries()) {
+    if (result.has(k)) {
+      result.set(k, conflictFn(a.get(k)!, v));
+    }
+    else {
+      result.set(k, v);
+    }
+  }
+  return result;
 }

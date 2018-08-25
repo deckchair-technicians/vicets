@@ -1,5 +1,5 @@
 import {BaseSchema, isSchema} from "./impl";
-import {ObjectSchema} from "./impl/obj";
+import {ObjectSchema} from "./impl/associative/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError} from "./problems";
 import {object, schema} from "./schemas";

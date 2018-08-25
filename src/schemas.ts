@@ -1,13 +1,13 @@
 import {DelegatingSchema} from "./impl";
 import {DataSchema} from "./data";
-import {ObjectSchema} from "./impl/obj";
+import {ObjectSchema} from "./impl/associative/obj";
 import {EqualsSchema} from "./impl/eq";
 import {InSchema} from "./impl/isin";
 import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor, entries, typeDescription} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor, entries, toMap, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
 import {ArraySchema} from "./impl/array";
@@ -15,8 +15,8 @@ import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
-import {TagSchemaAsOptional} from "./impl/associative";
-import {MapSchema} from "./impl/map";
+import {TagSchemaAsOptional} from "./impl/associative/associative";
+import {MapSchema} from "./impl/associative/map";
 import {OverrideSchema} from "./impl/override";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
@@ -114,12 +114,13 @@ function schematizeEntries(object: Object) {
   return fixed;
 }
 
-export function object<T extends object>(object: Object): Schema<any, object> {
-  return new ObjectSchema(schematizeEntries(object));
+export function object<T extends object>(fieldSchemas: Object): Schema<any, object> {
+  return new ObjectSchema(schematizeEntries(fieldSchemas));
 }
 
-export function map<K,V>(object: Object): Schema<any, Map<K,V>> {
-  return new MapSchema<K,V>(schematizeEntries(object));
+export function map<K,V>(entrySchemas: Object | Map<K,Schema<any,V>>): Schema<any, Map<K,V>> {
+  return new MapSchema<K,V>(entrySchemas instanceof Map ? entrySchemas : toMap(schematizeEntries(entrySchemas)));
+}
 }
 
 export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {
