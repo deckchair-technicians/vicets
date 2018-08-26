@@ -6,11 +6,6 @@ import {eq, schematize, Schema, failure} from "../../";
 import {typeDescription} from "../../src/impl/util";
 
 describe('schematize', () => {
-  it('Treats functions as predicates, with function body as failure message', () => {
-    const isEven = schematize((x) => x % 2 === 0);
-    expect(isEven.conform(1)).deep.equals(failure("(x) => x % 2 === 0"));
-  });
-
   xit('Returns InstanceOfSchema for classes', () => {
     fail('Not implemented')
   });

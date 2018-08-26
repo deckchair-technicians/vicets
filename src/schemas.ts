@@ -20,6 +20,7 @@ import {MapSchema} from "./impl/associative/map";
 import {OverrideSchema} from "./impl/override";
 import {TupleSchema} from "./impl/associative/tuple";
 import {SetSchema} from "./impl/set";
+import {schematizeEntries} from "./schematize";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -112,14 +113,6 @@ export function isurl(opts?: IsURLOptions): Schema<any, string> {
   return new UrlSchema(opts || {});
 }
 
-function schematizeEntries(object: Object) {
-  const fixed = {};
-  for (const [k, v] of entries(object)) {
-    fixed[k] = schematize(v);
-  }
-  return fixed;
-}
-
 export function object<T extends object>(fieldSchemas: Object): Schema<any, object> {
   return new ObjectSchema(schematizeEntries(fieldSchemas));
 }
@@ -147,35 +140,6 @@ export function predicate<T>(predicate: (value: T) => boolean,
   const messageFn = buildPredicateMessageFunction(failureMessage, predicate);
   return schema(
     (x) => predicate(x) === true ? x : failure(messageFn(x)))
-}
-
-export type Schemaish = Schema<any, any> | Function | number | string | boolean | object;
-
-export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
-  switch (typeof x) {
-    case "function":
-      return predicate(x as (x: any) => boolean);
-
-    case "string":
-    case "number":
-    case "boolean":
-      return eq(x)  as any as Schema<IN, OUT>;
-
-    case "object":
-      const obj = (x as object);
-
-      if ('conform' in obj && typeof x['conform'] === "function")
-        return x as Schema<IN, OUT>;
-
-      else if(Object.getPrototypeOf(x) === Object.prototype)
-        return object(obj) as any as Schema<IN, OUT>;
-
-      else
-        throw Error(`Cannot build schema from non-plain object ${Object.getPrototypeOf(x).name}`);
-
-    default:
-      throw Error(`Cannot build schema from ${typeof x}: ${x}`);
-  }
 }
 
 export function defer<IN, OUT>(factory: () => Schema<IN, OUT>): Schema<IN, OUT> {

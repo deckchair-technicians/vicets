@@ -1,9 +1,9 @@
 import {Constructor, mapValues, PrimitiveValue} from "../util";
 import {BaseSchema} from "../index";
 import {failure, Problems} from "../../problems";
-import {isdata} from "../../schemas";
 import {discriminatorReports} from "./find_discriminators";
 import {Schema} from "../../schema";
+import {DataSchema} from "../../data";
 
 export class DiscriminatedUnionSchema<T> extends BaseSchema<any, T> {
   private readonly discriminator: keyof T;
@@ -19,7 +19,7 @@ export class DiscriminatedUnionSchema<T> extends BaseSchema<any, T> {
     if (schemasByValue === undefined)
       throw new Error(`Discriminator '${discriminator}' is not valid: ${report.problems.get(discriminator) || 'not found in classes'}.`);
 
-    this.schemasByDiscriminatorValue = mapValues((v) => isdata(v), schemasByValue);
+    this.schemasByDiscriminatorValue = mapValues((v) => new DataSchema(v), schemasByValue);
   }
 
   conform(value: object): Problems | T {
