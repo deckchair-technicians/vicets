@@ -19,6 +19,7 @@ import {TagSchemaAsOptional} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
 import {OverrideSchema} from "./impl/override";
 import {TupleSchema} from "./impl/associative/tuple";
+import {SetSchema} from "./impl/set";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -50,6 +51,10 @@ export function isany(): Schema<any, any> {
 
 export function arrayof<T>(schema: Schema<any,T>): Schema<any, T[]> {
   return new ArraySchema(schema);
+}
+
+export function setof<T>(schema: Schema<any,T>): Schema<any, Set<T>> {
+  return new SetSchema(schema);
 }
 
 export function enumvalue<T extends object>(e: T): Schema<any, T[keyof T]> {
