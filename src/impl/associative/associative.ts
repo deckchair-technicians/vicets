@@ -14,7 +14,7 @@ export function conformInPlace<K, V>(thing: Associative<K, V>, itemSchemas: Iter
   let problems = new Problems([]);
   for (const [k, s] of itemSchemas) {
     if (!(thing.has(k))) {
-      if (s[optionalField] !== true)
+      if (s[isOptional] !== true)
         problems = problems.merge(failure("No value", [k]));
       continue;
     }
@@ -31,10 +31,10 @@ export function conformInPlace<K, V>(thing: Associative<K, V>, itemSchemas: Iter
   return problems.length > 0 ? problems : undefined;
 }
 
-const optionalField = Symbol("optionalField");
+const isOptional = Symbol("isOptional");
 
 export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined> {
-  [optionalField] = true;
+  [isOptional] = true;
 
   constructor(private readonly subschema: Schema<IN, OUT>) {
     super();
