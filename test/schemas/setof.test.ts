@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {problem, problems, eq, matches, object, schema, setof} from "../../";
+import {eq, matches, object, problem, problems, schema, setof} from "../../";
 import {failure} from "../../src/problems";
 
 describe('setof', () => {
@@ -33,7 +33,7 @@ describe('setof', () => {
     const s = setof(eq("valid"));
     expect(s.conform(new Set(["invalid value", "valid"])))
       .deep.equals(failure(
-        "expected 'valid' but got string: \"invalid value\"",
+      "expected 'valid' but got string: \"invalid value\"",
       ["invalid value"]));
   });
 
@@ -41,23 +41,8 @@ describe('setof', () => {
     const schema = object({a: matches(/abc/)});
     const outerObject = setof(schema);
     expect(outerObject.conform([{a: "invalid value 1"}, {a: "invalid value 2"}]))
-      .deep.equals({
-      problems: [
-        {
-          message: "did not match /abc/",
-          path: [
-            0,
-            "a"
-          ]
-        },
-        {
-          message: "did not match /abc/",
-          path: [
-            1,
-            "a"
-          ]
-        }
-      ]
-    })
+      .deep.equals(problems(
+      problem("did not match /abc/", [0, "a"]),
+      problem("did not match /abc/", [1, "a"])));
   });
 });
