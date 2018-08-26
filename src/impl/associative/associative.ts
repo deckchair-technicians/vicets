@@ -28,7 +28,7 @@ export function conformInPlace<K, V>(thing: Associative<K, V>, itemSchemas: Iter
       thing.set(k, v);
   }
 
-  return problems.problems.length > 0 ? problems : undefined;
+  return problems.length > 0 ? problems : undefined;
 }
 
 const optionalField = Symbol("optionalField");

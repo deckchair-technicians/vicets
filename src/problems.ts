@@ -16,6 +16,9 @@ export class Problem {
 }
 
 export class Problems {
+  get length(): number {
+    return this.problems.length;
+  }
   constructor(readonly problems: Problem[]) {
   }
 

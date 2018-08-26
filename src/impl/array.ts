@@ -20,7 +20,7 @@ export class ArraySchema<T> extends BaseSchema<any,T[]> {
       else
         conformed[i] = conformedItem
     }
-    if(problems.problems.length > 0)
+    if(problems.length > 0)
       return problems;
 
     return conformed;
