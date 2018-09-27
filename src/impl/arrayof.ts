@@ -3,7 +3,7 @@ import {failure, Problems, ValidationResult} from "../problems";
 import {Schema} from "../schema";
 import {typeDescription} from "./util";
 
-export class ArraySchema<T> extends BaseSchema<any,T[]> {
+export class ArrayOfSchema<T> extends BaseSchema<any[],T[]> {
   constructor(private readonly itemSchema: Schema<any,T>){
     super();
   }
@@ -25,5 +25,4 @@ export class ArraySchema<T> extends BaseSchema<any,T[]> {
 
     return conformed;
   }
-
 }

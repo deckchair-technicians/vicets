@@ -10,7 +10,7 @@ import {IsURLOptions, UrlSchema} from "./impl/url";
 import {buildPredicateMessageFunction, Constructor, entries, toMap, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
-import {ArraySchema} from "./impl/array";
+import {ArrayOfSchema} from "./impl/arrayof";
 import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
@@ -51,7 +51,7 @@ export function isany(): Schema<any, any> {
 }
 
 export function arrayof<T>(schema: Schema<any,T>): Schema<any, T[]> {
-  return new ArraySchema(schema);
+  return new ArrayOfSchema(schema);
 }
 
 export function setof<T>(schema: Schema<any,T>): Schema<any, Set<T>> {
