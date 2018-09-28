@@ -24,6 +24,10 @@ describe('Using build() on @data classes', () => {
     expect(conform(A, {}))
       .deep.equals(failure("No value", ["field"]));
   });
+  it('complains when additional fields exist', () => {
+    expect(conform(A, {field: "valid", additionalField: "should not be here"}))
+      .deep.equals(failure("Unexpected item", ["additionalField"]));
+  });
 
   it('gives useful exception when asked to build a non-@data class', () => {
     class NotData{}
@@ -35,13 +39,9 @@ xit('should support custom constructors(?)', () => {
 });
 xit('should complain if subclasses redefine fields', () => {
 });
-xit('additional fields', () => {
-});
 xit('nice error message for fields missing schema', () => {
 });
 xit('should support adding additional methods', () => {
-});
-xit('supports recursion', () => {
 });
 
 

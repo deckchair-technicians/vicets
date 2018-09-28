@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {eq, failure, opt, tuple, Schema} from "../..";
+import {problem, problems} from "../../src/problems";
 
 describe('tuple()', () => {
   const s: Schema<any, [string,number]> = tuple(eq("valid"), eq(1));
@@ -36,5 +37,15 @@ describe('tuple()', () => {
 
     expect(nested.conform([[1]]))
       .deep.equals([[1]]);
+  });
+  it('complains when additional fields exist', () => {
+    expect(s.conform(["valid", 1, "should not be here", "should not be here"]))
+      .deep.equals(problems(
+      problem(
+        "Unexpected item",
+        [2]),
+      problem(
+        "Unexpected item",
+        [3])));
   });
 });

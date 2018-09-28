@@ -21,6 +21,10 @@ class TupleStrategies<T extends any[]> implements Associative<number, any> {
   get(k: number): any {
     return this.result[k];
   }
+
+  keys() : Iterable<number> {
+    return Array(this.result.length).keys();
+  }
 }
 
 export class TupleSchema<T extends any[]> extends BaseSchema<T> {
@@ -46,6 +50,3 @@ export class TupleSchema<T extends any[]> extends BaseSchema<T> {
     return problems ? problems : instance;
   }
 }
-
-
-

@@ -10,7 +10,13 @@ describe('object', () => {
       ['a']));
     expect(s.conform({a: 1})).deep.equals({a: 1});
   });
+  it('Complains when additional fields exist', () => {
+    const s: Schema<object, object> = object({});
 
+    expect(s.conform({unexpected: "whatever"})).deep.equals(failure(
+      "Unexpected item",
+      ['unexpected']));
+  });
   it('Can be nested', () => {
     const s: Schema<object,object> = object({a: {b: eq(1)}});
 

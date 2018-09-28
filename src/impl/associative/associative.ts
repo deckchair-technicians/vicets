@@ -8,16 +8,21 @@ export interface Associative<K, V> {
   has(k: K): boolean;
 
   get(k: K): any;
+
+  keys() : Iterable<K>;
 }
 
-export function conformInPlace<K, V>(thing: Associative<K, V>, itemSchemas: Iterable<[K, Schema]>): Problems | undefined {
+export function conformInPlace<K, V>(thing: Associative<K, V>,
+                                     itemSchemas: Iterable<[K, Schema]>): Problems | undefined {
   let problems = new Problems([]);
+  const unmatchedThingKeys = new Set(thing.keys());
   for (const [k, s] of itemSchemas) {
     if (!(thing.has(k))) {
       if (s[isOptional] !== true)
         problems = problems.merge(failure("No value", [k]));
       continue;
     }
+    unmatchedThingKeys.delete(k);
 
     const v: ValidationResult<any> = s.conform(thing.get(k));
 
@@ -26,6 +31,10 @@ export function conformInPlace<K, V>(thing: Associative<K, V>, itemSchemas: Iter
     }
     else
       thing.set(k, v);
+  }
+
+  for(const k of unmatchedThingKeys){
+    problems = problems.merge(failure("Unexpected item", [k]));
   }
 
   return problems.length > 0 ? problems : undefined;

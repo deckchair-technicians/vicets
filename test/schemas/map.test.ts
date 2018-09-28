@@ -22,6 +22,10 @@ describe('map()', () => {
     expect(optional.conform(valid))
       .deep.equals(valid);
   });
+  it('Complains when additional fields exist', () => {
+    expect(s.conform(new Map().set('a', 1).set('unexpected', 'whatever')))
+      .deep.equals(failure('Unexpected item', ['unexpected']));
+  });
   it('appends key to path in problems', () => {
     expect(s.conform(new Map().set('a', 2)))
       .deep.equals(failure(

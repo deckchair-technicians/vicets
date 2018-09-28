@@ -31,6 +31,10 @@ class ObjectStrategies implements Associative<string, any> {
   get(k: any): any {
     return this.result[k];
   }
+
+  keys() : Iterable<string> {
+    return Object.keys(this.result);
+  }
 }
 
 export class ObjectSchema extends BaseSchema<any, object> {
