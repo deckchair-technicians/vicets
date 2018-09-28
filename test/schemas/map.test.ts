@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {eq, failure, map, opt, Schema} from "../..";
+import {UnexpectedItemBehaviour} from "../../src/impl/associative/associative";
 
 describe('map()', () => {
   const s: Schema<any, Map<string, number>> = map<string, number>({a: eq(1)});
@@ -25,6 +26,20 @@ describe('map()', () => {
   it('Complains when additional fields exist', () => {
     expect(s.conform(new Map().set('a', 1).set('unexpected', 'whatever')))
       .deep.equals(failure('Unexpected item', ['unexpected']));
+  });
+  it('Can specify additional fields should be deleted', () => {
+    const deleteAdditionalFields: Schema<any, Map<string, number>> = map<string, number>({a: eq(1)})
+      .changeBehaviour(UnexpectedItemBehaviour.DELETE);
+
+    expect(deleteAdditionalFields.conform(new Map().set('a', 1).set('unexpected', 'whatever')))
+      .deep.equals(new Map().set('a', 1));
+  });
+  it('Can specify additional fields should be ignored', () => {
+    const deleteAdditionalFields: Schema<any, Map<string, number>> = map<string, number>({a: eq(1)})
+      .changeBehaviour(UnexpectedItemBehaviour.IGNORE);
+
+    expect(deleteAdditionalFields.conform(new Map().set('a', 1).set('unexpected', 'whatever')))
+      .deep.equals(new Map().set('a', 1).set('unexpected', 'whatever'));
   });
   it('appends key to path in problems', () => {
     expect(s.conform(new Map().set('a', 2)))

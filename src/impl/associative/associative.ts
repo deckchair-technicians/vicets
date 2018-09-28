@@ -2,18 +2,42 @@ import {Schema} from "../../schema";
 import {BaseSchema} from "../index";
 import {failure, isError, Problems, ValidationResult} from "../../problems";
 
+export interface HasUnexpectedItemBehaviour {
+  changeBehaviour(unexpectedItemBehaviour: UnexpectedItemBehaviour) : this;
+}
+
 export interface Associative<K, V> {
   set(k: K, v: V): this;
+
+  delete(k: K): boolean;
 
   has(k: K): boolean;
 
   get(k: K): any;
 
-  keys() : Iterable<K>;
+  keys(): Iterable<K>;
 }
 
-export function conformInPlace<K, V>(thing: Associative<K, V>,
+export enum UnexpectedItemBehaviour {
+  DELETE="delete",
+  IGNORE="ignore",
+  PROBLEM="problem"
+}
+
+const strictnessOrder : UnexpectedItemBehaviour[] = [UnexpectedItemBehaviour.IGNORE, UnexpectedItemBehaviour.DELETE, UnexpectedItemBehaviour.PROBLEM];
+
+export function strictest(a:UnexpectedItemBehaviour, b:UnexpectedItemBehaviour) : UnexpectedItemBehaviour {
+  const aPrecedent = strictnessOrder.indexOf(a);
+  const bPrecedent = strictnessOrder.indexOf(b);
+  if(aPrecedent < 0) throw new Error(`Strictness of '${a}' is not specified`);
+  if(bPrecedent < 0) throw new Error(`Strictness of '${b}' is not specified`);
+  return aPrecedent > bPrecedent ? a : b;
+}
+
+export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
+                                     thing: Associative<K, V>,
                                      itemSchemas: Iterable<[K, Schema]>): Problems | undefined {
+
   let problems = new Problems([]);
   const unmatchedThingKeys = new Set(thing.keys());
   for (const [k, s] of itemSchemas) {
@@ -33,8 +57,19 @@ export function conformInPlace<K, V>(thing: Associative<K, V>,
       thing.set(k, v);
   }
 
-  for(const k of unmatchedThingKeys){
-    problems = problems.merge(failure("Unexpected item", [k]));
+  for (const k of unmatchedThingKeys) {
+    switch (unexpectedItems) {
+      case UnexpectedItemBehaviour.IGNORE:
+        break;
+      case UnexpectedItemBehaviour.DELETE:
+        thing.delete(k);
+        break;
+      case UnexpectedItemBehaviour.PROBLEM:
+        problems = problems.merge(failure("Unexpected item", [k]));
+        break;
+      default:
+        throw new Error(`Not implemented- ${unexpectedItems}`);
+    }
   }
 
   return problems.length > 0 ? problems : undefined;

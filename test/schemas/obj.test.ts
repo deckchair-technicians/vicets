@@ -1,5 +1,7 @@
 import {expect} from 'chai';
 import {failure, object, Schema, eq} from "../..";
+import {map} from "../../index";
+import {UnexpectedItemBehaviour} from "../../src/impl/associative/associative";
 
 describe('object', () => {
   it('Appends key to path in problems', () => {
@@ -16,6 +18,20 @@ describe('object', () => {
     expect(s.conform({unexpected: "whatever"})).deep.equals(failure(
       "Unexpected item",
       ['unexpected']));
+  });
+  it('Can specify additional fields should be deleted', () => {
+    const s: Schema<object, object> = object({})
+      .changeBehaviour(UnexpectedItemBehaviour.DELETE);
+
+    expect(s.conform({unexpected: 'whatever'}))
+      .deep.equals({});
+  });
+  it('Can specify additional fields should be ignored', () => {
+    const s: Schema<object, object> = object({})
+      .changeBehaviour(UnexpectedItemBehaviour.IGNORE);
+
+    expect(s.conform({unexpected: 'whatever'}))
+      .deep.equals({unexpected: 'whatever'});
   });
   it('Can be nested', () => {
     const s: Schema<object,object> = object({a: {b: eq(1)}});

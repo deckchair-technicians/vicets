@@ -1,36 +1,46 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {typeDescription} from "../util";
-import {Associative, conformInPlace} from "./associative";
+import {Associative, conformInPlace, HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./associative";
 import {BaseSchema} from "../index";
 
 class TupleStrategies<T extends any[]> implements Associative<number, any> {
-  constructor(public readonly result: T) {
+  private readonly deleted : number[] = [];
+  constructor(private readonly resultIn: T) {
 
   }
-
+  get result()  : T{
+    return Array.from(this.keys()).filter(n=>this.deleted.indexOf(n) < 0).map(n=>this.resultIn[n]) as T;
+  }
   set(k: number, v: any): this {
-    this.result[k] = v;
+    this.resultIn[k] = v;
     return this;
   }
 
   has(k: number): boolean {
-    return k < this.result.length;
+    return k < this.resultIn.length;
   }
 
   get(k: number): any {
-    return this.result[k];
+    return this.resultIn[k];
+  }
+
+  delete(k: number): boolean{
+    if(this.resultIn.length <= k) return false;
+    this.deleted.push(k);
+    return true;
   }
 
   keys() : Iterable<number> {
-    return Array(this.result.length).keys();
+    return Array(this.resultIn.length).keys();
   }
 }
 
-export class TupleSchema<T extends any[]> extends BaseSchema<T> {
+export class TupleSchema<T extends any[]> extends BaseSchema<T> implements  HasUnexpectedItemBehaviour{
   private readonly itemSchemas: [number, Schema][];
 
-  constructor(schemas: Schema[]) {
+  constructor(schemas: Schema[],
+              private readonly unexpectedItems: UnexpectedItemBehaviour) {
     super();
     this.itemSchemas = schemas.map((v, i) => [i, v] as [number, Schema]);
   }
@@ -46,7 +56,12 @@ export class TupleSchema<T extends any[]> extends BaseSchema<T> {
     for (let i = 0; i < value.length; i++) {
       instance[i] = value[i];
     }
-    const problems = conformInPlace(new TupleStrategies(instance), this.itemSchemas);
-    return problems ? problems : instance;
+    const result = new TupleStrategies(instance);
+    const problems = conformInPlace(this.unexpectedItems, result, this.itemSchemas);
+    return problems ? problems : result.result;
+  }
+
+  changeBehaviour(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
+    return new TupleSchema(this.itemSchemas.map(([n,s])=>s), unexpectedItemBehaviour) as this;
   }
 }

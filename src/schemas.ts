@@ -6,7 +6,7 @@ import {InSchema} from "./impl/isin";
 import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
-import {IsURLOptions, UrlSchema} from "./impl/url";
+import {IsURLOptions, UrlSchema} from "./impl/validator/url";
 import {buildPredicateMessageFunction, Constructor, entries, toMap, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
@@ -15,7 +15,7 @@ import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
-import {TagSchemaAsOptional} from "./impl/associative/associative";
+import {HasUnexpectedItemBehaviour, TagSchemaAsOptional, UnexpectedItemBehaviour} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
 import {OverrideSchema} from "./impl/override";
 import {TupleSchema} from "./impl/associative/tuple";
@@ -113,21 +113,37 @@ export function isurl(opts?: IsURLOptions): Schema<any, string> {
   return new UrlSchema(opts || {});
 }
 
-export function object<T extends object>(fieldSchemas: Object): Schema<any, object> {
-  return new ObjectSchema(schematizeEntries(fieldSchemas));
+export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasUnexpectedItemBehaviour {
+  return new ObjectSchema(schematizeEntries(fieldSchemas), UnexpectedItemBehaviour.PROBLEM);
 }
 
-export function map<K,V>(entrySchemas: Object | Map<K,Schema<any,V>>): Schema<any, Map<K,V>> {
-  return new MapSchema<K,V>(entrySchemas instanceof Map ? entrySchemas : toMap(schematizeEntries(entrySchemas)));
+export function map<K, V>(entrySchemas: Object | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasUnexpectedItemBehaviour  {
+  return new MapSchema<K, V>(
+    entrySchemas instanceof Map
+      ? entrySchemas
+      : toMap(schematizeEntries(entrySchemas)),
+    UnexpectedItemBehaviour.PROBLEM);
 }
 
-export function tuple<A>(a:Schema<any,A>) : Schema<any, [A]>;
-export function tuple<A,B>(a:Schema<any,A>, b:Schema<any,B>,) : Schema<any, [A, B]>;
-export function tuple<A,B, C>(a:Schema<any,A>, b:Schema<any,B>, c:Schema<any,C>) : Schema<any, [A, B, C]>;
-export function tuple<A,B, C, D>(a:Schema<any,A>, b:Schema<any,B>, c:Schema<any,C>, d:Schema<any,D>) : Schema<any, [A, B, C, D]>;
-export function tuple<A,B, C, D, E>(a:Schema<any,A>, b:Schema<any,B>, c:Schema<any,C>, d:Schema<any,D>, e:Schema<any,E>) : Schema<any, [A, B, C, D ,E]>;
-export function tuple<T extends any[]>(...s: Schema[]) : Schema<any, T>{
-  return new TupleSchema(s);
+export function tuple<A>(a: Schema<any, A>):
+  Schema<any, [A]> & HasUnexpectedItemBehaviour;
+
+export function tuple<A, B>(a: Schema<any, A>, b: Schema<any, B>,):
+  Schema<any, [A, B]> & HasUnexpectedItemBehaviour;
+
+export function tuple<A, B, C>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>):
+  Schema<any, [A, B, C]> & HasUnexpectedItemBehaviour;
+
+export function tuple<A, B, C, D>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>):
+  Schema<any, [A, B, C, D]> & HasUnexpectedItemBehaviour;
+
+export function tuple<A, B, C, D, E>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>, e: Schema<any, E>):
+  Schema<any, [A, B, C, D, E]> & HasUnexpectedItemBehaviour;
+
+export function tuple<T extends any[]>(...s: Schema[]):
+  Schema<any, T> & HasUnexpectedItemBehaviour {
+
+  return new TupleSchema(s, UnexpectedItemBehaviour.PROBLEM);
 }
 
 export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {

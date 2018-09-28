@@ -3,6 +3,7 @@ import {ObjectSchema} from "./impl/associative/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError} from "./problems";
 import {schematizeEntries} from "./schematize";
+import {UnexpectedItemBehaviour} from "./impl/associative/associative";
 
 let BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
 
@@ -63,7 +64,7 @@ export function data<C extends { new(...args: any[]): any }>(c: C): C {
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
 
-  const schema = new ObjectSchema(schematizeEntries(objectWithDefaults)) as ObjectSchema;
+  const schema = new ObjectSchema(schematizeEntries(objectWithDefaults), UnexpectedItemBehaviour.PROBLEM) as ObjectSchema;
   return hasSchema(schema)(c);
 }
 

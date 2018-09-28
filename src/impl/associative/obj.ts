@@ -1,7 +1,10 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {merge, typeDescription} from "../util";
-import {Associative, conformInPlace} from "./associative";
+import {
+  Associative, conformInPlace, HasUnexpectedItemBehaviour, strictest,
+  UnexpectedItemBehaviour
+} from "./associative";
 import {BaseSchema} from "../index";
 
 function objectEntries(object: object): [string, Schema][] {
@@ -24,6 +27,10 @@ class ObjectStrategies implements Associative<string, any> {
     return this
   }
 
+  delete(k:any) :boolean {
+    return delete this.result[k];
+  }
+
   has(k: any): boolean {
     return k in this.result;
   }
@@ -37,10 +44,11 @@ class ObjectStrategies implements Associative<string, any> {
   }
 }
 
-export class ObjectSchema extends BaseSchema<any, object> {
+export class ObjectSchema extends BaseSchema<any, object> implements HasUnexpectedItemBehaviour{
   public readonly fieldSchemaArray: [string, Schema][];
 
-  constructor(private readonly fieldSchemasAsObject: Record<string,Schema>) {
+  constructor(private readonly fieldSchemasAsObject: Record<string,Schema>,
+              private readonly unexpectedItems: UnexpectedItemBehaviour) {
     super();
     this.fieldSchemaArray = objectEntries(fieldSchemasAsObject);
   }
@@ -58,15 +66,18 @@ export class ObjectSchema extends BaseSchema<any, object> {
   }
 
   public conformInPlace(instance: {}) : ValidationResult<{}>{
-    const problems = conformInPlace(new ObjectStrategies(instance), this.fieldSchemaArray);
+    const problems = conformInPlace(this.unexpectedItems, new ObjectStrategies(instance), this.fieldSchemaArray);
     return problems ? problems : instance;
   }
 
   intersect(other: this): this {
     const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b));
-    return new ObjectSchema(mergedSchemas) as this;
+    return new ObjectSchema(mergedSchemas, strictest(this.unexpectedItems, other.unexpectedItems)) as this;
   }
 
+  changeBehaviour(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
+    return new ObjectSchema(this.fieldSchemasAsObject, unexpectedItemBehaviour) as this;
+  }
 }
 
 
