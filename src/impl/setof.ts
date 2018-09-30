@@ -3,7 +3,7 @@ import {failure, Problems, ValidationResult} from "../problems";
 import {Schema} from "../schema";
 import {typeDescription} from "./util";
 
-export class SetSchema<T> extends BaseSchema<any, Set<T>> {
+export class SetOfSchema<T> extends BaseSchema<any, Set<T>> {
   constructor(private readonly itemSchema: Schema<any, T>) {
     super();
   }
