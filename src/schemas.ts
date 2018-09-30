@@ -22,6 +22,7 @@ import {TupleSchema} from "./impl/associative/tuple";
 import {SetOfSchema} from "./impl/setof";
 import {schematizeEntries} from "./schematize";
 import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
+import {UuidSchema} from "./impl/uuid";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -112,6 +113,10 @@ export function isin<T>(...values: T[]): Schema<any, T> {
 
 export function isurl(opts?: IsURLOptions): Schema<any, string> {
   return new UrlSchema(opts || {});
+}
+
+export function isuuid(): Schema<any, string> {
+  return new UuidSchema();
 }
 
 export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasUnexpectedItemBehaviour {
