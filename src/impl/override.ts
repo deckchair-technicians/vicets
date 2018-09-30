@@ -1,8 +1,11 @@
 import {failure, Problems, ValidationResult} from "../problems";
 import {BaseSchema} from "./index";
 import {Schema} from "../schema";
-import {SchemaOverrides} from "../schemas";
 import {typeDescription} from "./util";
+
+export interface SchemaOverrides<IN, OUT> {
+  failure?: string | ((value: IN) => Problems);
+}
 
 export class OverrideSchema<IN, OUT> extends BaseSchema<IN, OUT> {
   constructor(private readonly subschema: Schema<IN, OUT>,

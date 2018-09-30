@@ -17,12 +17,12 @@ import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
 import {TagSchemaAsOptional} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
-import {OverrideSchema} from "./impl/override";
 import {TupleSchema} from "./impl/associative/tuple";
 import {SetOfSchema} from "./impl/setof";
 import {schematizeEntries} from "./schematize";
 import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 import {UuidSchema} from "./impl/uuid";
+import {OverrideSchema, SchemaOverrides} from "./impl/override";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -162,9 +162,7 @@ export function defer<IN, OUT>(factory: () => Schema<IN, OUT>): Schema<IN, OUT> 
   return new DeferredSchema(factory);
 }
 
-export interface SchemaOverrides<IN, OUT> {
-  failure?: string | ((value: IN) => Problems);
-}
+export {SchemaOverrides} from "./impl/override";
 
 export function override<IN, OUT>(s: Schema<IN, OUT>, o: SchemaOverrides<IN, OUT>) {
   return new OverrideSchema(s, o);
