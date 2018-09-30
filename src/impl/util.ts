@@ -17,7 +17,7 @@ export function isPrimitive(value: any): boolean {
   return (typeof value !== 'object' && typeof value !== 'function') || value === null
 }
 
-export type Constructor<T={}> = new(...args: any[]) => T ;
+export type Constructor<T=any> = new(...args: any[]) => T ;
 
 export function unsafeCast<T>(x: any): T {
   return x as T;

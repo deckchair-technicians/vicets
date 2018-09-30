@@ -54,7 +54,7 @@ export function hasSchema(schema: ObjectSchema): <C extends { new(...args: any[]
   }
 }
 
-export function data<C extends { new(...args: any[]): any }>(c: C): C {
+export function data<C extends Constructor> (c: C): C {
   // buildSchemaUsingDefaultFieldValues is required to allow calling parent constructor
   const objectWithDefaults = buildSchemaUsingDefaultFieldValues(() => new c());
 
@@ -88,8 +88,11 @@ export function build<T>(c: Constructor<T>, values: {}): T {
  * by specifying fields in code. The compiler will complain if
  * fields are missing.
  *
- * `construct(A, {})` will cause the compiler to complain that
- * `{}` is missing whatever fields A requires.
+ * `build(A, {})` will NOT cause the compiler to complain,
+ * even if `{}` is missing fields `A` requires.
+ *
+ * `construct(A, {})` WILL cause the compiler to complain if
+ * `{}` is missing fields `A` requires.
  */
 export function construct<T>(c: Constructor<T>, value: T): T {
   return build(c, value);
