@@ -3,7 +3,7 @@ import {ObjectSchema} from "./impl/associative/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError} from "./problems";
 import {schematizeEntries} from "./schematize";
-import {UnexpectedItemBehaviour} from "./impl/associative/associative";
+import {UnexpectedItemBehaviour} from "./unexpected_items";
 
 let BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
 

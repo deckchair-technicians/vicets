@@ -1,10 +1,7 @@
 import {Schema} from "../../schema";
 import {BaseSchema} from "../index";
 import {failure, isError, Problems, ValidationResult} from "../../problems";
-
-export interface HasUnexpectedItemBehaviour {
-  changeBehaviour(unexpectedItemBehaviour: UnexpectedItemBehaviour) : this;
-}
+import {UnexpectedItemBehaviour} from "../../unexpected_items";
 
 export interface Associative<K, V> {
   set(k: K, v: V): this;
@@ -18,21 +15,7 @@ export interface Associative<K, V> {
   keys(): Iterable<K>;
 }
 
-export enum UnexpectedItemBehaviour {
-  DELETE="delete",
-  IGNORE="ignore",
-  PROBLEM="problem"
-}
 
-const strictnessOrder : UnexpectedItemBehaviour[] = [UnexpectedItemBehaviour.IGNORE, UnexpectedItemBehaviour.DELETE, UnexpectedItemBehaviour.PROBLEM];
-
-export function strictest(a:UnexpectedItemBehaviour, b:UnexpectedItemBehaviour) : UnexpectedItemBehaviour {
-  const aPrecedent = strictnessOrder.indexOf(a);
-  const bPrecedent = strictnessOrder.indexOf(b);
-  if(aPrecedent < 0) throw new Error(`Strictness of '${a}' is not specified`);
-  if(bPrecedent < 0) throw new Error(`Strictness of '${b}' is not specified`);
-  return aPrecedent > bPrecedent ? a : b;
-}
 
 export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
                                      thing: Associative<K, V>,

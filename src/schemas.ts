@@ -15,12 +15,13 @@ import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
-import {HasUnexpectedItemBehaviour, TagSchemaAsOptional, UnexpectedItemBehaviour} from "./impl/associative/associative";
+import {TagSchemaAsOptional} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
 import {OverrideSchema} from "./impl/override";
 import {TupleSchema} from "./impl/associative/tuple";
 import {SetSchema} from "./impl/set";
 import {schematizeEntries} from "./schematize";
+import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();

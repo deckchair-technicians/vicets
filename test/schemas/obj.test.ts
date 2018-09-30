@@ -1,7 +1,5 @@
 import {expect} from 'chai';
-import {failure, object, Schema, eq} from "../..";
-import {map} from "../../index";
-import {UnexpectedItemBehaviour} from "../../src/impl/associative/associative";
+import {failure, object, Schema, eq, UnexpectedItemBehaviour} from "../..";
 
 describe('object', () => {
   it('Appends key to path in problems', () => {
@@ -21,14 +19,14 @@ describe('object', () => {
   });
   it('Can specify additional fields should be deleted', () => {
     const s: Schema<object, object> = object({})
-      .changeBehaviour(UnexpectedItemBehaviour.DELETE);
+      .onUnexpected(UnexpectedItemBehaviour.DELETE);
 
     expect(s.conform({unexpected: 'whatever'}))
       .deep.equals({});
   });
   it('Can specify additional fields should be ignored', () => {
     const s: Schema<object, object> = object({})
-      .changeBehaviour(UnexpectedItemBehaviour.IGNORE);
+      .onUnexpected(UnexpectedItemBehaviour.IGNORE);
 
     expect(s.conform({unexpected: 'whatever'}))
       .deep.equals({unexpected: 'whatever'});

@@ -2,7 +2,7 @@ import {Schema} from "./schema";
 import {entries} from "./impl/util";
 import {EqualsSchema} from "./impl/eq";
 import {ObjectSchema} from "./impl/associative/obj";
-import {UnexpectedItemBehaviour} from "./impl/associative/associative";
+import {UnexpectedItemBehaviour} from "./unexpected_items";
 
 export type Schemaish = Schema<any, any> | Function | number | string | boolean | object;
 

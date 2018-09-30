@@ -1,8 +1,9 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {typeDescription} from "../util";
-import {Associative, conformInPlace, HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./associative";
+import {Associative, conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
+import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
 
 class TupleStrategies<T extends any[]> implements Associative<number, any> {
   private readonly deleted : number[] = [];
@@ -61,7 +62,7 @@ export class TupleSchema<T extends any[]> extends BaseSchema<T> implements  HasU
     return problems ? problems : result.result;
   }
 
-  changeBehaviour(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
+  onUnexpected(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
     return new TupleSchema(this.itemSchemas.map(([n,s])=>s), unexpectedItemBehaviour) as this;
   }
 }

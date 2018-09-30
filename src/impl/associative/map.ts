@@ -1,8 +1,9 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {entries, mergeMaps, typeDescription} from "../util";
-import {conformInPlace, HasUnexpectedItemBehaviour, strictest, UnexpectedItemBehaviour} from "./associative";
+import {conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
+import {HasUnexpectedItemBehaviour, strictest, UnexpectedItemBehaviour} from "../../unexpected_items";
 
 export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements HasUnexpectedItemBehaviour{
   constructor(
@@ -32,7 +33,7 @@ export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements Ha
     return new MapSchema(mergedSchemas, strictest(this.unexpectedItems, other.unexpectedItems)) as this;
   }
 
-  changeBehaviour(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
+  onUnexpected(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
     return new MapSchema(this.itemSchemas, unexpectedItemBehaviour) as this;
   }
 }

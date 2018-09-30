@@ -2,10 +2,9 @@ import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {merge, typeDescription} from "../util";
 import {
-  Associative, conformInPlace, HasUnexpectedItemBehaviour, strictest,
-  UnexpectedItemBehaviour
-} from "./associative";
+  Associative, conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
+import {HasUnexpectedItemBehaviour, strictest, UnexpectedItemBehaviour} from "../../unexpected_items";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
@@ -75,7 +74,7 @@ export class ObjectSchema extends BaseSchema<any, object> implements HasUnexpect
     return new ObjectSchema(mergedSchemas, strictest(this.unexpectedItems, other.unexpectedItems)) as this;
   }
 
-  changeBehaviour(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
+  onUnexpected(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
     return new ObjectSchema(this.fieldSchemasAsObject, unexpectedItemBehaviour) as this;
   }
 }
