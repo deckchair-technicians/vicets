@@ -6,7 +6,7 @@ import {InSchema} from "./impl/isin";
 import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
-import {IsURLOptions, UrlSchema} from "./impl/validator/url";
+import {IsURLOptions, UrlSchema} from "./impl/url";
 import {buildPredicateMessageFunction, Constructor, entries, toMap, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
