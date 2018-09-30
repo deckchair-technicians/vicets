@@ -5,10 +5,9 @@ import {conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
 import {HasUnexpectedItemBehaviour, strictest, UnexpectedItemBehaviour} from "../../unexpected_items";
 
-export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements HasUnexpectedItemBehaviour{
-  constructor(
-    private readonly itemSchemas: Map<K, Schema<any, V>>,
-    private readonly unexpectedItems: UnexpectedItemBehaviour) {
+export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements HasUnexpectedItemBehaviour {
+  constructor(private readonly itemSchemas: Map<K, Schema<any, V>>,
+              private readonly unexpectedItems: UnexpectedItemBehaviour) {
     super();
   }
 

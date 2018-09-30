@@ -2,7 +2,7 @@ import "reflect-metadata";
 import {expect} from 'chai';
 import {fail} from "assert";
 
-import {eq, schematize, Schema, failure} from "../../";
+import {eq, Schema, schematize} from "../../";
 import {typeDescription} from "../../src/impl/util";
 
 describe('schematize', () => {

@@ -31,6 +31,7 @@ describe('enumkey', () => {
       a,
       b
     }
+
     const s = enumkey(NoValues);
     it('accepts keys', () => {
       expect(s.conform('a')).to.equals(NoValues.a);

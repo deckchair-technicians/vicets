@@ -12,7 +12,7 @@ export class SetOfSchema<T> extends BaseSchema<any, Set<T>> {
     if (!(value instanceof Set || value instanceof Array))
       return failure(`${typeDescription(value)} was not an Array or a Set`);
 
-    const entries: Iterable<[any,any]> = value instanceof Set ? value.entries() : value.map((v, i)=>[i,v] as [any,any]);
+    const entries: Iterable<[any, any]> = value instanceof Set ? value.entries() : value.map((v, i) => [i, v] as [any, any]);
 
     const conformed = new Set<T>();
     let problems = new Problems([]);

@@ -15,7 +15,7 @@ describe('isurl', () => {
       .deep.equals({problems: [{message: 'not a valid url: http://localhost', path: []}]});
   });
   it('passes through options', () => {
-    const s: Schema<any, string> = isurl({require_tld:false});
+    const s: Schema<any, string> = isurl({require_tld: false});
     expect(s.conform("http://localhost/test.html")).to.equal("http://localhost/test.html");
   });
 });

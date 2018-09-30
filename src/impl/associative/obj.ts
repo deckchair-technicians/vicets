@@ -1,8 +1,7 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {merge, typeDescription} from "../util";
-import {
-  Associative, conformInPlace} from "./associative";
+import {Associative, conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
 import {HasUnexpectedItemBehaviour, strictest, UnexpectedItemBehaviour} from "../../unexpected_items";
 
@@ -26,7 +25,7 @@ class ObjectStrategies implements Associative<string, any> {
     return this
   }
 
-  delete(k:any) :boolean {
+  delete(k: any): boolean {
     return delete this.result[k];
   }
 
@@ -38,15 +37,15 @@ class ObjectStrategies implements Associative<string, any> {
     return this.result[k];
   }
 
-  keys() : Iterable<string> {
+  keys(): Iterable<string> {
     return Object.keys(this.result);
   }
 }
 
-export class ObjectSchema extends BaseSchema<any, object> implements HasUnexpectedItemBehaviour{
+export class ObjectSchema extends BaseSchema<any, object> implements HasUnexpectedItemBehaviour {
   public readonly fieldSchemaArray: [string, Schema][];
 
-  constructor(private readonly fieldSchemasAsObject: Record<string,Schema>,
+  constructor(private readonly fieldSchemasAsObject: Record<string, Schema>,
               private readonly unexpectedItems: UnexpectedItemBehaviour) {
     super();
     this.fieldSchemaArray = objectEntries(fieldSchemasAsObject);
@@ -64,7 +63,7 @@ export class ObjectSchema extends BaseSchema<any, object> implements HasUnexpect
     return this.conformInPlace(instance);
   }
 
-  public conformInPlace(instance: {}) : ValidationResult<{}>{
+  public conformInPlace(instance: {}): ValidationResult<{}> {
     const problems = conformInPlace(this.unexpectedItems, new ObjectStrategies(instance), this.fieldSchemaArray);
     return problems ? problems : instance;
   }

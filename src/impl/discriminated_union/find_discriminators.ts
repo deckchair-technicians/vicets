@@ -1,4 +1,4 @@
-import {Constructor, entries, first, isPrimitive, mapKeyValue, PrimitiveValue, unsafeCast} from "../util";
+import {Constructor, first, isPrimitive, mapKeyValue, PrimitiveValue, unsafeCast} from "../util";
 import {EqualsSchema} from "../eq";
 import * as os from "os";
 import {Schema} from "../../schema";
@@ -19,7 +19,18 @@ class CandidateDiscriminators<T> {
     }
   }
 
-  keys() : IterableIterator<keyof T>{
+  private static fieldsWithPrimitiveEquals<T>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
+    return CandidateDiscriminators.fieldSchemas(ctor)
+      .map(([field, schema]) => schema instanceof EqualsSchema && isPrimitive(schema.expected) ? [field, schema.expected] : undefined)
+      .filter((x) => x)
+      .map((x) => unsafeCast(x))
+  }
+
+  private static fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
+    return schemaOf(ctor).fieldSchemaArray;
+  }
+
+  keys(): IterableIterator<keyof T> {
     return this.fields.keys();
   }
 
@@ -35,16 +46,6 @@ class CandidateDiscriminators<T> {
     }
     if (values.size !== this.constructors.length)
       return 'field is not present in all classes';
-  }
-
-  private static fieldsWithPrimitiveEquals<T>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
-    return CandidateDiscriminators.fieldSchemas(ctor)
-      .map(([field, schema]) => schema instanceof EqualsSchema && isPrimitive(schema.expected) ? [field, schema.expected] : undefined)
-      .filter((x) => x)
-      .map((x) => unsafeCast(x))
-  }
-  private static fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
-    return schemaOf(ctor).fieldSchemaArray;
   }
 
 
@@ -79,7 +80,7 @@ export function detectDiscriminator<T>(ctors: Constructor<T>[]): keyof T {
     return k;
   }
 
-  const listOfFieldProblems = Array.from(report.problems.entries()).map(([k,problem]) => `${k}: ${problem}`);
+  const listOfFieldProblems = Array.from(report.problems.entries()).map(([k, problem]) => `${k}: ${problem}`);
   throw new Error(`No discriminator field found. Considered:${os.EOL}${listOfFieldProblems.join(os.EOL)}`);
 }
 

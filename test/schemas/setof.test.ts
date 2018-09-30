@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, matches, object, problem, problems, schema, setof, failure} from "../../";
+import {eq, failure, matches, object, problem, problems, schema, setof} from "../../";
 
 describe('setof', () => {
   it('converts arrays into sets- this is natural when using JSON as the source', () => {

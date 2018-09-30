@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, build, data, eq, failure, conform} from "../..";
+import {__, build, conform, data, eq, failure} from "../..";
 
 
 describe('Using build() on @data classes', () => {
@@ -30,8 +30,10 @@ describe('Using build() on @data classes', () => {
   });
 
   it('gives useful exception when asked to build a non-@data class', () => {
-    class NotData{}
-    expect(()=>build(NotData, {})).to.throw(/No schema/);
+    class NotData {
+    }
+
+    expect(() => build(NotData, {})).to.throw(/No schema/);
   });
 });
 

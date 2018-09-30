@@ -15,8 +15,6 @@ export interface Associative<K, V> {
   keys(): Iterable<K>;
 }
 
-
-
 export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
                                      thing: Associative<K, V>,
                                      itemSchemas: Iterable<[K, Schema]>): Problems | undefined {

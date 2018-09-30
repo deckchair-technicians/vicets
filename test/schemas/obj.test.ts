@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {failure, object, Schema, eq, UnexpectedItemBehaviour} from "../..";
+import {eq, failure, object, Schema, UnexpectedItemBehaviour} from "../..";
 
 describe('object', () => {
   it('Appends key to path in problems', () => {
@@ -32,7 +32,7 @@ describe('object', () => {
       .deep.equals({unexpected: 'whatever'});
   });
   it('Can be nested', () => {
-    const s: Schema<object,object> = object({a: {b: eq(1)}});
+    const s: Schema<object, object> = object({a: {b: eq(1)}});
 
     expect(s.conform({a: {b: 2}})).deep.equals(failure(
       "expected '1' but got number: 2",

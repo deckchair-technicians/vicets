@@ -6,13 +6,16 @@ import {BaseSchema} from "../index";
 import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
 
 class TupleStrategies<T extends any[]> implements Associative<number, any> {
-  private readonly deleted : number[] = [];
+  private readonly deleted: number[] = [];
+
   constructor(private readonly resultIn: T) {
 
   }
-  get result()  : T{
-    return Array.from(this.keys()).filter(n=>this.deleted.indexOf(n) < 0).map(n=>this.resultIn[n]) as T;
+
+  get result(): T {
+    return Array.from(this.keys()).filter(n => this.deleted.indexOf(n) < 0).map(n => this.resultIn[n]) as T;
   }
+
   set(k: number, v: any): this {
     this.resultIn[k] = v;
     return this;
@@ -26,18 +29,18 @@ class TupleStrategies<T extends any[]> implements Associative<number, any> {
     return this.resultIn[k];
   }
 
-  delete(k: number): boolean{
-    if(this.resultIn.length <= k) return false;
+  delete(k: number): boolean {
+    if (this.resultIn.length <= k) return false;
     this.deleted.push(k);
     return true;
   }
 
-  keys() : Iterable<number> {
+  keys(): Iterable<number> {
     return Array(this.resultIn.length).keys();
   }
 }
 
-export class TupleSchema<T extends any[]> extends BaseSchema<T> implements  HasUnexpectedItemBehaviour{
+export class TupleSchema<T extends any[]> extends BaseSchema<T> implements HasUnexpectedItemBehaviour {
   private readonly itemSchemas: [number, Schema][];
 
   constructor(schemas: Schema[],
@@ -63,6 +66,6 @@ export class TupleSchema<T extends any[]> extends BaseSchema<T> implements  HasU
   }
 
   onUnexpected(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
-    return new TupleSchema(this.itemSchemas.map(([n,s])=>s), unexpectedItemBehaviour) as this;
+    return new TupleSchema(this.itemSchemas.map(([n, s]) => s), unexpectedItemBehaviour) as this;
   }
 }

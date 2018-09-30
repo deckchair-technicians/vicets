@@ -3,7 +3,7 @@ import {arrayof, matches, object, schema} from "../../";
 
 describe('arrayof', () => {
   it('returns array of conformed values', () => {
-    const s = arrayof(schema((v)=>v+" conformed"));
+    const s = arrayof(schema((v) => v + " conformed"));
     expect(s.conform(["abc1", "abc2", "abc3"]))
       .deep.equals(["abc1 conformed", "abc2 conformed", "abc3 conformed"])
   });

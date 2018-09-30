@@ -17,16 +17,16 @@ export class OverrideSchema<IN, OUT> extends BaseSchema<IN, OUT> {
       : result;
   }
 
-  private failure(value: IN, original: Problems) : Problems {
+  private failure(value: IN, original: Problems): Problems {
     const f = this.overrides.failure;
 
-    if(!f ){
+    if (!f) {
       return original;
     }
-    else if(typeof f === 'string'){
+    else if (typeof f === 'string') {
       return failure(f)
     }
-    else if(f instanceof Function){
+    else if (f instanceof Function) {
       return f(value);
     }
     else {

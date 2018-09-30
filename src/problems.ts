@@ -16,10 +16,11 @@ export class Problem {
 }
 
 export class Problems {
+  constructor(readonly problems: Problem[]) {
+  }
+
   get length(): number {
     return this.problems.length;
-  }
-  constructor(readonly problems: Problem[]) {
   }
 
   prefixPath(p: Path): Problems {

@@ -5,13 +5,13 @@ import {
   construct,
   data,
   eq,
-  schemaOf,
   failure,
   hasSchema,
   matches,
   problem,
   problems,
-  schema
+  schema,
+  schemaOf
 } from "../../";
 import {Constructor} from "../../src/impl/util";
 
@@ -111,7 +111,7 @@ describe('Intersecting @data classes', () => {
       }
 
       expect(conform(ValidateAndCoerce, {a: "lowercase"}))
-        .deep.equals(failure("did not match /[A-Z]+/",["a"]));
+        .deep.equals(failure("did not match /[A-Z]+/", ["a"]));
 
       expect(conform(ValidateAndCoerce, {a: "UPPERCASE"}))
         .deep.equals({a: "UPPERCASE"});

@@ -1,4 +1,4 @@
-import {failure, Problems, ValidationResult} from "../problems";
+import {failure, ValidationResult} from "../problems";
 import {BaseSchema} from "./index";
 
 export class InSchema<T> extends BaseSchema<any, T> {

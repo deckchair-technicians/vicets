@@ -1,5 +1,5 @@
 import {BaseSchema} from "./index";
-import {failure, Problems, ValidationResult} from "../problems";
+import {failure, ValidationResult} from "../problems";
 import {entries, typeDescription} from "./util";
 
 enum EnumType {
@@ -27,7 +27,7 @@ export class EnumValueSchema<T extends object> extends BaseSchema<any, T[keyof T
 
     this.enumValues = new Set<any>();
     for (let [k, v] of entries(this.e) as [string | number, any][]) {
-      if(!isNaN(Number(k)))
+      if (!isNaN(Number(k)))
         k = Number(k);
 
       const valueType: string = typeof v;
@@ -60,7 +60,7 @@ export class EnumValueSchema<T extends object> extends BaseSchema<any, T[keyof T
       someStringMembers ? EnumType.Mixed :
         EnumType.InitializedIntegers;
 
-    this.failureMessage = `expected one of [${Array.from(this.enumValues).map((v)=>JSON.stringify(v)).join(', ')}]`;
+    this.failureMessage = `expected one of [${Array.from(this.enumValues).map((v) => JSON.stringify(v)).join(', ')}]`;
   }
 
   conform(value: any): ValidationResult<T[keyof T]> {

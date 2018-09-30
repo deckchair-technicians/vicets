@@ -1,14 +1,18 @@
 import {expect} from 'chai';
-import {isinstance, failure} from "../../";
+import {failure, isinstance} from "../../";
 
-describe('isinstance', ()=>{
-  class A{
-    constructor(public field: string){}
+describe('isinstance', () => {
+  class A {
+    constructor(public field: string) {
+    }
   }
-  class B{
-    constructor(public field: string){}
+
+  class B {
+    constructor(public field: string) {
+    }
   }
-  it('works', ()=>{
+
+  it('works', () => {
     const instance = new A('test');
     const differentType = new B('test');
     const notInstance = Object.assign({}, instance);

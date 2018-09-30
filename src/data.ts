@@ -54,7 +54,7 @@ export function hasSchema(schema: ObjectSchema): <C extends { new(...args: any[]
   }
 }
 
-export function data<C extends Constructor> (c: C): C {
+export function data<C extends Constructor>(c: C): C {
   // buildSchemaUsingDefaultFieldValues is required to allow calling parent constructor
   const objectWithDefaults = buildSchemaUsingDefaultFieldValues(() => new c());
 

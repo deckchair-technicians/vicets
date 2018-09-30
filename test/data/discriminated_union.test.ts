@@ -1,4 +1,4 @@
-import {__, build, data, discriminated, discriminatedBy, eq, isdata, failure} from "../../";
+import {__, build, data, discriminated, discriminatedBy, eq, failure, isdata} from "../../";
 import {expect} from "chai";
 
 describe('discriminated', () => {
@@ -119,30 +119,30 @@ describe('discriminatedBy', () => {
     discriminator = 2;
   }
 
-  describe('Using discriminated() on classes with ambiguous discriminators', ()=>{
+  describe('Using discriminated() on classes with ambiguous discriminators', () => {
     it('shows nice error message when multiple discriminators are found', () => {
       expect(() => discriminated(MultipleDiscriminators_A, MultipleDiscriminators_B))
         .to.throw('Multiple possible discriminator fields: [type, discriminator]');
     });
   });
 
-  describe('Using discriminatedBy', ()=>{
+  describe('Using discriminatedBy', () => {
     const explicitlyDiscriminated = discriminatedBy("type", MultipleDiscriminators_A, MultipleDiscriminators_B);
 
-    it('allows selecting discriminator field', ()=>{
+    it('allows selecting discriminator field', () => {
       expect(explicitlyDiscriminated.conform({type: 1, discriminator: 1}))
         .deep.equals({type: 1, discriminator: 1}).instanceOf(MultipleDiscriminators_A);
 
       expect(explicitlyDiscriminated.conform({type: 2, discriminator: 2}))
         .deep.equals({type: 2, discriminator: 2}).instanceOf(MultipleDiscriminators_B);
     });
-    it('produces a useful error message if field does not exist', ()=>{
-      expect(()=>discriminatedBy("notOnClasses" as keyof MultipleDiscriminators_A, MultipleDiscriminators_A))
+    it('produces a useful error message if field does not exist', () => {
+      expect(() => discriminatedBy("notOnClasses" as keyof MultipleDiscriminators_A, MultipleDiscriminators_A))
         .to.throw(/notOnClasses/)
 
     });
-    it('schema fails as expected', ()=>{
-      expect(explicitlyDiscriminated.conform({type:1, discriminator: "not valid"}))
+    it('schema fails as expected', () => {
+      expect(explicitlyDiscriminated.conform({type: 1, discriminator: "not valid"}))
         .deep.equals({
         problems: [
           {
