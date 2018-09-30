@@ -50,7 +50,6 @@ export function hasSchema(schema: ObjectSchema): <C extends { new(...args: any[]
 
     const decorated = hackClassName[c.name];
     Object.defineProperty(decorated, SCHEMA_SYMBOL, {value: schema, writable: false});
-    Object.defineProperty(c, SCHEMA_SYMBOL, {value: schema, writable: false});
     return decorated;
   }
 }

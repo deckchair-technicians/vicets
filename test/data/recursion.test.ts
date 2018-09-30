@@ -1,10 +1,10 @@
 import {expect} from 'chai';
-import {__, arrayof, data, failure, isdata} from "../../";
+import {__, arrayof, data, defer, failure, isdata} from "../../";
 
-describe('Recursion', () => {
+describe('Recursion using defer() and isdata()', () => {
   @data
   class Me {
-    constructor(public field: Me[] = __(arrayof(isdata(Me)))) {
+    constructor(public field: Me[] = __(arrayof(defer(() => isdata(Me))))) {
     }
   }
 
