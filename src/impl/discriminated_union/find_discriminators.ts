@@ -2,7 +2,7 @@ import {Constructor, first, isPrimitive, mapKeyValue, PrimitiveValue, unsafeCast
 import {EqualsSchema} from "../eq";
 import * as os from "os";
 import {Schema} from "../../schema";
-import {schemaOf} from "../../data";
+import {schemaOf} from "../../hasschema";
 
 class CandidateDiscriminators<T> {
   private readonly constructors: Constructor<T>[] = [];

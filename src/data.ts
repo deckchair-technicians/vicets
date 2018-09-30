@@ -4,59 +4,13 @@ import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError} from "./problems";
 import {schematizeEntries} from "./schematize";
 import {UnexpectedItemBehaviour} from "./unexpected_items";
+import {suspendValidation, hasSchema, schemaOf} from "./hasschema";
 
-let BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
 
-function buildSchemaUsingDefaultFieldValues<T>(f: () => T): T {
-  try {
-    BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = true;
-    return f();
-  } finally {
-    BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES = false;
-  }
-}
-
-const SCHEMA_SYMBOL = Symbol('schema');
-
-export function schemaOf<T>(ctor: Constructor<T>): ObjectSchema {
-  for (let search: Function = ctor; search; search = Object.getPrototypeOf(search)) {
-    const pd = Object.getOwnPropertyDescriptor(search, SCHEMA_SYMBOL);
-    if (pd !== undefined)
-      return pd.value;
-  }
-  throw new Error(`No schema on ${ctor.name}- not annotated with @data?`);
-}
-
-// TODO: add generic constraints to IN/OUT on Schema?
-export function hasSchema(schema: ObjectSchema): <C extends { new(...args: any[]): object }>(c: C) => C {
-  return function <C extends { new(...args: any[]): object }>(c: C): C {
-    const hackClassName = {};
-    hackClassName[c.name] = class extends c {
-      constructor(...args: any[]) {
-        super(...args);
-        if (BUILDING_SCHEMA_USING_DEFAULT_FIELD_VALUES)
-          return;
-
-        for (const [k, v] of entries(this)) {
-          if (isSchema(v))
-            this[k] = undefined;
-        }
-        const conformed = schema.conformInPlace(this);
-        if (conformed instanceof Problems) {
-          throw new ValidationError(this, conformed);
-        }
-      };
-    };
-
-    const decorated = hackClassName[c.name];
-    Object.defineProperty(decorated, SCHEMA_SYMBOL, {value: schema, writable: false});
-    return decorated;
-  }
-}
 
 export function data<C extends Constructor>(c: C): C {
-  // buildSchemaUsingDefaultFieldValues is required to allow calling parent constructor
-  const objectWithDefaults = buildSchemaUsingDefaultFieldValues(() => new c());
+  // suspendValidation is required to allow calling parent constructor
+  const objectWithDefaults = suspendValidation(() => new c());
 
   for (const [k, v] of entries(objectWithDefaults)) {
     if (!(isSchema(v) || isPrimitive(v)))
