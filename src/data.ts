@@ -18,7 +18,7 @@ function buildSchemaUsingDefaultFieldValues<T>(f: () => T): T {
 
 const SCHEMA_SYMBOL = Symbol('schema');
 
-export function extractSchema<T>(ctor: Constructor<T>): ObjectSchema {
+export function schemaOf<T>(ctor: Constructor<T>): ObjectSchema {
   for (let search: Function = ctor; search; search = Object.getPrototypeOf(search)) {
     const pd = Object.getOwnPropertyDescriptor(search, SCHEMA_SYMBOL);
     if (pd !== undefined)
@@ -68,7 +68,7 @@ export function data<C extends { new(...args: any[]): any }>(c: C): C {
 }
 
 export function conform<T>(c: Constructor<T>, values: {}): Problems | T {
-  const conformed = extractSchema(c).conform(values);
+  const conformed = schemaOf(c).conform(values);
   if (conformed instanceof Problems) {
     return conformed;
   }

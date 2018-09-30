@@ -2,7 +2,7 @@ import {Constructor, entries, first, isPrimitive, mapKeyValue, PrimitiveValue, u
 import {EqualsSchema} from "../eq";
 import * as os from "os";
 import {Schema} from "../../schema";
-import {extractSchema} from "../../data";
+import {schemaOf} from "../../data";
 
 class CandidateDiscriminators<T> {
   private readonly constructors: Constructor<T>[] = [];
@@ -44,7 +44,7 @@ class CandidateDiscriminators<T> {
       .map((x) => unsafeCast(x))
   }
   private static fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
-    return extractSchema(ctor).fieldSchemaArray;
+    return schemaOf(ctor).fieldSchemaArray;
   }
 
 

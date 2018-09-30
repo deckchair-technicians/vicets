@@ -5,7 +5,7 @@ import {
   construct,
   data,
   eq,
-  extractSchema,
+  schemaOf,
   failure,
   hasSchema,
   matches,
@@ -18,7 +18,7 @@ import {Constructor} from "../../src/impl/util";
 function intersect<A, B>
 (a: Constructor<A>, b: Constructor<B>): Constructor<A & B> {
 
-  const schema = extractSchema(a).intersect(extractSchema(b));
+  const schema = schemaOf(a).intersect(schemaOf(b));
 
   @hasSchema(schema)
   class Intersection {
