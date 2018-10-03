@@ -18,6 +18,9 @@ jobs:
           name: Testing
           command: npm run test
       - run:
+          name: Circular deps check
+          command: npm run madge:circular
+      - run:
           name: Set build number
           command: npm --no-git-tag-version version "0.0.$CIRCLE_BUILD_NUM"
       - run:
