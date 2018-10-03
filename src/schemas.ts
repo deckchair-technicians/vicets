@@ -23,6 +23,7 @@ import {schematizeEntries} from "./schematize";
 import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 import {UuidSchema} from "./impl/uuid";
 import {OverrideSchema, SchemaOverrides} from "./impl/override";
+import {NumberSchema} from "./impl/number";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -117,6 +118,10 @@ export function isurl(opts?: IsURLOptions): Schema<any, string> {
 
 export function isuuid(): Schema<any, string> {
   return new UuidSchema();
+}
+
+export function isnumber(): Schema<any, number> {
+  return new NumberSchema();
 }
 
 export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasUnexpectedItemBehaviour {

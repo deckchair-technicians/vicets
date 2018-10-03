@@ -64,15 +64,6 @@ export abstract class StringSchema extends BaseSchema<any, string> {
   abstract conformString(value: string): ValidationResult<string>;
 }
 
-export abstract class NumberSchema extends BaseSchema<any, number> {
-  conform(value: any): ValidationResult<number> {
-    if (typeof value === 'number' || value instanceof Number)
-      return this.conformNumber(value as number);
-    return failure('expected a number');
-  }
-
-  abstract conformNumber(value: number): ValidationResult<number>;
-}
 
 export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
   constructor(private readonly delegatedConform: (value: IN) => Problems | OUT) {
