@@ -55,12 +55,12 @@ export function problem(message: string, path: Path = []) {
   return new Problem(path, message);
 }
 
-export function problems(problem: Problem, ...more: Problem[]) {
-  return new Problems([...[problem], ...more]);
+export function problems(...ps: Problem[]) : Problems | undefined {
+  return ps.length === 0 ? undefined : new Problems(ps);
 }
 
 export function failure(message: string, path: Path = []): Problems {
-  return problems(problem(message, path));
+  return problems(problem(message, path)) as Problems;
 }
 
 export class ValidationError extends Error {

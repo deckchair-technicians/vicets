@@ -107,3 +107,7 @@ export function mergeMaps<K, V>(a: Map<K, V>, b: Map<K, V>, conflictFn: (a: V, b
   }
   return result;
 }
+
+export function identity<T>(t:T):T{
+  return t;
+}

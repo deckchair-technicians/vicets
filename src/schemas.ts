@@ -7,7 +7,7 @@ import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
 import {failure, Problems} from "./problems";
 import {RegExpSchema} from "./impl/regexp";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor, entries, toMap, typeDescription} from "./impl/util";
+import {buildPredicateMessageFunction, Constructor, entries, identity, toMap, typeDescription} from "./impl/util";
 import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
 import {Schema} from "./schema";
 import {ArrayOfSchema} from "./impl/arrayof";
@@ -25,6 +25,7 @@ import {UuidSchema} from "./impl/uuid";
 import {OverrideSchema, SchemaOverrides} from "./impl/override";
 import {NumberSchema} from "./impl/number";
 import {ObjOfSchema} from "./impl/associative/objof";
+import {UniqueSchema} from "./impl/unique";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -178,3 +179,10 @@ export function override<IN, OUT>(s: Schema<IN, OUT>, o: SchemaOverrides<IN, OUT
   return new OverrideSchema(s, o);
 }
 
+export function unique<T>(): Schema<any, T[]> {
+  return uniqueBy(identity);
+}
+
+export function uniqueBy<T, V = T>(fn: (t: T) => V): Schema<any, T[]> {
+  return new UniqueSchema<T, V>(fn);
+}
