@@ -24,6 +24,7 @@ import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_
 import {UuidSchema} from "./impl/uuid";
 import {OverrideSchema, SchemaOverrides} from "./impl/override";
 import {NumberSchema} from "./impl/number";
+import {ObjOfSchema} from "./impl/associative/objof";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -126,6 +127,10 @@ export function isnumber(): Schema<any, number> {
 
 export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasUnexpectedItemBehaviour {
   return new ObjectSchema(schematizeEntries(fieldSchemas), UnexpectedItemBehaviour.PROBLEM);
+}
+
+export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
+  return new ObjOfSchema(schema);
 }
 
 export function map<K, V>(entrySchemas: Object | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasUnexpectedItemBehaviour {
