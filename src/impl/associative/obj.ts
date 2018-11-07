@@ -16,7 +16,7 @@ function objectEntries(object: object): [string, Schema][] {
   return result;
 }
 
-class ObjectStrategies implements Associative<string, any> {
+export class ObjectStrategies implements Associative<string, any> {
   constructor(public readonly result: {}) {
   }
 
