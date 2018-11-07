@@ -183,6 +183,6 @@ export function unique<T>(): Schema<any, T[]> {
   return uniqueBy(identity);
 }
 
-export function uniqueBy<T, V = T>(fn: (t: T) => V): Schema<any, T[]> {
+export function uniqueBy<T, V = any>(fn: (t: T) => V): Schema<any, T[]> {
   return new UniqueSchema<T, V>(fn);
 }
