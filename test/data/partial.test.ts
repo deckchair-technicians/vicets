@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, data, eq, failure, MissingItemBehaviour, Schema, schemaOf} from "../../index";
+import {__, data, eq, failure, MissingItemBehaviour, Schema, schemaOf, ValidationResult} from "../../index";
 import {Constructor} from "../../src/impl/util";
 import {ObjectSchema} from "../../src/impl/associative/obj";
 
@@ -18,7 +18,8 @@ describe('Using build() on @data classes', () => {
   const s = partial(Thing);
 
   it('sets the right values', () => {
-    expect(s.conform({a: "valid", b: "valid"}))
+    const conformed: ValidationResult<Partial<Thing>> = s.conform({a: "valid", b: "valid"});
+    expect(conformed)
       .deep.eq({a: "valid", b: "valid"});
   });
   it('returns errors', () => {
