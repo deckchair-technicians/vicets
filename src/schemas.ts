@@ -20,7 +20,7 @@ import {MapSchema} from "./impl/associative/map";
 import {TupleSchema} from "./impl/associative/tuple";
 import {SetOfSchema} from "./impl/setof";
 import {schematizeEntries} from "./schematize";
-import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
+import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 import {UuidSchema} from "./impl/uuid";
 import {OverrideSchema, SchemaOverrides} from "./impl/override";
 import {NumberSchema} from "./impl/number";
@@ -126,15 +126,15 @@ export function isnumber(): Schema<any, number> {
   return new NumberSchema();
 }
 
-export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasUnexpectedItemBehaviour {
-  return new ObjectSchema(schematizeEntries(fieldSchemas), UnexpectedItemBehaviour.PROBLEM);
+export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasItemBehaviour {
+  return new ObjectSchema(schematizeEntries(fieldSchemas), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
 }
 
 export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
   return new ObjOfSchema(schema);
 }
 
-export function map<K, V>(entrySchemas: Object | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasUnexpectedItemBehaviour {
+export function map<K, V>(entrySchemas: Object | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasItemBehaviour {
   return new MapSchema<K, V>(
     entrySchemas instanceof Map
       ? entrySchemas
@@ -142,17 +142,17 @@ export function map<K, V>(entrySchemas: Object | Map<K, Schema<any, V>>): Schema
     UnexpectedItemBehaviour.PROBLEM);
 }
 
-export function tuple<A>(a: Schema<any, A>): Schema<any, [A]> & HasUnexpectedItemBehaviour;
+export function tuple<A>(a: Schema<any, A>): Schema<any, [A]> & HasItemBehaviour;
 
-export function tuple<A, B>(a: Schema<any, A>, b: Schema<any, B>,): Schema<any, [A, B]> & HasUnexpectedItemBehaviour;
+export function tuple<A, B>(a: Schema<any, A>, b: Schema<any, B>,): Schema<any, [A, B]> & HasItemBehaviour;
 
-export function tuple<A, B, C>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>): Schema<any, [A, B, C]> & HasUnexpectedItemBehaviour;
+export function tuple<A, B, C>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>): Schema<any, [A, B, C]> & HasItemBehaviour;
 
-export function tuple<A, B, C, D>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>): Schema<any, [A, B, C, D]> & HasUnexpectedItemBehaviour;
+export function tuple<A, B, C, D>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>): Schema<any, [A, B, C, D]> & HasItemBehaviour;
 
-export function tuple<A, B, C, D, E>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>, e: Schema<any, E>): Schema<any, [A, B, C, D, E]> & HasUnexpectedItemBehaviour;
+export function tuple<A, B, C, D, E>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>, e: Schema<any, E>): Schema<any, [A, B, C, D, E]> & HasItemBehaviour;
 
-export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> & HasUnexpectedItemBehaviour {
+export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> & HasItemBehaviour {
 
   return new TupleSchema(s, UnexpectedItemBehaviour.PROBLEM);
 }

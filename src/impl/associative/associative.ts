@@ -1,7 +1,7 @@
 import {Schema} from "../../schema";
 import {BaseSchema} from "../index";
 import {failure, isError, Problems, ValidationResult} from "../../problems";
-import {UnexpectedItemBehaviour} from "../../unexpected_items";
+import {MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
 
 export interface Associative<K, V> {
   set(k: K, v: V): this;
@@ -16,6 +16,7 @@ export interface Associative<K, V> {
 }
 
 export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
+                                     missingItems: MissingItemBehaviour,
                                      thing: Associative<K, V>,
                                      itemSchemas: Iterable<[K, Schema]>): Problems | undefined {
 
@@ -23,8 +24,9 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
   const unmatchedThingKeys = new Set(thing.keys());
   for (const [k, s] of itemSchemas) {
     if (!(thing.has(k))) {
-      if (s[isOptional] !== true)
+      if (s[isOptional] !== true && missingItems !== MissingItemBehaviour.IGNORE){
         problems = problems.merge(failure("No value", [k]));
+      }
       continue;
     }
     unmatchedThingKeys.delete(k);

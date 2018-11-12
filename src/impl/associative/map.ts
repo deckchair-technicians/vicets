@@ -3,9 +3,14 @@ import {Schema} from "../../schema";
 import {entries, mergeMaps, typeDescription} from "../util";
 import {conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
-import {HasUnexpectedItemBehaviour, strictest, UnexpectedItemBehaviour} from "../../unexpected_items";
+import {
+  HasItemBehaviour,
+  MissingItemBehaviour,
+  strictestUnexpected,
+  UnexpectedItemBehaviour
+} from "../../unexpected_items";
 
-export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements HasUnexpectedItemBehaviour {
+export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements HasItemBehaviour {
   constructor(private readonly itemSchemas: Map<K, Schema<any, V>>,
               private readonly unexpectedItems: UnexpectedItemBehaviour) {
     super();
@@ -23,17 +28,21 @@ export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements Ha
     for (let [k, v] of kvs) {
       instance.set(k, v);
     }
-    const problems = conformInPlace(this.unexpectedItems, instance, this.itemSchemas.entries());
+    const problems = conformInPlace(this.unexpectedItems, MissingItemBehaviour.PROBLEM, instance, this.itemSchemas.entries());
     return problems ? problems : instance;
   }
 
   intersect(other: this): this {
     const mergedSchemas = mergeMaps(this.itemSchemas, other.itemSchemas, (a: Schema, b: Schema) => a.and(b));
-    return new MapSchema(mergedSchemas, strictest(this.unexpectedItems, other.unexpectedItems)) as this;
+    return new MapSchema(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems)) as this;
   }
 
-  onUnexpected(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
-    return new MapSchema(this.itemSchemas, unexpectedItemBehaviour) as this;
+  onUnexpected(behaviour: UnexpectedItemBehaviour): this {
+    return new MapSchema(this.itemSchemas, behaviour) as this;
+  }
+
+  onMissing(behaviour: MissingItemBehaviour): this {
+    throw new Error("Not implemented");
   }
 }
 

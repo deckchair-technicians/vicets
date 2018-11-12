@@ -1,10 +1,10 @@
 import {expect} from 'chai';
 import {eq, failure, opt, Schema, tuple} from "../..";
 import {problem, problems} from "../../src/problems";
-import {HasUnexpectedItemBehaviour, UnexpectedItemBehaviour} from "../../src/unexpected_items";
+import {HasItemBehaviour, UnexpectedItemBehaviour} from "../../src/unexpected_items";
 
 describe('tuple()', () => {
-  const s: Schema<any, [string, number]> & HasUnexpectedItemBehaviour = tuple(eq("valid"), eq(1));
+  const s: Schema<any, [string, number]> & HasItemBehaviour = tuple(eq("valid"), eq(1));
 
   it('passes valid values through', () => {
     expect(s.conform(["valid", 1]))

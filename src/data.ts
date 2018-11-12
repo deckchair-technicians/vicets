@@ -3,9 +3,8 @@ import {ObjectSchema} from "./impl/associative/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError} from "./problems";
 import {schematizeEntries} from "./schematize";
-import {UnexpectedItemBehaviour} from "./unexpected_items";
-import {suspendValidation, hasSchema, schemaOf} from "./hasschema";
-
+import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
+import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
 
 
 export function data<C extends Constructor>(c: C): C {
@@ -17,7 +16,7 @@ export function data<C extends Constructor>(c: C): C {
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
 
-  const schema = new ObjectSchema(schematizeEntries(objectWithDefaults), UnexpectedItemBehaviour.PROBLEM) as ObjectSchema;
+  const schema = new ObjectSchema(schematizeEntries(objectWithDefaults), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM) as ObjectSchema;
   return hasSchema(schema)(c);
 }
 

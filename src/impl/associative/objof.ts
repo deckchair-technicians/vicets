@@ -2,7 +2,7 @@ import {BaseSchema} from "../index";
 import {Schema} from "../../schema";
 import {failure, ValidationResult} from "../../problems";
 import {conformInPlace} from "./associative";
-import {UnexpectedItemBehaviour} from "../../unexpected_items";
+import {MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
 import {ObjectStrategies} from "./obj";
 
 export class ObjOfSchema<T> extends BaseSchema<any, { [k: string]: T }> {
@@ -20,7 +20,7 @@ export class ObjOfSchema<T> extends BaseSchema<any, { [k: string]: T }> {
     const itemSchemas = Object.keys(value).map(k => [k, this.valueSchema] as [string, Schema<any, T>]);
     const instance = <{ [p: string]: T }>{};
     Object.assign(instance, value);
-    const problems = conformInPlace(UnexpectedItemBehaviour.PROBLEM, new ObjectStrategies(instance), itemSchemas);
+    const problems = conformInPlace(UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM, new ObjectStrategies(instance), itemSchemas);
     return problems ? problems : instance;
   }
 }

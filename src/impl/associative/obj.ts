@@ -3,7 +3,12 @@ import {Schema} from "../../schema";
 import {merge, typeDescription} from "../util";
 import {Associative, conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
-import {HasUnexpectedItemBehaviour, strictest, UnexpectedItemBehaviour} from "../../unexpected_items";
+import {
+  HasItemBehaviour,
+  MissingItemBehaviour, strictestMissing,
+  strictestUnexpected,
+  UnexpectedItemBehaviour
+} from "../../unexpected_items";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
@@ -42,11 +47,12 @@ export class ObjectStrategies implements Associative<string, any> {
   }
 }
 
-export class ObjectSchema extends BaseSchema<any, object> implements HasUnexpectedItemBehaviour {
+export class ObjectSchema extends BaseSchema<any, object> implements HasItemBehaviour {
   public readonly fieldSchemaArray: [string, Schema][];
 
   constructor(private readonly fieldSchemasAsObject: Record<string, Schema>,
-              private readonly unexpectedItems: UnexpectedItemBehaviour) {
+              private readonly unexpectedItems: UnexpectedItemBehaviour,
+              private readonly missingItems: MissingItemBehaviour) {
     super();
     this.fieldSchemaArray = objectEntries(fieldSchemasAsObject);
   }
@@ -64,17 +70,26 @@ export class ObjectSchema extends BaseSchema<any, object> implements HasUnexpect
   }
 
   public conformInPlace(instance: {}): ValidationResult<{}> {
-    const problems = conformInPlace(this.unexpectedItems, new ObjectStrategies(instance), this.fieldSchemaArray);
+    const problems = conformInPlace(
+      this.unexpectedItems,
+      this.missingItems,
+      new ObjectStrategies(instance),
+      this.fieldSchemaArray);
+
     return problems ? problems : instance;
   }
 
   intersect(other: this): this {
     const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b));
-    return new ObjectSchema(mergedSchemas, strictest(this.unexpectedItems, other.unexpectedItems)) as this;
+    return new ObjectSchema(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems)) as this;
   }
 
-  onUnexpected(unexpectedItemBehaviour: UnexpectedItemBehaviour): this {
-    return new ObjectSchema(this.fieldSchemasAsObject, unexpectedItemBehaviour) as this;
+  onUnexpected(behaviour: UnexpectedItemBehaviour): this {
+    return new ObjectSchema(this.fieldSchemasAsObject, behaviour, this.missingItems) as this;
+  }
+
+  onMissing(behaviour: MissingItemBehaviour): this {
+    return new ObjectSchema(this.fieldSchemasAsObject, this.unexpectedItems, behaviour) as this;
   }
 }
 
