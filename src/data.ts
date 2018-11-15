@@ -54,6 +54,7 @@ export function construct<T>(c: Constructor<T>, value: T): T {
 export class DataSchema<T> extends BaseSchema<any, T> {
   constructor(private readonly c: Constructor<T>) {
     super();
+    schemaOf(c);
   }
 
   conform(value: any): Problems | T {
