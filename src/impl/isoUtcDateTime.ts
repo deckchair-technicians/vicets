@@ -1,28 +1,45 @@
 import {BaseSchema} from "./index";
 import {failure, ValidationResult} from "../problems";
 
-const regex = /^([1-9][0-9]{3})-([0-1][0-9])-([0-3][0-9])T([0-2][0-9]):([0-6][0-9])(:([0-6][0-9])(\.([0-9]{3}))?)?((Z)|(\+([0-2][0-9]):([0-6][0-9])))$/;
-export class IsoUtcDateTimeSchema extends BaseSchema<any, Date> {
+const regex = /^([1-9][0-9]{3})-([0-1][0-9])-([0-3][0-9])(T([0-2][0-9]):([0-6][0-9])(:([0-6][0-9])(\.([0-9]{3}))?)?((Z)|(\+([0-2][0-9]):([0-6][0-9]))))?$/;
+
+export enum TimeExpectation {
+  NEVER = 'never',
+  ALWAYS = 'always',
+  MAYBE = 'maybe',
+}
+
+export class IsoUtcDateSchema extends BaseSchema<any, Date> {
+  constructor(private readonly time: TimeExpectation) {
+    super()
+  }
+
   conform(value: any): ValidationResult<Date> {
-    if(typeof value === 'string'){
+    if (typeof value === 'string') {
       const match = regex.exec(value);
-      if(!match)
+      if (!match)
         return failure("expected a valid ISO8601 string");
 
-      try{
+      try {
         const year = Number.parseInt(match[1]);
         const month = Number.parseInt(match[2]) - 1;
         const date = Number.parseInt(match[3]);
-        const hours = Number.parseInt(match[4]);
-        const minutes = Number.parseInt(match[5]);
-        const seconds = match[7] ? Number.parseInt(match[7]) : 0;
-        const millis = match[9] ? Number.parseInt(match[9]) : 0;
 
-        const offsetHours = match[13] ? Number.parseInt(match[13]) : 0;
-        const offsetMinutes = match[14] ? Number.parseInt(match[14]) : 0;
+        if(value.length === 10 && this.time === TimeExpectation.ALWAYS)
+          return failure("date should have a time of day component");
 
-        if(offsetHours !==0 || offsetMinutes !== 0)
+        const hours = match[5] ? Number.parseInt(match[5]) : 0;
+        const minutes = match[6] ? Number.parseInt(match[6]) : 0;
+
+        const seconds = match[8] ? Number.parseInt(match[8]) : 0;
+        const millis = match[10] ? Number.parseInt(match[10]) : 0;
+
+        const offsetHours = match[14] ? Number.parseInt(match[14]) : 0;
+        const offsetMinutes = match[15] ? Number.parseInt(match[15]) : 0;
+
+        if (offsetHours !== 0 || offsetMinutes !== 0)
           return failure("expected a UTC date, with timezone specified as Z or 00:00");
+
 
         value = new Date(Date.UTC(
           year,
@@ -33,7 +50,7 @@ export class IsoUtcDateTimeSchema extends BaseSchema<any, Date> {
           seconds,
           millis
         ));
-        if(
+        if (
           value.getUTCFullYear() !== year ||
           value.getUTCMonth() !== month ||
           value.getUTCDate() !== date ||
@@ -47,8 +64,11 @@ export class IsoUtcDateTimeSchema extends BaseSchema<any, Date> {
       }
     }
 
-    if(! (value instanceof Date))
+    if (!(value instanceof Date))
       return failure("expected a date or string");
+
+    if (this.time === TimeExpectation.NEVER && new Date(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()).getTime() !== value.getTime())
+      return failure("date should not have a time of day component");
 
     return value;
   }

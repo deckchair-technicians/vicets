@@ -4,7 +4,7 @@ import {failure} from "../../src/problems";
 import {isoUtcDateTime, validate} from "../../index";
 
 
-describe('isoutcdatetime', () => {
+describe('isoUtcDateTime', () => {
   const s: Schema<any, Date> = isoUtcDateTime();
   const now = new Date();
 
@@ -30,6 +30,9 @@ describe('isoutcdatetime', () => {
   });
   it('can specify timezone as zero offset', () => {
     expect(validate(s, "2020-02-29T00:00+00:00").getTime()).eq(new Date(Date.UTC(2020, 1, 29)).getTime());
+  });
+  it('requires time component', () => {
+    expect(s.conform("2020-02-29")).deep.eq(failure("date should have a time of day component"));
   });
   it('can specify timezone as non-zero offset', () => {
     expect(s.conform("2020-02-29T00:00+10:00")).deep.eq(failure("expected a UTC date, with timezone specified as Z or 00:00"));
