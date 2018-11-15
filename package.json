@@ -29,6 +29,7 @@
     "@types/uuid": "^3.4.3",
     "google-libphonenumber": "^3.1.6",
     "node-yaml": "^3.1.1",
+    "phone": "^2.3.0",
     "reflect-metadata": "^0.1.12",
     "tslib": "^1.9.3",
     "validator": "10.4.0"

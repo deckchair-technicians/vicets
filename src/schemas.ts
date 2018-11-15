@@ -27,6 +27,7 @@ import {NumberSchema} from "./impl/number";
 import {ObjOfSchema} from "./impl/associative/objof";
 import {UniqueSchema} from "./impl/unique";
 import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
+import {E164PhoneNumberSchema} from "./impl/phoneNumber";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -136,6 +137,14 @@ export function isoUtcDateTime() : Schema<any, Date> {
 const DATE = new IsoUtcDateSchema(TimeExpectation.NEVER);
 export function isoDateOnly():Schema<any,Date>{
   return DATE;
+}
+const PHONE = new E164PhoneNumberSchema();
+
+/**
+ * E.164 phone number normaliser
+ */
+export function e164PhoneNumber(): Schema<any, string> {
+  return PHONE;
 }
 
 export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasItemBehaviour {
