@@ -1,11 +1,11 @@
 import {BaseSchema} from "./index";
 import {failure, ValidationResult} from "../problems";
 
-const dateRegex = /^([1-9][0-9]{3})-([0-1][0-9])-([0-3][0-9])T([0-2][0-9]):([0-6][0-9])(:([0-6][0-9])(\.([0-9]{3}))?)?((Z)|(\+([0-2][0-9]):([0-6][0-9])))$/;
-export class UtcDateSchema extends BaseSchema<any, Date> {
+const regex = /^([1-9][0-9]{3})-([0-1][0-9])-([0-3][0-9])T([0-2][0-9]):([0-6][0-9])(:([0-6][0-9])(\.([0-9]{3}))?)?((Z)|(\+([0-2][0-9]):([0-6][0-9])))$/;
+export class IsoUtcDateTimeSchema extends BaseSchema<any, Date> {
   conform(value: any): ValidationResult<Date> {
     if(typeof value === 'string'){
-      const match = dateRegex.exec(value);
+      const match = regex.exec(value);
       if(!match)
         return failure("expected a valid ISO8601 string");
 
