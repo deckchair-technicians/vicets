@@ -130,21 +130,21 @@ export function isnumber(): Schema<any, number> {
 
 const DATE_TIME = new IsoUtcDateSchema(TimeExpectation.ALWAYS);
 
-export function isoUtcDateTime() : Schema<any, Date> {
+export function isoUtcDateTime(): Schema<any, Date> {
   return DATE_TIME;
 }
 
 const DATE = new IsoUtcDateSchema(TimeExpectation.NEVER);
-export function isoDateOnly():Schema<any,Date>{
+
+export function isoDateOnly(): Schema<any, Date> {
   return DATE;
 }
-const PHONE = new E164PhoneNumberSchema();
 
 /**
  * E.164 phone number normaliser
  */
-export function e164PhoneNumber(): Schema<any, string> {
-  return PHONE;
+export function e164PhoneNumber(defaultCountryIso3166: string = 'USA'): Schema<any, string> {
+  return new E164PhoneNumberSchema(defaultCountryIso3166);
 }
 
 export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasItemBehaviour {
