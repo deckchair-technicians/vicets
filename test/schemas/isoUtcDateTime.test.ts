@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {Schema} from "../..";
 import {failure} from "../../src/problems";
 import {isoUtcDateTime, validate} from "../../index";
+import {utcDate} from "../../src/impl/util";
 
 
 describe('isoUtcDateTime', () => {
@@ -26,15 +27,15 @@ describe('isoUtcDateTime', () => {
     expect(validate(s, noMillisOrSeconds).getTime()).eq(expected);
   });
   it('leap years are accepted', () => {
-    expect(validate(s, "2020-02-29T00:00Z").getTime()).eq(new Date(Date.UTC(2020, 1, 29)).getTime());
+    expect(validate(s, "2020-02-29T00:00Z").getTime()).eq(utcDate(2020, 1, 29).getTime());
   });
   it('can specify timezone as zero offset', () => {
-    expect(validate(s, "2020-02-29T00:00+00:00").getTime()).eq(new Date(Date.UTC(2020, 1, 29)).getTime());
+    expect(validate(s, "2020-02-29T00:00+00:00").getTime()).eq(utcDate(2020, 1, 29).getTime());
   });
   it('requires time component', () => {
     expect(s.conform("2020-02-29")).deep.eq(failure("date should have a time of day component"));
   });
-  it('can specify timezone as non-zero offset', () => {
+  it('can NOT specify timezone as non-zero offset', () => {
     expect(s.conform("2020-02-29T00:00+10:00")).deep.eq(failure("expected a UTC date, with timezone specified as Z or 00:00"));
   });
   it('complains about 31st feb', () => {

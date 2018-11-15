@@ -17,7 +17,7 @@ export function isPrimitive(value: any): boolean {
   return (typeof value !== 'object' && typeof value !== 'function') || value === null
 }
 
-export type Constructor<T=any> = new(...args: any[]) => T ;
+export type Constructor<T = any> = new(...args: any[]) => T ;
 
 export function unsafeCast<T>(x: any): T {
   return x as T;
@@ -108,6 +108,15 @@ export function mergeMaps<K, V>(a: Map<K, V>, b: Map<K, V>, conflictFn: (a: V, b
   return result;
 }
 
-export function identity<T>(t:T):T{
+export function identity<T>(t: T): T {
   return t;
+}
+
+export function utcDate(year: number, month: number, date: number, hours?: number, minutes?: number, seconds?: number, ms?: number): Date {
+  const ts = ms ? Date.UTC(year, month, date, hours, minutes, seconds, ms)
+    :seconds ? Date.UTC(year, month, date, hours, minutes, seconds)
+      : minutes ? Date.UTC(year, month, date, hours, minutes)
+        : hours ? Date.UTC(year, month, date, hours)
+          : Date.UTC(year, month, date);
+  return new Date(ts)
 }

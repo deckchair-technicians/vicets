@@ -2,29 +2,31 @@ import {expect} from 'chai';
 import {Schema} from "../..";
 import {failure} from "../../src/problems";
 import {isoDateOnly, validate} from "../../index";
+import {utcDate} from "../../src/impl/util";
 
 describe('isoDateOnly', () => {
   const s: Schema<any, Date> = isoDateOnly();
 
   it('if value is already a date, it is passed through', () => {
-    const date = new Date(Date.UTC(2010, 1, 1));
+    const date = utcDate(2010, 1, 1);
     expect(validate(s, date)).eq(date);
   });
   it('dates with a time component are rejected', () => {
-    const date = new Date(Date.UTC(2010, 1, 1, 10, 11));
+    const date = utcDate(2010, 1, 1, 10, 11);
     expect(s.conform(date)).deep.eq(failure("date should not have a time of day component"));
     expect(s.conform("2018-10-20T11:00Z")).deep.eq(failure("date should not have a time of day component"));
     expect(s.conform("2018-10-20T11:00:12Z")).deep.eq(failure("date should not have a time of day component"));
   });
   it('works for iso strings', () => {
-    const exampleDate = new Date(Date.UTC(2018, 9, 31));
+    const exampleDate = utcDate(2018, 9, 31);
     expect(validate(s, "2018-10-31").getTime()).eq(exampleDate.getTime());
     expect(validate(s, "2018-10-31T00:00Z").getTime()).eq(exampleDate.getTime());
     expect(validate(s, "2018-10-31T00:00:00Z").getTime()).eq(exampleDate.getTime());
     expect(validate(s, "2018-10-31T00:00:00.000Z").getTime()).eq(exampleDate.getTime());
+    expect(validate(s, "2011-10-05T00:00:00.000Z").getTime()).eq(utcDate(2011, 9, 5).getTime());
   });
   it('leap years are accepted', () => {
-    expect(validate(s, "2020-02-29").getTime()).eq(new Date(Date.UTC(2020, 1, 29)).getTime());
+    expect(validate(s, "2020-02-29").getTime()).eq(utcDate(2020, 1, 29).getTime());
   });
   it('complains about 31st feb', () => {
     expect(s.conform("2018-02-31")).deep.eq(failure("expected a valid date"));

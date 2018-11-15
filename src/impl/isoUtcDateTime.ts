@@ -1,5 +1,6 @@
 import {BaseSchema} from "./index";
 import {failure, ValidationResult} from "../problems";
+import {utcDate} from "./util";
 
 const regex = /^([1-9][0-9]{3})-([0-1][0-9])-([0-3][0-9])(T([0-2][0-9]):([0-6][0-9])(:([0-6][0-9])(\.([0-9]{3}))?)?((Z)|(\+([0-2][0-9]):([0-6][0-9]))))?$/;
 
@@ -41,7 +42,7 @@ export class IsoUtcDateSchema extends BaseSchema<any, Date> {
           return failure("expected a UTC date, with timezone specified as Z or 00:00");
 
 
-        value = new Date(Date.UTC(
+        value = utcDate(
           year,
           month,
           date,
@@ -49,7 +50,7 @@ export class IsoUtcDateSchema extends BaseSchema<any, Date> {
           minutes,
           seconds,
           millis
-        ));
+        );
         if (
           value.getUTCFullYear() !== year ||
           value.getUTCMonth() !== month ||
@@ -67,7 +68,7 @@ export class IsoUtcDateSchema extends BaseSchema<any, Date> {
     if (!(value instanceof Date))
       return failure("expected a date or string");
 
-    if (this.time === TimeExpectation.NEVER && new Date(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()).getTime() !== value.getTime())
+    if (this.time === TimeExpectation.NEVER && utcDate(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()).getTime() !== value.getTime())
       return failure("date should not have a time of day component");
 
     return value;
