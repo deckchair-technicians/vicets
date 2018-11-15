@@ -27,7 +27,7 @@ import {NumberSchema} from "./impl/number";
 import {ObjOfSchema} from "./impl/associative/objof";
 import {UniqueSchema} from "./impl/unique";
 import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
-import {E164PhoneNumberSchema} from "./impl/phoneNumber";
+import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
