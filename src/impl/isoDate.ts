@@ -31,6 +31,9 @@ export class IsoDateSchema extends BaseSchema<any,Date>{
     if(! (value instanceof Date))
       return failure("expected a date or string");
 
+    if(new Date(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()).getTime() !== value.getTime())
+      return failure("date should not have a time of day component");
+
     return value;
   }
 }
