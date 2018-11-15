@@ -28,6 +28,7 @@ import {ObjOfSchema} from "./impl/associative/objof";
 import {UniqueSchema} from "./impl/unique";
 import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
 import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
+import {schemaOf} from "./hasschema";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -39,6 +40,11 @@ export function opt<IN, OUT>(s: Schema<any, OUT>): Schema<any, OUT | undefined> 
 
 export function isdata<T>(constructor: Constructor<T>): Schema<any, T> {
   return new DataSchema(constructor);
+}
+
+export function partial<T>(type: Constructor<T>): Schema<any, Partial<T>> {
+  const objectSchema: ObjectSchema = schemaOf(type);
+  return objectSchema.onMissing(MissingItemBehaviour.IGNORE);
 }
 
 export function eq<T>(value: T): Schema<any, T> {

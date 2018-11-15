@@ -1,12 +1,8 @@
 import {expect} from "chai";
-import {__, data, eq, failure, MissingItemBehaviour, Schema, schemaOf, ValidationResult} from "../../index";
+import {__, data, eq, failure, MissingItemBehaviour, partial, Schema, schemaOf, ValidationResult} from "../../index";
 import {Constructor} from "../../src/impl/util";
 import {ObjectSchema} from "../../src/impl/associative/obj";
 
-function partial<T>(type: Constructor<T>): Schema<any, Partial<T>> {
-  const objectSchema: ObjectSchema = schemaOf(type);
-  return objectSchema.onMissing(MissingItemBehaviour.IGNORE);
-}
 
 describe('Using build() on @data classes', () => {
   @data
