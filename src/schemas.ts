@@ -26,6 +26,7 @@ import {OverrideSchema, SchemaOverrides} from "./impl/override";
 import {NumberSchema} from "./impl/number";
 import {ObjOfSchema} from "./impl/associative/objof";
 import {UniqueSchema} from "./impl/unique";
+import {UtcDateSchema} from "./impl/utcdate";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -125,6 +126,13 @@ export function isuuid(): Schema<any, string> {
 export function isnumber(): Schema<any, number> {
   return new NumberSchema();
 }
+
+const DATE_SCHEMA = new UtcDateSchema();
+
+export function utcdate() : Schema<any, Date> {
+  return DATE_SCHEMA;
+}
+
 
 export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasItemBehaviour {
   return new ObjectSchema(schematizeEntries(fieldSchemas), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
