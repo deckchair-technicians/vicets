@@ -20,6 +20,26 @@ export function data<C extends Constructor>(c: C): C {
   return hasSchema(schema)(c);
 }
 
+export function intersect<A, B>
+(a: Constructor<A>, b: Constructor<B>): Constructor<A & B> {
+
+  const schema = schemaOf(a).intersect(schemaOf(b));
+
+  @hasSchema(schema)
+  class Intersection {
+  }
+
+  for (let id in a.prototype) {
+    (<any>Intersection.prototype)[id] = (<any>a.prototype)[id];
+  }
+  for (let id in b.prototype) {
+    if (!Intersection.prototype.hasOwnProperty(id)) {
+      (<any>Intersection.prototype)[id] = (<any>b.prototype)[id];
+    }
+  }
+  return Intersection as any as Constructor<A & B>;
+}
+
 export function makeInstance<T>(c: Constructor<T>, obj: object): T {
   return Object.assign(Object.create(c.prototype), obj);
 }

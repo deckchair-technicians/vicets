@@ -1,26 +1,5 @@
 import {expect} from "chai";
-import {__, conformAs, construct, data, eq, failure, hasSchema, matches, problem, problems, schema, schemaOf} from "../../";
-import {Constructor} from "../../src/impl/util";
-
-function intersect<A, B>
-(a: Constructor<A>, b: Constructor<B>): Constructor<A & B> {
-
-  const schema = schemaOf(a).intersect(schemaOf(b));
-
-  @hasSchema(schema)
-  class Intersection {
-  }
-
-  for (let id in a.prototype) {
-    (<any>Intersection.prototype)[id] = (<any>a.prototype)[id];
-  }
-  for (let id in b.prototype) {
-    if (!Intersection.prototype.hasOwnProperty(id)) {
-      (<any>Intersection.prototype)[id] = (<any>b.prototype)[id];
-    }
-  }
-  return Intersection as any as Constructor<A & B>;
-}
+import {__, intersect, conformAs, construct, data, eq, failure, matches, problem, problems, schema} from "../../";
 
 describe('Intersecting @data classes', () => {
   @data
