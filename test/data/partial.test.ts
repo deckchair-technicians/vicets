@@ -1,7 +1,5 @@
 import {expect} from "chai";
-import {__, data, eq, failure, MissingItemBehaviour, partial, Schema, schemaOf, ValidationResult} from "../../index";
-import {Constructor} from "../../src/impl/util";
-import {ObjectSchema} from "../../src/impl/associative/obj";
+import {__, data, eq, failure, partial, ValidationResult} from "../../index";
 
 
 describe('Using build() on @data classes', () => {

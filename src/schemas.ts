@@ -29,6 +29,7 @@ import {UniqueSchema} from "./impl/unique";
 import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
 import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
 import {schemaOf} from "./hasschema";
+import {SelectSchema} from "./impl/select";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -212,4 +213,8 @@ export function unique<T>(): Schema<any, T[]> {
 
 export function uniqueBy<T, V = any>(fn: (t: T) => V): Schema<T[], T[]> {
   return new UniqueSchema<T, V>(fn);
+}
+
+export function select<T>(path: string[], s: Schema<any, T>): Schema<any, T> {
+  return new SelectSchema(s, path);
 }

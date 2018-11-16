@@ -1,7 +1,7 @@
 import {BaseSchema, isSchema} from "./impl";
 import {ObjectSchema} from "./impl/associative/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
-import {failure, Problems, ValidationError} from "./problems";
+import {failure, Problems, ValidationError, ValidationResult} from "./problems";
 import {schematizeEntries} from "./schematize";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
@@ -20,16 +20,19 @@ export function data<C extends Constructor>(c: C): C {
   return hasSchema(schema)(c);
 }
 
-export function conform<T>(c: Constructor<T>, values: {}): Problems | T {
-  const conformed = schemaOf(c).conform(values);
-  if (conformed instanceof Problems) {
-    return conformed;
-  }
-  return Object.assign(Object.create(c.prototype), conformed);
+export function makeInstance<T>(c: Constructor<T>, obj: object): T {
+  return Object.assign(Object.create(c.prototype), obj);
+}
+
+export function conformAs<T>(c: Constructor<T>, obj: object): ValidationResult<T> {
+  const result = schemaOf(c).conform(obj);
+  if (result instanceof Problems)
+    return result;
+  return makeInstance(c, result);
 }
 
 export function build<T>(c: Constructor<T>, values: {}): T {
-  const conformed = conform(c, values);
+  const conformed = conformAs(c, values);
   if (conformed instanceof Problems) {
     throw new ValidationError(values, conformed);
   }
@@ -70,5 +73,4 @@ export class DataSchema<T> extends BaseSchema<any, T> {
       throw e;
     }
   }
-
 }

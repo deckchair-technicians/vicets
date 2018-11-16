@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, build, conform, data, eq, failure} from "../..";
+import {__, build, conformAs, data, eq, failure} from "../..";
 
 
 describe('Using build() on @data classes', () => {
@@ -21,11 +21,11 @@ describe('Using build() on @data classes', () => {
     expect(() => build(A, {field: "some bad value"})).to.throw(/some bad value/);
   });
   it('complains when field is missing', () => {
-    expect(conform(A, {}))
+    expect(conformAs(A, {}))
       .deep.equals(failure("No value", ["field"]));
   });
   it('complains when additional fields exist', () => {
-    expect(conform(A, {field: "valid", additionalField: "should not be here"}))
+    expect(conformAs(A, {field: "valid", additionalField: "should not be here"}))
       .deep.equals(failure("Unexpected item", ["additionalField"]));
   });
 

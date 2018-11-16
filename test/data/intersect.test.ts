@@ -1,18 +1,5 @@
 import {expect} from "chai";
-import {
-  __,
-  conform,
-  construct,
-  data,
-  eq,
-  failure,
-  hasSchema,
-  matches,
-  problem,
-  problems,
-  schema,
-  schemaOf
-} from "../../";
+import {__, conformAs, construct, data, eq, failure, hasSchema, matches, problem, problems, schema, schemaOf} from "../../";
 import {Constructor} from "../../src/impl/util";
 
 function intersect<A, B>
@@ -57,12 +44,12 @@ describe('Intersecting @data classes', () => {
 
   });
   it('reports errors from left @data class', () => {
-    expect(conform(C, {a: "INVALID", b: "valid b"}))
+    expect(conformAs(C, {a: "INVALID", b: "valid b"}))
       .deep.equals(failure("expected 'valid a' but got string: \"INVALID\"", ["a"]));
 
   });
   it('reports errors from right @data class', () => {
-    expect(conform(C, {a: "valid a", b: "INVALID"}))
+    expect(conformAs(C, {a: "valid a", b: "INVALID"}))
       .deep.equals(failure("expected 'valid b' but got string: \"INVALID\"", ["b"]));
 
   });
@@ -87,7 +74,7 @@ describe('Intersecting @data classes', () => {
     }
 
     it('values for shared keys must be valid in both classes', () => {
-      const valid = conform(AbcDef, {a: "abcdef"});
+      const valid = conformAs(AbcDef, {a: "abcdef"});
       expect(valid).deep.equals({a: "abcdef"});
     });
     it('conformed result is passed left to right', () => {
@@ -104,24 +91,24 @@ describe('Intersecting @data classes', () => {
       class CoerceAndValidate extends intersect(CoerceToUpper, RequiresUpperCase) {
       }
 
-      expect(conform(CoerceAndValidate, {a: "lowercase"}))
+      expect(conformAs(CoerceAndValidate, {a: "lowercase"}))
         .deep.equals({a: "LOWERCASE"});
 
       class ValidateAndCoerce extends intersect(RequiresUpperCase, CoerceToUpper) {
       }
 
-      expect(conform(ValidateAndCoerce, {a: "lowercase"}))
+      expect(conformAs(ValidateAndCoerce, {a: "lowercase"}))
         .deep.equals(failure("did not match /[A-Z]+/", ["a"]));
 
-      expect(conform(ValidateAndCoerce, {a: "UPPERCASE"}))
+      expect(conformAs(ValidateAndCoerce, {a: "UPPERCASE"}))
         .deep.equals({a: "UPPERCASE"});
     });
     it('values for shared keys must be valid in both classes', () => {
-      expect(conform(AbcDef, {a: "def"}))
+      expect(conformAs(AbcDef, {a: "def"}))
         .deep.equals(problems(
         problem("did not match /abc/", ["a"])));
 
-      expect(conform(AbcDef, {a: "abc"}))
+      expect(conformAs(AbcDef, {a: "abc"}))
         .deep.equals(problems(
         problem("did not match /def/", ["a"])));
     });
