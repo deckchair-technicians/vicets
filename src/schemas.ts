@@ -30,6 +30,7 @@ import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
 import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
 import {schemaOf} from "./hasschema";
 import {SelectSchema} from "./impl/select";
+import {LensBehaviour, LensSchema} from "./impl/lens";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -216,5 +217,16 @@ export function uniqueBy<T, V = any>(fn: (t: T) => V): Schema<T[], T[]> {
 }
 
 export function select<T>(path: string[], s: Schema<any, T>): Schema<any, T> {
-  return new SelectSchema(s, path);
+  return new SelectSchema(path, s);
+}
+
+
+export {LensBehaviour} from './impl/lens'
+/**
+ * Expects an object. Conforms value at path using schema, and returns the outer object.
+ *
+ * lens(["a", "b"], eq("valid")).conform({a:{b:"valid"}}) returns {a:{b:"valid"}}
+ */
+export function lens<T, U>(path: string[], s: Schema<any, U>, behaviour: LensBehaviour): Schema<any, T> {
+  return new LensSchema(path, s, behaviour);
 }

@@ -3,8 +3,8 @@ import {Schema} from "../schema";
 import {failure, Problems, ValidationResult} from "../problems";
 
 export class SelectSchema<T> extends BaseSchema<any, T> {
-  constructor(private readonly subschema: Schema<any, T>,
-              private readonly path: string[]) {
+  constructor(private readonly path: string[],
+              private readonly subschema: Schema<any, T>) {
     super()
   };
 
