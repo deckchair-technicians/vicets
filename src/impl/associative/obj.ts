@@ -5,7 +5,8 @@ import {Associative, conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
 import {
   HasItemBehaviour,
-  MissingItemBehaviour, strictestMissing,
+  MissingItemBehaviour,
+  strictestMissing,
   strictestUnexpected,
   UnexpectedItemBehaviour
 } from "../../unexpected_items";
@@ -47,17 +48,19 @@ export class ObjectStrategies implements Associative<string, any> {
   }
 }
 
-export class ObjectSchema extends BaseSchema<any, object> implements HasItemBehaviour {
+export type Schemas<T extends object> = { [K in keyof T]: Schema<any, T[K]> };
+
+export class ObjectSchema<T extends object> extends BaseSchema<any, T> implements HasItemBehaviour {
   public readonly fieldSchemaArray: [string, Schema][];
 
-  constructor(private readonly fieldSchemasAsObject: Record<string, Schema>,
+  constructor(private readonly fieldSchemasAsObject: Schemas<T>,
               private readonly unexpectedItems: UnexpectedItemBehaviour,
               private readonly missingItems: MissingItemBehaviour) {
     super();
     this.fieldSchemaArray = objectEntries(fieldSchemasAsObject);
   }
 
-  conform(value: any): ValidationResult<object> {
+  conform(value: any): ValidationResult<T> {
     if (value === undefined || value === null)
       return failure('no value');
 
@@ -66,7 +69,7 @@ export class ObjectSchema extends BaseSchema<any, object> implements HasItemBeha
 
     const instance = {};
     Object.assign(instance, value);
-    return this.conformInPlace(instance);
+    return this.conformInPlace(instance) as T;
   }
 
   public conformInPlace(instance: {}): ValidationResult<{}> {
@@ -79,9 +82,9 @@ export class ObjectSchema extends BaseSchema<any, object> implements HasItemBeha
     return problems ? problems : instance;
   }
 
-  intersect(other: this): this {
-    const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b));
-    return new ObjectSchema(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems)) as this;
+  intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U>{
+    const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b)) as Schemas<T & U>;
+    return new ObjectSchema<T & U>(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems));
   }
 
   onUnexpected(behaviour: UnexpectedItemBehaviour): this {

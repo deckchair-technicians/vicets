@@ -32,7 +32,7 @@ describe('object', () => {
       .deep.equals({unexpected: 'whatever'});
   });
   it('Can be nested', () => {
-    const s: Schema<object, object> = object({a: {b: eq(1)}});
+    const s: Schema<object, object> = object({a: object({b: eq(1)})});
 
     expect(s.conform({a: {b: 2}})).deep.equals(failure(
       "expected '1' but got number: 2",

@@ -1,11 +1,12 @@
-import {ObjectSchema} from "./impl/associative/obj";
+import {ObjectSchema, Schemas} from "./impl/associative/obj";
 import {Constructor, entries} from "./impl/util";
 import {isSchema} from "./impl";
 import {Problems, ValidationError} from "./problems";
+import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
 const SCHEMA_SYMBOL = Symbol('schema');
 
-export function schemaOf<T>(ctor: Constructor<T>): ObjectSchema {
+export function schemaOf<T extends object>(ctor: Constructor<T>): ObjectSchema<T> {
   for (let search: Function = ctor; search; search = Object.getPrototypeOf(search)) {
     const pd = Object.getOwnPropertyDescriptor(search, SCHEMA_SYMBOL);
     if (pd !== undefined)
@@ -26,7 +27,7 @@ export function suspendValidation<T>(f: () => T): T {
 
 
 // TODO: add generic constraints to IN/OUT on Schema?
-export function hasSchema(schema: ObjectSchema): <C extends { new(...args: any[]): object }>(c: C) => C {
+export function hasSchema<C extends { new(...args: any[]): object }>(schema: ObjectSchema<C> ): (c: C) => C {
   return function <C extends { new(...args: any[]): object }>(c: C): C {
     const hackClassName = {};
     hackClassName[c.name] = class extends c {

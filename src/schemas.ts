@@ -1,6 +1,6 @@
 import {DelegatingSchema} from "./impl";
 import {DataSchema} from "./data";
-import {ObjectSchema} from "./impl/associative/obj";
+import {ObjectSchema, Schemas} from "./impl/associative/obj";
 import {EqualsSchema} from "./impl/eq";
 import {InSchema} from "./impl/isin";
 import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
@@ -40,12 +40,12 @@ export function opt<IN, OUT>(s: Schema<any, OUT>): Schema<any, OUT | undefined> 
   return new TagSchemaAsOptional(s);
 }
 
-export function isdata<T>(constructor: Constructor<T>): Schema<any, T> {
+export function isdata<T extends object>(constructor: Constructor<T>): Schema<any, T> {
   return new DataSchema(constructor);
 }
 
-export function partial<T>(type: Constructor<T>): Schema<any, Partial<T>> {
-  const objectSchema: ObjectSchema = schemaOf(type);
+export function partial<T extends object>(type: Constructor<T>): Schema<any, Partial<T>> {
+  const objectSchema: ObjectSchema<T> = schemaOf(type);
   return objectSchema.onMissing(MissingItemBehaviour.IGNORE);
 }
 
@@ -155,15 +155,15 @@ export function e164PhoneNumber(defaultCountryIso3166: string = 'USA'): Schema<a
   return new E164PhoneNumberSchema(defaultCountryIso3166);
 }
 
-export function object<T extends object>(fieldSchemas: Object): Schema<any, object> & HasItemBehaviour {
-  return new ObjectSchema(schematizeEntries(fieldSchemas), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
+export function object<T extends object>(fieldSchemas: Schemas<T>): Schema<any, T> & HasItemBehaviour {
+  return new ObjectSchema<T>(fieldSchemas, UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
 }
 
 export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
   return new ObjOfSchema(schema);
 }
 
-export function map<K, V>(entrySchemas: Object | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasItemBehaviour {
+export function map<K, V>(entrySchemas: Schemas<{}> | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasItemBehaviour {
   return new MapSchema<K, V>(
     entrySchemas instanceof Map
       ? entrySchemas

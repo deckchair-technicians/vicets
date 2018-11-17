@@ -1,5 +1,5 @@
 import {BaseSchema, isSchema} from "./impl";
-import {ObjectSchema} from "./impl/associative/obj";
+import {ObjectSchema, Schemas} from "./impl/associative/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError, ValidationResult} from "./problems";
 import {schematizeEntries} from "./schematize";
@@ -9,23 +9,22 @@ import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
 
 export function data<C extends Constructor>(c: C): C {
   // suspendValidation is required to allow calling parent constructor
-  const objectWithDefaults = suspendValidation(() => new c());
+  const objectWithDefaults = suspendValidation(() => new c() as Schemas<C>);
 
   for (const [k, v] of entries(objectWithDefaults)) {
     if (!(isSchema(v) || isPrimitive(v)))
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
 
-  const schema = new ObjectSchema(schematizeEntries(objectWithDefaults), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM) as ObjectSchema;
+  const schema = new ObjectSchema<C>(schematizeEntries(objectWithDefaults), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
   return hasSchema(schema)(c);
 }
 
-export function intersect<A, B>
+export function intersect<A extends object, B extends object>
 (a: Constructor<A>, b: Constructor<B>): Constructor<A & B> {
 
-  const schema = schemaOf(a).intersect(schemaOf(b));
-
-  @hasSchema(schema)
+  const schema: ObjectSchema<A & B> = schemaOf(a).intersect(schemaOf(b));
+  @hasSchema(schema as any)
   class Intersection {
   }
 
@@ -44,14 +43,14 @@ export function makeInstance<T>(c: Constructor<T>, obj: object): T {
   return Object.assign(Object.create(c.prototype), obj);
 }
 
-export function conformAs<T>(c: Constructor<T>, obj: object): ValidationResult<T> {
+export function conformAs<T extends object>(c: Constructor<T>, obj: object): ValidationResult<T> {
   const result = schemaOf(c).conform(obj);
   if (result instanceof Problems)
     return result;
   return makeInstance(c, result);
 }
 
-export function build<T>(c: Constructor<T>, values: {}): T {
+export function build<T extends object>(c: Constructor<T>, values: {}): T {
   const conformed = conformAs(c, values);
   if (conformed instanceof Problems) {
     throw new ValidationError(values, conformed);
@@ -70,11 +69,11 @@ export function build<T>(c: Constructor<T>, values: {}): T {
  * `construct(A, {})` WILL cause the compiler to complain if
  * `{}` is missing fields `A` requires.
  */
-export function construct<T>(c: Constructor<T>, value: T): T {
+export function construct<T extends object>(c: Constructor<T>, value: T): T {
   return build(c, value);
 }
 
-export class DataSchema<T> extends BaseSchema<any, T> {
+export class DataSchema<T extends object> extends BaseSchema<any, T> {
   constructor(private readonly c: Constructor<T>) {
     super();
     schemaOf(c);

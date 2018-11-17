@@ -1,18 +1,20 @@
 import {Schema} from "./schema";
 import {entries} from "./impl/util";
 import {EqualsSchema} from "./impl/eq";
-import {ObjectSchema} from "./impl/associative/obj";
+import {ObjectSchema, Schemas} from "./impl/associative/obj";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
 export type Schemaish = Schema<any, any> | Function | number | string | boolean | object;
 
-export function schematizeEntries(object: Object) {
-  const fixed = {};
+export function schematizeEntries<T extends object>(object: Object) : Schemas<T>{
+  const fixed = <Schemas<T>>{};
   for (const [k, v] of entries(object)) {
     fixed[k] = schematize(v);
   }
   return fixed;
 }
+
+type LiftObject<T> = T extends object ? T : never;
 
 export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
   switch (typeof x) {
@@ -28,8 +30,10 @@ export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
         return x as Schema<IN, OUT>;
 
       else if (Object.getPrototypeOf(x) === Object.prototype)
-        return new ObjectSchema(schematizeEntries(obj), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM) as any as Schema<IN, OUT>;
-
+        return new ObjectSchema<LiftObject<OUT>>(
+          schematizeEntries(obj),
+          UnexpectedItemBehaviour.PROBLEM,
+          MissingItemBehaviour.PROBLEM) as any as Schema<IN, OUT>;
       else
         throw Error(`Cannot build schema from non-plain object ${Object.getPrototypeOf(x).name}`);
 
