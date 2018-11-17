@@ -5,7 +5,7 @@ import {discriminatorReports} from "./find_discriminators";
 import {Schema} from "../../schema";
 import {DataSchema} from "../../data";
 
-export class DiscriminatedUnionSchema<T> extends BaseSchema<any, T> {
+export class DiscriminatedUnionSchema<T  extends object> extends BaseSchema<any, T> {
   private readonly discriminator: keyof T;
   private readonly schemasByDiscriminatorValue: Map<PrimitiveValue, Schema<any, T>>;
 

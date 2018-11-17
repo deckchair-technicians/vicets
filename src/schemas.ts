@@ -91,11 +91,11 @@ export function lookup<T extends object>(e: T): Schema<any, T[keyof T]> {
   return new LookupSchema(e);
 }
 
-export function discriminated<T>(...ctors: Constructor<T>[]): Schema<any, T> {
+export function discriminated<T extends object>(...ctors: Constructor<T>[]): Schema<any, T> {
   return discriminatedBy(detectDiscriminator(ctors), ...ctors);
 }
 
-export function discriminatedBy<T>(discriminator: keyof T,
+export function discriminatedBy<T extends object>(discriminator: keyof T,
                                    ...ctors: Constructor<T>[]): Schema<any, T> {
   return new DiscriminatedUnionSchema<T>(ctors, discriminator);
 }
@@ -155,8 +155,12 @@ export function e164PhoneNumber(defaultCountryIso3166: string = 'USA'): Schema<a
   return new E164PhoneNumberSchema(defaultCountryIso3166);
 }
 
-export function object<T extends object>(fieldSchemas: Schemas<T>): Schema<any, T> & HasItemBehaviour {
-  return new ObjectSchema<T>(fieldSchemas, UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
+export function object<T extends object>(
+  fieldSchemas: Schemas<T>,
+  unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM,
+  missing: MissingItemBehaviour = MissingItemBehaviour.PROBLEM
+): Schema<any, T> & HasItemBehaviour {
+  return new ObjectSchema<T>(fieldSchemas, unexpected, missing);
 }
 
 export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
@@ -222,6 +226,7 @@ export function select<T>(path: string[], s: Schema<any, T>): Schema<any, T> {
 
 
 export {LensBehaviour} from './impl/lens'
+
 /**
  * Expects an object. Conforms value at path using schema, and returns the outer object.
  *

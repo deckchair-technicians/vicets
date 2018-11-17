@@ -72,6 +72,9 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
     return this.conformInPlace(instance) as T;
   }
 
+  /**
+   * Required to allow @hasSchema to conform 'this'
+   */
   public conformInPlace(instance: {}): ValidationResult<{}> {
     const problems = conformInPlace(
       this.unexpectedItems,

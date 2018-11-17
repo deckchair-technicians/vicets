@@ -4,7 +4,7 @@ import * as os from "os";
 import {Schema} from "../../schema";
 import {schemaOf} from "../../hasschema";
 
-class CandidateDiscriminators<T> {
+class CandidateDiscriminators<T extends object> {
   private readonly constructors: Constructor<T>[] = [];
   private readonly fields = new Map<keyof T, Map<PrimitiveValue, Constructor<T>[]>>();
 
@@ -19,14 +19,14 @@ class CandidateDiscriminators<T> {
     }
   }
 
-  private static fieldsWithPrimitiveEquals<T>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
+  private static fieldsWithPrimitiveEquals<T  extends object>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
     return CandidateDiscriminators.fieldSchemas(ctor)
       .map(([field, schema]) => schema instanceof EqualsSchema && isPrimitive(schema.expected) ? [field, schema.expected] : undefined)
       .filter((x) => x)
       .map((x) => unsafeCast(x))
   }
 
-  private static fieldSchemas<T>(ctor: Constructor<T>): [string, Schema<any, any>][] {
+  private static fieldSchemas<T extends object>(ctor: Constructor<T>): [string, Schema<any, any>][] {
     return schemaOf(ctor).fieldSchemaArray;
   }
 
@@ -66,7 +66,7 @@ class DiscriminatorReport<T> {
   }
 }
 
-export function detectDiscriminator<T>(ctors: Constructor<T>[]): keyof T {
+export function detectDiscriminator<T  extends object>(ctors: Constructor<T>[]): keyof T {
   const report = discriminatorReports(ctors);
 
   if (report.validFields.size > 1)
@@ -84,7 +84,7 @@ export function detectDiscriminator<T>(ctors: Constructor<T>[]): keyof T {
   throw new Error(`No discriminator field found. Considered:${os.EOL}${listOfFieldProblems.join(os.EOL)}`);
 }
 
-export function discriminatorReports<T>(ctors: Constructor<T>[]): DiscriminatorReport<T> {
+export function discriminatorReports<T  extends object>(ctors: Constructor<T>[]): DiscriminatorReport<T> {
   const candidates = new CandidateDiscriminators<T>(ctors);
   const report = new DiscriminatorReport<T>();
   for (const k of candidates.keys()) {
