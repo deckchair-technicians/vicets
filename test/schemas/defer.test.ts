@@ -1,6 +1,5 @@
 import {expect} from 'chai';
-import {arrayof, defer, object} from "../../src/schemas";
-import {failure} from "../../src/problems";
+import {failure, arrayof, defer, object} from "../../src";
 
 describe('defer()', () => {
   const s = arrayof(object({more: defer(() => s)}));

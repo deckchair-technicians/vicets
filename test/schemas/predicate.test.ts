@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {failure, predicate} from "../../";
+import {failure, predicate} from "../../src";
 
 describe('predicate', () => {
   it('Uses function body as failure message', () => {

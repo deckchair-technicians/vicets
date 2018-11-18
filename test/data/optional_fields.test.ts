@@ -1,4 +1,4 @@
-import {__, build, data, eq, opt, schema} from "../..";
+import {__, build, data, eq, opt, schema} from "../../src";
 import {expect} from "chai";
 
 describe('Optional fields', () => {

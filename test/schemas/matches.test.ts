@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {matches, Schema} from "../../";
+import {matches, Schema} from "../../src";
 
 describe('matches', () => {
   const s: Schema<any, string> = matches(/.*abc.*/);

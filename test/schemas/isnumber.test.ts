@@ -1,6 +1,5 @@
 import {expect} from 'chai';
-import {isnumber, Schema} from "../..";
-import {failure} from "../../src/problems";
+import {failure, isnumber, Schema} from "../../src";
 
 describe('isnumber', () => {
   const s: Schema<any, number> = isnumber();

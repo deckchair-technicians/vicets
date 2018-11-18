@@ -1,7 +1,5 @@
 import {expect} from 'chai';
-import {Schema} from "../..";
-import {failure} from "../../src/problems";
-import {isoDateOnly, validate} from "../../index";
+import {failure, Schema, isoDateOnly, validate} from "../../src";
 import {utcDate} from "../../src/impl/util";
 
 describe('isoDateOnly', () => {

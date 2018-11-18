@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, build, data, eq} from "../..";
+import {__, build, data, eq} from "../../src";
 
 describe('Inheritance', () => {
   @data

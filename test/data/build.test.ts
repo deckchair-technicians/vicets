@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, build, conformAs, data, eq, failure} from "../..";
+import {__, build, conformAs, data, eq, failure} from "../../src";
 
 
 describe('Using build() on @data classes', () => {

@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {predicate, problem, problems} from "../../";
+import {predicate, problem, problems} from "../../src";
 
 describe('or', () => {
   it('Returns the result of the first schema that passes, or all problems from all schemas', () => {

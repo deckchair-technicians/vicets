@@ -1,7 +1,5 @@
 import {expect} from 'chai';
-import {Schema} from "../..";
-import {failure} from "../../src/problems";
-import {isoUtcDateTime, validate} from "../../index";
+import {Schema, failure, isoUtcDateTime, validate} from "../../src";
 import {utcDate} from "../../src/impl/util";
 
 

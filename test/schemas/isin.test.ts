@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {isin, Schema} from "../../";
+import {isin, Schema} from "../../src";
 
 describe('isin', () => {
   const s: Schema<any, string> = isin('a', 'b', 'c');

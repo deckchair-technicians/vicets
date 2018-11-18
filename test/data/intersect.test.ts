@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, intersect, conformAs, construct, data, eq, failure, matches, problem, problems, schema} from "../../";
+import {__, intersect, conformAs, construct, data, eq, failure, matches, problem, problems, schema} from "../../src";
 
 describe('Intersecting @data classes', () => {
   @data

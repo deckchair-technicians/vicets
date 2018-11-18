@@ -31,7 +31,7 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
       - run:
           name: Deploy to NPM
-          command: npm publish --access public
+          command: sudo ./publish.sh
 workflows:
   version: 2
   main:

@@ -1,7 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, opt, Schema, tuple} from "../..";
-import {problem, problems} from "../../src/problems";
-import {HasItemBehaviour, UnexpectedItemBehaviour} from "../../src/unexpected_items";
+import {HasItemBehaviour, UnexpectedItemBehaviour, problem, problems, eq, failure, opt, Schema, tuple} from "../../src";
 
 describe('tuple()', () => {
   const s: Schema<any, [string, number]> & HasItemBehaviour = tuple(eq("valid"), eq(1));

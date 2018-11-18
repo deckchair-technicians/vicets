@@ -1,6 +1,5 @@
-import {failure} from "../../src/problems";
-import {conform, eq, lens, validate, LensBehaviour} from "../../index";
 import {expect} from "chai";
+import {failure, conform, eq, lens, validate, LensBehaviour} from "../../src";
 
 
 describe('lens', () => {
