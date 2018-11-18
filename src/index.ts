@@ -13,7 +13,7 @@ export {Schemas} from "./impl/associative/associative";
 export function validate<IN,OUT>(schema:Schema<IN,OUT>, value:IN) : OUT {
   const conformed = conform(schema, value);
   if (conformed instanceof Problems) {
-    throw new ValidationError(schema, conformed);
+    throw new ValidationError(value, conformed);
   }
   return conformed;
 }

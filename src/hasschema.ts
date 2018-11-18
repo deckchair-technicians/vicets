@@ -43,7 +43,7 @@ export function hasSchema<C extends { new(...args: any[]): object }>(schema: Obj
         }
         const conformed = schema.conformInPlace(this);
         if (conformed instanceof Problems) {
-          throw new ValidationError(schema, conformed);
+          throw new ValidationError(this, conformed);
         }
       };
     };
