@@ -1,10 +1,11 @@
 import {BaseSchema, isSchema} from "./impl";
-import {ObjectSchema, Schemas} from "./impl/associative/obj";
+import {ObjectSchema} from "./impl/associative/obj";
 import {Constructor, entries, isPrimitive} from "./impl/util";
 import {failure, Problems, ValidationError, ValidationResult} from "./problems";
 import {schematizeEntries} from "./schematize";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
+import {Schemas} from "./impl/associative/associative";
 
 
 export function data<C extends Constructor>(c: C): C {

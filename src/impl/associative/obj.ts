@@ -1,7 +1,7 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {merge, typeDescription} from "../util";
-import {Associative, conformInPlace} from "./associative";
+import {Associative, conformInPlace, Schemas} from "./associative";
 import {BaseSchema} from "../index";
 import {
   HasItemBehaviour,
@@ -47,8 +47,6 @@ export class ObjectStrategies implements Associative<string, any> {
     return Object.keys(this.result);
   }
 }
-
-export type Schemas<T extends object> = { [K in keyof T]: Schema<any, T[K]> };
 
 export class ObjectSchema<T extends object> extends BaseSchema<any, T> implements HasItemBehaviour {
   public readonly fieldSchemaArray: [string, Schema][];

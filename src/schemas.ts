@@ -1,6 +1,6 @@
 import {DelegatingSchema} from "./impl";
 import {DataSchema} from "./data";
-import {ObjectSchema, Schemas} from "./impl/associative/obj";
+import {ObjectSchema} from "./impl/associative/obj";
 import {EqualsSchema} from "./impl/eq";
 import {InSchema} from "./impl/isin";
 import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
@@ -15,7 +15,7 @@ import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
-import {TagSchemaAsOptional} from "./impl/associative/associative";
+import {Schemas, TagSchemaAsOptional} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
 import {TupleSchema} from "./impl/associative/tuple";
 import {SetOfSchema} from "./impl/setof";

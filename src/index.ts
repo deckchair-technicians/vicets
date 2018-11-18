@@ -8,6 +8,7 @@ export * from "./data"
 export * from "./schematize";
 export * from "./unexpected_items"
 export * from "./hasschema";
+export {Schemas} from "./impl/associative/associative";
 
 export function validate<IN,OUT>(schema:Schema<IN,OUT>, value:IN) : OUT {
   const conformed = conform(schema, value);
