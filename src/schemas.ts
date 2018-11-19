@@ -31,6 +31,7 @@ import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
 import {schemaOf} from "./hasschema";
 import {SelectSchema} from "./impl/select";
 import {LensBehaviour, LensSchema} from "./impl/lens";
+import {DefaultValueSchema} from "./impl/defaultValue";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -120,7 +121,7 @@ export function isboolean(): Schema<any, boolean> {
     (x) => `expected a boolean but got ${x}`);
 }
 
-export function isin<T>(...values: T[]): Schema<any, T> {
+export function isIn<T>(...values: T[]): Schema<any, T> {
   return new InSchema<T>(values);
 }
 
@@ -234,4 +235,8 @@ export {LensBehaviour} from './impl/lens'
  */
 export function lens<T, U>(path: string[], s: Schema<any, U>, behaviour: LensBehaviour): Schema<any, T> {
   return new LensSchema(path, s, behaviour);
+}
+
+export function defaultValue<T>(value:T, schema:Schema<any,T>) : Schema<any,T>{
+  return new DefaultValueSchema(value,schema)
 }
