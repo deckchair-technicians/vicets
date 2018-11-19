@@ -237,6 +237,6 @@ export function lens<T, U>(path: string[], s: Schema<any, U>, behaviour: LensBeh
   return new LensSchema(path, s, behaviour);
 }
 
-export function defaultValue<T>(value:T, schema:Schema<any,T>) : Schema<any,T>{
+export function defaultValue<T>(value:()=>T, schema:Schema<any,T>) : Schema<any,T>{
   return new DefaultValueSchema(value,schema)
 }
