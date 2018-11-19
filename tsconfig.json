@@ -3,19 +3,14 @@
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "outDir": "./dist",
     "sourceMap": true,
     "target": "es6",
-    "importHelpers": true,
-    "strict": true,
     "noImplicitAny": false,
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "suppressImplicitAnyIndexErrors": true,
-
     "esModuleInterop": true,
+    "strictNullChecks": true,
     "experimentalDecorators": true
-  },
-  "include": ["src/**/*"],
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }
