@@ -22,8 +22,11 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
 
   let problems = new Problems([]);
   const unmatchedThingKeys = new Set(thing.keys());
+
   for (const [k, s] of itemSchemas) {
-    if (!(thing.has(k))) {
+    const v: ValidationResult<any> = s.conform(thing.get(k));
+
+    if (isError(v) && !thing.has(k)) {
       if (s[isOptional] !== true && missingItems !== MissingItemBehaviour.IGNORE){
         problems = problems.merge(failure("No value", [k]));
       }
@@ -31,13 +34,12 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
     }
     unmatchedThingKeys.delete(k);
 
-    const v: ValidationResult<any> = s.conform(thing.get(k));
-
     if (isError(v)) {
       problems = problems.merge((v as Problems).prefixPath([k]));
     }
-    else
+    else if(v !== undefined){
       thing.set(k, v);
+    }
   }
 
   for (const k of unmatchedThingKeys) {
