@@ -1,4 +1,4 @@
-import {build, data, eq} from "../../src";
+import {build, data, eq} from "../../index";
 import {expect} from "chai";
 
 describe('Union type fields', () => {

@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {failure, conform, eq, lens, validate, LensBehaviour} from "../../src";
+import {failure, conform, eq, lens, validate, LensBehaviour} from "../../index";
 
 
 describe('lens', () => {

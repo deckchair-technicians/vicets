@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {lookup, Problems, Schema} from "../../src";
+import {lookup, Problems, Schema} from "../../index";
 
 describe('lookup', () => {
   describe('Basics', () => {

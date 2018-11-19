@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {enumkey} from "../../src";
+import {enumkey} from "../../index";
 
 describe('enumkey', () => {
   describe('String enums', () => {

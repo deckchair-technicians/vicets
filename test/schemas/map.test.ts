@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, map, opt, Schema, UnexpectedItemBehaviour} from "../../src";
+import {eq, failure, map, opt, Schema, UnexpectedItemBehaviour} from "../../index";
 
 describe('map()', () => {
   const s: Schema<any, Map<string, number>> = map<string, number>({a: eq(1)});

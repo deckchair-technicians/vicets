@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {failure, schema} from "../../src";
+import {failure, schema} from "../../index";
 
 describe('and', () => {
   it('Passes result of first schema to second, and so on', () => {

@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {e164PhoneNumber, failure, Schema} from "../../src";
+import {e164PhoneNumber, failure, Schema} from "../../index";
 
 describe('e164PhoneNumber', () => {
   const uk: Schema<any, string> = e164PhoneNumber('GBR');

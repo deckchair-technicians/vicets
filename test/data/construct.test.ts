@@ -1,4 +1,4 @@
-import {isstring, construct, data} from "../../src";
+import {isstring, construct, data} from "../../index";
 
 describe('using construct() on @data classes', () => {
   @data

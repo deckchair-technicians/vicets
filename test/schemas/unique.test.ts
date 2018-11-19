@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {unique, problem, problems} from "../../src";
+import {unique, problem, problems} from "../../index";
 
 describe('unique', () => {
   it('passes through values', () => {

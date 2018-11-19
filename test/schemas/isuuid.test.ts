@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {isuuid, Schema} from "../../src";
+import {isuuid, Schema} from "../../index";
 const uuid = require("uuid");
 
 describe('isuuid', () => {

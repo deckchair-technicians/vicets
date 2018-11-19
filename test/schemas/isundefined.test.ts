@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {failure, isundefined} from "../../src";
+import {failure, isundefined} from "../../index";
 
 describe('isundefined', () => {
   it('works', () => {

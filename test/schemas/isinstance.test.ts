@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {failure, isinstance} from "../../src";
+import {failure, isinstance} from "../../index";
 
 describe('isinstance', () => {
   class A {

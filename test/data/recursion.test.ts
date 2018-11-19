@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {__, arrayof, data, defer, failure, isdata} from "../../src";
+import {__, arrayof, data, defer, failure, isdata} from "../../index";
 
 describe('Recursion using defer() and isdata()', () => {
   @data

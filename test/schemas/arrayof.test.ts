@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {arrayof, matches, object, schema} from "../../src";
+import {arrayof, matches, object, schema} from "../../index";
 
 describe('arrayof', () => {
   it('returns array of conformed values', () => {

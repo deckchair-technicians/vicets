@@ -1,4 +1,4 @@
-import {__, build, data, discriminated, discriminatedBy, eq, failure, isdata} from "../../src";
+import {__, build, data, discriminated, discriminatedBy, eq, failure, isdata} from "../../index";
 import {expect} from "chai";
 
 describe('discriminated', () => {
