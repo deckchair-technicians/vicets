@@ -32,6 +32,7 @@ import {schemaOf} from "./hasschema";
 import {SelectSchema} from "./impl/select";
 import {LensBehaviour, LensSchema} from "./impl/lens";
 import {DefaultValueSchema} from "./impl/defaultValue";
+import {BooleanSchema} from "./impl/bool";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -97,7 +98,7 @@ export function discriminated<T extends object>(...ctors: Constructor<T>[]): Sch
 }
 
 export function discriminatedBy<T extends object>(discriminator: keyof T,
-                                   ...ctors: Constructor<T>[]): Schema<any, T> {
+                                                  ...ctors: Constructor<T>[]): Schema<any, T> {
   return new DiscriminatedUnionSchema<T>(ctors, discriminator);
 }
 
@@ -116,9 +117,7 @@ export function matches(r: RegExp): Schema<any, string> {
 }
 
 export function isboolean(): Schema<any, boolean> {
-  return predicate<any>(
-    (x) => x instanceof Boolean || typeof x === "boolean",
-    (x) => `expected a boolean but got ${x}`);
+  return new BooleanSchema();
 }
 
 export function isIn<T>(...values: T[]): Schema<any, T> {
@@ -237,6 +236,6 @@ export function lens<T, U>(path: string[], s: Schema<any, U>, behaviour: LensBeh
   return new LensSchema(path, s, behaviour);
 }
 
-export function defaultValue<T>(value:()=>T, schema:Schema<any,T>) : Schema<any,T>{
-  return new DefaultValueSchema(value,schema)
+export function defaultValue<T>(value: () => T, schema: Schema<any, T>): Schema<any, T> {
+  return new DefaultValueSchema(value, schema)
 }
