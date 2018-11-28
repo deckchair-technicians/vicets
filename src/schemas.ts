@@ -150,8 +150,9 @@ export function isoDateOnly(): Schema<any, Date> {
 
 /**
  * E.164 phone number normaliser
+ * if no default country is passed, it validates number depending on coutry calling code (has to begin with '+')
  */
-export function e164PhoneNumber(defaultCountryIso3166: string = 'USA'): Schema<any, string> {
+export function e164PhoneNumber(defaultCountryIso3166?: string): Schema<any, string> {
   return new E164PhoneNumberSchema(defaultCountryIso3166);
 }
 

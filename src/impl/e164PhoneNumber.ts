@@ -4,7 +4,7 @@ import {BaseSchema} from "./index";
 import phone from "phone";
 
 export class E164PhoneNumberSchema extends BaseSchema<any, string> {
-  constructor(private readonly defaultCountryIso3166: string) {
+  constructor(private readonly defaultCountryIso3166?: string) {
     super();
   }
 
@@ -13,7 +13,7 @@ export class E164PhoneNumberSchema extends BaseSchema<any, string> {
     if (typeof value !== 'string')
       return failure(`expected a string but got ${typeDescription(value)}`);
 
-    const result = phone(value, this.defaultCountryIso3166);
+    const result = this.defaultCountryIso3166 ? phone(value, this.defaultCountryIso3166) : phone(value);
 
     if (result.length === 0) {
       return failure(`expected a valid E.164 phone number`)
