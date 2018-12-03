@@ -43,11 +43,11 @@ export class Problems {
   }
 }
 
-export function isError(x: Problems | any): boolean {
+export function isError(x: ValidationResult<any>): x is Problems {
   return x != null && x instanceof Problems;
 }
 
-export function isSuccess(x: Problems | any): boolean {
+export function isSuccess<T>(x: ValidationResult<T>): x is T {
   return !isError(x);
 }
 
@@ -55,7 +55,7 @@ export function problem(message: string, path: Path = []) {
   return new Problem(path, message);
 }
 
-export function problems(...ps: Problem[]) : Problems | undefined {
+export function problems(...ps: Problem[]): Problems | undefined {
   return ps.length === 0 ? undefined : new Problems(ps);
 }
 

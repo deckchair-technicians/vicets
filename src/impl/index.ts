@@ -75,6 +75,6 @@ export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
   }
 }
 
-export function isSchema(value: any): boolean {
+export function isSchema(value: any): value is Schema {
   return value instanceof BaseSchema;
 }
