@@ -51,6 +51,17 @@ export function partial<T extends object>(type: Constructor<T>): Schema<any, Par
   return objectSchema.onMissing(MissingItemBehaviour.IGNORE);
 }
 
+export function pick<T extends object, U extends keyof T>(type: Constructor<T>, pickedFields: U[]): Schema<any, Pick<T, U>> {
+  const objectSchema: ObjectSchema<T> = schemaOf(type);
+  const schemas: Schemas<Pick<T, U>> = {};
+  for (const pf of pickedFields) {
+    for (const f of objectSchema.fieldSchemaArray) {
+      if (f[0] === pf) Object.assign(schemas, {[f[0]]: f[1]})
+    }
+  }
+  return new ObjectSchema<Pick<T, U>>(schemas, UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
+}
+
 export function eq<T>(value: T): Schema<any, T> {
   return new EqualsSchema(value);
 }
