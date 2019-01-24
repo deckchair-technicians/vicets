@@ -1,5 +1,6 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
+import {EqualsSchema} from "../eq";
 import {merge, typeDescription} from "../util";
 import {Associative, conformInPlace, Schemas} from "./associative";
 import {BaseSchema} from "../index";
@@ -15,9 +16,10 @@ function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
   for (const k in object) {
     const s = object[k];
-    if (!('conform' in s))
-      throw new Error(`${k} was a ${typeDescription(s)}. Expected a schema`);
-    result.push([k, s]);
+    if (typeof s['conform'] !== 'function')
+      result.push([k, new EqualsSchema(s)]);
+    else
+      result.push([k, s]);
   }
   return result;
 }

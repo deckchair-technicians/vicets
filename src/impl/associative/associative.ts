@@ -75,4 +75,4 @@ export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined
 
 }
 
-export type Schemas<T extends object> = { [K in keyof T]: Schema<any, T[K]> };
+export type Schemas<T extends object> = { [K in keyof T]: Schema<any, T[K]> | T[K] };
