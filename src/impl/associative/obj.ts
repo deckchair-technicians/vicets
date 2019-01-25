@@ -10,7 +10,7 @@ import {
 import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
 import {merge} from "../util";
-import {Associative, conformInPlace, Schemas} from "./associative";
+import {Associative, conformInPlace, Pattern} from "./associative";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
@@ -24,7 +24,7 @@ function objectEntries(object: object): [string, Schema][] {
   return result;
 }
 
-function valuesToSchemas<T>(object: Schemas<T>,
+function valuesToSchemas<T extends object>(object: Pattern<T>,
                             unexpected: UnexpectedItemBehaviour,
                             missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
 
@@ -71,7 +71,7 @@ export class ObjectStrategies implements Associative<string, any> {
 export class ObjectSchema<T extends object> extends BaseSchema<any, T> implements HasItemBehaviour {
   public readonly fieldSchemaArray: [string, Schema][];
 
-  constructor(private readonly fieldSchemasAsObject: Schemas<T>,
+  constructor(private readonly fieldSchemasAsObject: Pattern<T>,
               private readonly unexpectedItems: UnexpectedItemBehaviour,
               private readonly missingItems: MissingItemBehaviour) {
     super();
@@ -104,7 +104,7 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
   }
 
   intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U> {
-    const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b)) as Schemas<T & U>;
+    const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b)) as Pattern<T & U>;
     return new ObjectSchema<T & U>(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems));
   }
 

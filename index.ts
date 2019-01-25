@@ -7,5 +7,5 @@ export * from "./src/unexpected_items"
 export * from "./src/hasschema";
 export * from "./src/helpers";
 export * from "./src/impl/index";
-export {Schemas} from "./src/impl/associative/associative";
+export {Pattern} from "./src/impl/associative/associative";
 

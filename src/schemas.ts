@@ -15,7 +15,7 @@ import {EnumValueSchema} from "./impl/enumvalue";
 import {LookupSchema} from "./impl/lookup";
 import {IsInstanceSchema} from "./impl/isinstance";
 import {DeferredSchema} from "./impl/deferred";
-import {Schemas, TagSchemaAsOptional} from "./impl/associative/associative";
+import {Pattern, TagSchemaAsOptional} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
 import {TupleSchema} from "./impl/associative/tuple";
 import {SetOfSchema} from "./impl/setof";
@@ -157,22 +157,22 @@ export function e164PhoneNumber(defaultCountryIso3166?: string): Schema<any, str
 }
 
 export function object<T extends object>(
-  fieldSchemas: Schemas<T>,
+  pattern: Pattern<T>,
   unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM,
   missing: MissingItemBehaviour = MissingItemBehaviour.PROBLEM
 ): Schema<any, T> & HasItemBehaviour {
-  return new ObjectSchema<T>(fieldSchemas, unexpected, missing);
+  return new ObjectSchema<T>(pattern, unexpected, missing);
 }
 
 export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
   return new ObjOfSchema(schema);
 }
 
-export function map<K, V>(entrySchemas: Schemas<{}> | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasItemBehaviour {
+export function map<K, V>(entryPattern: Pattern<{}> | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasItemBehaviour {
   return new MapSchema<K, V>(
-    entrySchemas instanceof Map
-      ? entrySchemas
-      : toMap(schematizeEntries(entrySchemas)),
+    entryPattern instanceof Map
+      ? entryPattern
+      : toMap(schematizeEntries(entryPattern)),
     UnexpectedItemBehaviour.PROBLEM);
 }
 

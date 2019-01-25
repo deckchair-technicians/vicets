@@ -5,12 +5,12 @@ import {failure, Problems, ValidationError, ValidationResult} from "./problems";
 import {schematizeEntries} from "./schematize";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
-import {Schemas} from "./impl/associative/associative";
+import {Pattern} from "./impl/associative/associative";
 
 
 export function data<C extends Constructor>(c: C): C {
   // suspendValidation is required to allow calling parent constructor
-  const objectWithDefaults = suspendValidation(() => new c() as Schemas<C>);
+  const objectWithDefaults = suspendValidation(() => new c() as Pattern<C>);
 
   for (const [k, v] of entries(objectWithDefaults)) {
     if (!(isSchema(v) || isPrimitive(v)))

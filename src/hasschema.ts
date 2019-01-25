@@ -3,7 +3,7 @@ import {Constructor, entries} from "./impl/util";
 import {isSchema} from "./impl";
 import {Problems, ValidationError} from "./problems";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
-import {Schemas} from "./impl/associative/associative";
+import {Pattern} from "./impl/associative/associative";
 
 const SCHEMA_SYMBOL = Symbol('schema');
 

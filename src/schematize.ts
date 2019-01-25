@@ -3,12 +3,12 @@ import {entries} from "./impl/util";
 import {EqualsSchema} from "./impl/eq";
 import {ObjectSchema} from "./impl/associative/obj";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
-import {Schemas} from "./impl/associative/associative";
+import {Pattern} from "./impl/associative/associative";
 
 export type Schemaish = Schema<any, any> | Function | number | string | boolean | object;
 
-export function schematizeEntries<T extends object>(object: Object) : Schemas<T>{
-  const fixed = <Schemas<T>>{};
+export function schematizeEntries<T extends object>(object: Object) : Pattern<T>{
+  const fixed = <Pattern<T>>{};
   for (const [k, v] of entries(object)) {
     fixed[k] = schematize(v);
   }
