@@ -77,6 +77,4 @@ export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined
 
 export type Pattern<T extends object> = { [K in keyof T]: K extends object
   ? Pattern<T[K]> | Schema<any, T[K]> | T[K]
-  : Schema<any, T[K]> | T[K] }
-
-  | Schema<any, T>
+  : Schema<any, T[K]> | T[K] };
