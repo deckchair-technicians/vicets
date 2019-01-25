@@ -1,7 +1,7 @@
-import {Schema} from "../../schema";
-import {BaseSchema} from "../index";
 import {failure, isError, Problems, ValidationResult} from "../../problems";
+import {Schema} from "../../schema";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
+import {BaseSchema} from "../index";
 
 export interface Associative<K, V> {
   set(k: K, v: V): this;
@@ -27,7 +27,7 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
     const v: ValidationResult<any> = s.conform(thing.get(k));
 
     if (isError(v) && !thing.has(k)) {
-      if (s[isOptional] !== true && missingItems !== MissingItemBehaviour.IGNORE){
+      if (s[isOptional] !== true && missingItems !== MissingItemBehaviour.IGNORE) {
         problems = problems.merge(failure("No value", [k]));
       }
       continue;
@@ -37,7 +37,7 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
     if (isError(v)) {
       problems = problems.merge((v as Problems).prefixPath([k]));
     }
-    else if(v !== undefined){
+    else if (v !== undefined) {
       thing.set(k, v);
     }
   }
@@ -75,4 +75,6 @@ export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined
 
 }
 
-export type Schemas<T extends object> = { [K in keyof T]: Schema<any, T[K]> | T[K] };
+export type Schemas<T> = T extends object
+  ? { [K in keyof T]: Schemas<T[K]> } | Schema<any, T>
+  : Schema<any, T> | T;

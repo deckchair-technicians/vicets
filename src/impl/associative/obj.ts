@@ -1,9 +1,5 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
-import {EqualsSchema} from "../eq";
-import {merge, typeDescription} from "../util";
-import {Associative, conformInPlace, Schemas} from "./associative";
-import {BaseSchema} from "../index";
 import {
   HasItemBehaviour,
   MissingItemBehaviour,
@@ -11,17 +7,39 @@ import {
   strictestUnexpected,
   UnexpectedItemBehaviour
 } from "../../unexpected_items";
+import {EqualsSchema} from "../eq";
+import {BaseSchema} from "../index";
+import {merge} from "../util";
+import {Associative, conformInPlace, Schemas} from "./associative";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
-  for (const k in object) {
+  for (const k of Object.keys(object)) {
     const s = object[k];
     if (typeof s['conform'] !== 'function')
-      result.push([k, new EqualsSchema(s)]);
+      throw new Error(`Not a schema ${s}`);
     else
       result.push([k, s]);
   }
   return result;
+}
+
+function valuesToSchemas<T>(object: Schemas<T>,
+                            unexpected: UnexpectedItemBehaviour,
+                            missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
+
+  //object : {a:{b:1}}
+  const result = {};
+  for (const k of Object.keys(object)) {
+    const s = object[k];
+    if (typeof s !== 'object')
+      result[k] = new EqualsSchema(s);
+    else if (typeof s['conform'] === 'function')
+      result[k] = s;
+    else
+      result[k] = new ObjectSchema(s, unexpected, missing);
+  }
+  return result as any;
 }
 
 export class ObjectStrategies implements Associative<string, any> {
@@ -57,7 +75,7 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
               private readonly unexpectedItems: UnexpectedItemBehaviour,
               private readonly missingItems: MissingItemBehaviour) {
     super();
-    this.fieldSchemaArray = objectEntries(fieldSchemasAsObject);
+    this.fieldSchemaArray = objectEntries(valuesToSchemas(fieldSchemasAsObject, unexpectedItems, missingItems));
   }
 
   conform(value: any): ValidationResult<T> {
@@ -85,7 +103,7 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
     return problems ? problems : instance;
   }
 
-  intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U>{
+  intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U> {
     const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b)) as Schemas<T & U>;
     return new ObjectSchema<T & U>(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems));
   }

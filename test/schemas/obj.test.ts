@@ -10,13 +10,23 @@ describe('object', () => {
       ['a']));
     expect(s.conform({a: 1})).deep.equals({a: 1});
   });
-  it('Treats non-schema values as eq(value)', () => {
+
+  it('Treats non-schema primitive values as eq(value)', () => {
     const s: Schema<object, object> = object({a: 1});
 
     expect(s.conform({a: 2})).deep.equals(failure(
       "expected '1' but got number: 2",
       ['a']));
     expect(s.conform({a: 1})).deep.equals({a: 1});
+  });
+
+  it('Treats non-schema object values as further Schemas', () => {
+    const s: Schema<object, object> = object({a: {b: 1}});
+
+    expect(s.conform({a: {b: 2}})).deep.equals(failure(
+      "expected '1' but got number: 2",
+      ['a', 'b']));
+    expect(s.conform({a: {b: 1}})).deep.equals({a: {b: 1}});
   });
 
   it('Complains when additional fields exist', () => {
