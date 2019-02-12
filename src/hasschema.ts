@@ -2,8 +2,6 @@ import {ObjectSchema} from "./impl/associative/obj";
 import {Constructor, entries} from "./impl/util";
 import {isSchema} from "./impl";
 import {Problems, ValidationError} from "./problems";
-import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
-import {Pattern} from "./impl/associative/associative";
 
 const SCHEMA_SYMBOL = Symbol('schema');
 

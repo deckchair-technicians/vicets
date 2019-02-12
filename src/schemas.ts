@@ -1,38 +1,38 @@
-import {DelegatingSchema} from "./impl";
 import {DataSchema} from "./data";
+import {schemaOf} from "./hasschema";
+import {DelegatingSchema} from "./impl";
+import {ArrayOfSchema} from "./impl/arrayof";
+import {Pattern, StrictPattern, TagSchemaAsOptional} from "./impl/associative/associative";
+import {MapSchema} from "./impl/associative/map";
 import {ObjectSchema} from "./impl/associative/obj";
+import {ObjOfSchema} from "./impl/associative/objof";
+import {TupleSchema} from "./impl/associative/tuple";
+import {BooleanSchema} from "./impl/bool";
+import {DefaultValueSchema} from "./impl/defaultValue";
+import {DeferredSchema} from "./impl/deferred";
+import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
+import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
+import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
+import {EnumValueSchema} from "./impl/enumvalue";
 import {EqualsSchema} from "./impl/eq";
 import {InSchema} from "./impl/isin";
-import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
-import {failure, Problems} from "./problems";
+import {IsInstanceSchema} from "./impl/isinstance";
+import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
+import {LensBehaviour, LensSchema} from "./impl/lens";
+import {LookupSchema} from "./impl/lookup";
+import {NumberSchema} from "./impl/number";
+import {OverrideSchema, SchemaOverrides} from "./impl/override";
 import {RegExpSchema} from "./impl/regexp";
+import {SelectSchema} from "./impl/select";
+import {SetOfSchema} from "./impl/setof";
+import {UniqueSchema} from "./impl/unique";
 import {IsURLOptions, UrlSchema} from "./impl/url";
 import {buildPredicateMessageFunction, Constructor, entries, identity, toMap, typeDescription} from "./impl/util";
-import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
+import {UuidSchema} from "./impl/uuid";
+import {failure, Problems} from "./problems";
 import {Schema} from "./schema";
-import {ArrayOfSchema} from "./impl/arrayof";
-import {EnumValueSchema} from "./impl/enumvalue";
-import {LookupSchema} from "./impl/lookup";
-import {IsInstanceSchema} from "./impl/isinstance";
-import {DeferredSchema} from "./impl/deferred";
-import {Pattern, TagSchemaAsOptional} from "./impl/associative/associative";
-import {MapSchema} from "./impl/associative/map";
-import {TupleSchema} from "./impl/associative/tuple";
-import {SetOfSchema} from "./impl/setof";
 import {schematizeEntries} from "./schematize";
 import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
-import {UuidSchema} from "./impl/uuid";
-import {OverrideSchema, SchemaOverrides} from "./impl/override";
-import {NumberSchema} from "./impl/number";
-import {ObjOfSchema} from "./impl/associative/objof";
-import {UniqueSchema} from "./impl/unique";
-import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
-import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
-import {schemaOf} from "./hasschema";
-import {SelectSchema} from "./impl/select";
-import {LensBehaviour, LensSchema} from "./impl/lens";
-import {DefaultValueSchema} from "./impl/defaultValue";
-import {BooleanSchema} from "./impl/bool";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -157,11 +157,16 @@ export function e164PhoneNumber(defaultCountryIso3166?: string): Schema<any, str
 }
 
 export function object<T extends object>(
-  pattern: Pattern<T>,
+  pattern: StrictPattern<T>,
   unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM,
   missing: MissingItemBehaviour = MissingItemBehaviour.PROBLEM
 ): Schema<any, T> & HasItemBehaviour {
   return new ObjectSchema<T>(pattern, unexpected, missing);
+}
+
+export function deepPartial<T extends object>(
+  pattern: Pattern<T>): Schema<any, T> & HasItemBehaviour {
+  return new ObjectSchema<T>(pattern, UnexpectedItemBehaviour.IGNORE, MissingItemBehaviour.PROBLEM);
 }
 
 export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {

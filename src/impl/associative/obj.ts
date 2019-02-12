@@ -10,7 +10,7 @@ import {
 import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
 import {merge} from "../util";
-import {Associative, conformInPlace, Pattern} from "./associative";
+import {Associative, conformInPlace, Pattern, StrictPattern} from "./associative";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
@@ -104,7 +104,7 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
   }
 
   intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U> {
-    const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b)) as Pattern<T & U>;
+    const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b)) as StrictPattern<T & U>;
     return new ObjectSchema<T & U>(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems));
   }
 

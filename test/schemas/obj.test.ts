@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, object, Schema, UnexpectedItemBehaviour} from "../../index";
+import {eq, failure, matches, object, deepPartial, Schema, UnexpectedItemBehaviour} from "../../index";
 
 describe('object', () => {
   it('Appends key to path in problems', () => {
@@ -9,6 +9,34 @@ describe('object', () => {
       "expected '1' but got number: 2",
       ['a']));
     expect(s.conform({a: 1})).deep.equals({a: 1});
+  });
+
+  it('object with deepPartial', () => {
+    type Example = {
+      a: number,
+      b: number }
+    const s: Schema<object, Example> = deepPartial<Example>({a: eq(1)});
+
+    expect(s.conform({a: 2})).deep.equals(failure(
+      "expected '1' but got number: 2",
+      ['a']));
+    expect(s.conform({})).deep.equals(failure(
+      "No value",
+      ['a']));
+    expect(s.conform({a: 1})).deep.equals({a: 1});
+  });
+
+  it('object with deepPartial- nesting', () => {
+    type Example = { a: { b: number }, c: number }
+
+    object({url: {path: matches(/asdsa/)}});
+
+    const s: Schema<object, Example> = deepPartial<Example>({a: {b: eq(1)}});
+
+    expect(s.conform({a: {b: 2}})).deep.equals(failure(
+      "expected '1' but got number: 2",
+      ['a', 'b']));
+    expect(s.conform({a: {b: 1}, c: 1})).deep.equals({a: {b: 1}, c: 1});
   });
 
   it('Treats non-schema primitive values as eq(value)', () => {
