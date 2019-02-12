@@ -1,5 +1,6 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
+import {matches} from "../../schemas";
 import {
   HasItemBehaviour,
   MissingItemBehaviour,
@@ -34,6 +35,8 @@ function valuesToSchemas<T extends object>(object: Pattern<T>,
     const s = object[k];
     if (typeof s !== 'object')
       result[k] = new EqualsSchema(s);
+    else if (s instanceof RegExp)
+      result[k] = matches(s);
     else if (typeof s['conform'] === 'function')
       result[k] = s;
     else

@@ -75,15 +75,16 @@ export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined
 
 }
 
+export type PrimitivePattern<T> = T extends string ? Schema<any, T> | T | RegExp: Schema<any, T> | T;
+
 export type StrictPatternItem<T> = T extends object
   ? StrictPattern<T> | Schema<any, T> | T
-  : Schema<any, T> | T
+  : PrimitivePattern<T>
 
 export type StrictPattern<T extends object> = { [K in keyof T]: StrictPatternItem<T[K]> };
 
-
 export type PatternItem<T> = T extends object
   ? Pattern<T> | Schema<any, T> | T
-  : Schema<any, T> | T
+  : PrimitivePattern<T>
 
 export type Pattern<T extends object> = { [K in keyof T]?: PatternItem<T[K]> };
