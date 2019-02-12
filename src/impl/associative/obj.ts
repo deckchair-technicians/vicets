@@ -1,6 +1,5 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
-import {matches} from "../../schemas";
 import {
   HasItemBehaviour,
   MissingItemBehaviour,
@@ -10,6 +9,7 @@ import {
 } from "../../unexpected_items";
 import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
+import {RegExpSchema} from "../regexp";
 import {merge} from "../util";
 import {Associative, conformInPlace, Pattern, StrictPattern} from "./associative";
 
@@ -26,8 +26,8 @@ function objectEntries(object: object): [string, Schema][] {
 }
 
 function valuesToSchemas<T extends object>(object: Pattern<T>,
-                            unexpected: UnexpectedItemBehaviour,
-                            missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
+                                           unexpected: UnexpectedItemBehaviour,
+                                           missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
 
   //object : {a:{b:1}}
   const result = {};
@@ -36,7 +36,7 @@ function valuesToSchemas<T extends object>(object: Pattern<T>,
     if (typeof s !== 'object')
       result[k] = new EqualsSchema(s);
     else if (s instanceof RegExp)
-      result[k] = matches(s);
+      result[k] = new RegExpSchema(s);
     else if (typeof s['conform'] === 'function')
       result[k] = s;
     else
