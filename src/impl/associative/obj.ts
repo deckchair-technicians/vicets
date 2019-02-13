@@ -10,7 +10,7 @@ import {
 import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
 import {RegExpSchema} from "../regexp";
-import {merge} from "../util";
+import {addGetter, copyGetters, mapGetters, merge} from "../util";
 import {Associative, conformInPlace, Pattern, StrictPattern} from "./associative";
 
 function objectEntries(object: object): [string, Schema][] {
@@ -46,11 +46,11 @@ function valuesToSchemas<T extends object>(object: Pattern<T>,
 }
 
 export class ObjectStrategies implements Associative<string, any> {
-  constructor(public readonly result: {}) {
+  constructor(public readonly result: any) {
   }
 
   set(k: any, v: any): this {
-    this.result[k] = v;
+    addGetter(this.result, k , ()=>v);
     return this
   }
 
@@ -88,8 +88,7 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
     if (typeof value !== 'object')
       return failure(`expected an object but got ${typeof value}`);
 
-    const instance = {};
-    Object.assign(instance, value);
+    const instance = copyGetters(value);
     return this.conformInPlace(instance) as T;
   }
 
