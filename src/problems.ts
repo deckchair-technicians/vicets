@@ -55,8 +55,8 @@ export function problem(message: string, path: Path = []) {
   return new Problem(path, message);
 }
 
-export function problems(...ps: Problem[]): Problems | undefined {
-  return ps.length === 0 ? undefined : new Problems(ps);
+export function problems(...ps: Problem[]): Problems {
+  return new Problems(ps);
 }
 
 export function failure(message: string, path: Path = []): Problems {

@@ -28,8 +28,7 @@ export class UniqueSchema<T, V> extends BaseSchema<T[], T[]> {
       const map = indexes.map((i) => problem(message, [i]));
       p.push(...map)
     }
-    const ps = problems(...p);
-    return ps !== undefined ? ps : value;
+    return p.length > 0 ? problems(...p) : value;
   }
 
 }
