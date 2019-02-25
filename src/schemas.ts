@@ -42,8 +42,8 @@ export function opt<IN, OUT>(s: Schema<any, OUT>): Schema<any, OUT | undefined> 
   return new TagSchemaAsOptional(s);
 }
 
-export function isdata<T extends object>(constructor: Constructor<T>): Schema<any, T> {
-  return new DataSchema(constructor);
+export function isdata<T extends object>(constructor: Constructor<T>, unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM): Schema<any, T> {
+  return new DataSchema(constructor, unexpected);
 }
 
 export function partial<T extends object>(type: Constructor<T>): Schema<any, Partial<T>> {

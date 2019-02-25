@@ -1,15 +1,16 @@
-import {Constructor, mapValues, PrimitiveValue} from "../util";
-import {BaseSchema} from "../index";
-import {failure, Problems} from "../../problems";
-import {discriminatorReports} from "./find_discriminators";
-import {Schema} from "../../schema";
 import {DataSchema} from "../../data";
+import {failure, Problems} from "../../problems";
+import {Schema} from "../../schema";
+import {UnexpectedItemBehaviour} from "../../unexpected_items";
+import {BaseSchema} from "../index";
+import {Constructor, mapValues, PrimitiveValue} from "../util";
+import {discriminatorReports} from "./find_discriminators";
 
-export class DiscriminatedUnionSchema<T  extends object> extends BaseSchema<any, T> {
+export class DiscriminatedUnionSchema<T extends object> extends BaseSchema<any, T> {
   private readonly discriminator: keyof T;
   private readonly schemasByDiscriminatorValue: Map<PrimitiveValue, Schema<any, T>>;
 
-  constructor(ctors: Constructor<T>[], discriminator: keyof T) {
+  constructor(ctors: Constructor<T>[], discriminator: keyof T, unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM) {
     super();
 
     this.discriminator = discriminator;
@@ -19,7 +20,7 @@ export class DiscriminatedUnionSchema<T  extends object> extends BaseSchema<any,
     if (schemasByValue === undefined)
       throw new Error(`Discriminator '${discriminator}' is not valid: ${report.problems.get(discriminator) || 'not found in classes'}.`);
 
-    this.schemasByDiscriminatorValue = mapValues((v) => new DataSchema(v), schemasByValue);
+    this.schemasByDiscriminatorValue = mapValues((v) => new DataSchema(v, unexpected), schemasByValue);
   }
 
   conform(value: object): Problems | T {
