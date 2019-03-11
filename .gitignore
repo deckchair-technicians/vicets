@@ -69,3 +69,6 @@ scratch/
 
 .idea/
 *.iml
+
+# Rollup cache
+.rpt2_cache/

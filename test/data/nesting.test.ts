@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, build, data, eq, isdata} from "../../index";
+import {__, build, data, eq, isdata} from "../../src/vice";
 
 describe('Nesting', () => {
   @data

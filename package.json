@@ -2,9 +2,14 @@
   "name": "@deckchair-technicians/vice",
   "version": "0.1.1",
   "description": "Validation and coercion toolkit",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/vice.umd.js",
+  "module": "dist/vice.es5.js",
+  "typings": "dist/types/vice.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "test": "./node_modules/.bin/mocha --require ts-node/register \"test/**/*.test.ts\"",
     "madge:circular": "./node_modules/.bin/madge --extensions ts --circular src/"
   },
@@ -15,6 +20,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "lodash.camelcase": "^4.3.0",
     "madge": "^3.2.0",
     "mocha": "^5.2.0",
     "ts-node": "^7.0.1",
@@ -31,7 +37,15 @@
     "node-yaml": "^3.1.1",
     "phone": "^2.3.0",
     "reflect-metadata": "^0.1.12",
+    "rollup": "^1.5.0",
+    "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-commonjs": "^9.2.1",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript2": "^0.19.3",
     "tslib": "^1.9.3",
     "validator": "10.4.0"
-  }
+  },
+  "sideEffects": false
 }

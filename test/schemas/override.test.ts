@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, override} from "../../index";
+import {eq, failure, override} from "../../src/vice";
 
 describe('override', () => {
 

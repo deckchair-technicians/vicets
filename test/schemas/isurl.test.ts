@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {isurl, Schema} from "../../index";
+import {isurl, Schema} from "../../src/vice";
 
 describe('isurl', () => {
   const s: Schema<any, string> = isurl();

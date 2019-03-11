@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {failure, isboolean, isnumber, Schema} from "../../index";
+import {failure, isboolean, isnumber, Schema} from "../../src/vice";
 
 describe('isboolean()', () => {
   const s: Schema<any, boolean> = isboolean();

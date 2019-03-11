@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {isany} from "../../index";
+import {isany} from "../../src/vice";
 
 describe('isany', () => {
   it('works', () => {

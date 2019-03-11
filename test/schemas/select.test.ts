@@ -1,4 +1,4 @@
-import {failure, conform, eq, select, validate} from "../../index";
+import {failure, conform, eq, select, validate} from "../../src/vice";
 import {expect} from "chai";
 
 describe('select', () => {

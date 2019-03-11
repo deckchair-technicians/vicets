@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {failure, isnull} from "../../index";
+import {failure, isnull} from "../../src/vice";
 
 describe('isnull', () => {
   it('works', () => {

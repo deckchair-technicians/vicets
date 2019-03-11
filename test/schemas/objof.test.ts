@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {matches, object, objof, schema} from "../../index";
+import {matches, object, objof, schema} from "../../src/vice";
 
 
 describe('objof', () => {

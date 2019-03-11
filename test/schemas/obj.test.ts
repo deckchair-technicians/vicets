@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, matches, object, deepPartial, Schema, UnexpectedItemBehaviour} from "../../index";
+import {eq, failure, matches, object, deepPartial, Schema, UnexpectedItemBehaviour} from "../../src/vice";
 
 describe('object', () => {
   it('Appends key to path in problems', () => {

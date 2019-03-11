@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {enumvalue, Problems} from "../../index";
+import {enumvalue, Problems} from "../../src/vice";
 
 describe('enumvalue', () => {
   describe('String enums', () => {

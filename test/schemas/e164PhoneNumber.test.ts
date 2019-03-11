@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {e164PhoneNumber, failure, Schema} from "../../index";
+import {e164PhoneNumber, failure, Schema} from "../../src/vice";
 
 describe('e164PhoneNumber', () => {
   describe('with a country as argument', () => {

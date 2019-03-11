@@ -1,5 +1,5 @@
-import {__, build, data} from "../../index";
-import {eq} from "../../index";
+import {__, build, data} from "../../src/vice";
+import {eq} from "../../src/vice";
 import {expect} from "chai";
 
 describe('Defining fields in constructor', () => {

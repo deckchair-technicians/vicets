@@ -1,4 +1,4 @@
-import {__, build, data, defaultValue, eq, opt, schema} from "../../index";
+import {__, build, data, defaultValue, eq, opt, schema} from "../../src/vice";
 import {expect} from "chai";
 
 describe('Optional fields', () => {
