@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {defaultValue, eq, failure, isIn} from "../../";
+import {defaultValue, eq, failure, isIn} from "../../src/vice";
 
 describe('defaultValue', () => {
   const s = defaultValue(() => "default", isIn("default", "also valid"));
