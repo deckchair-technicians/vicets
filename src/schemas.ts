@@ -67,6 +67,10 @@ export function isany(): Schema<any, any> {
   return schema((x) => x);
 }
 
+export function fail(problems: Problems): Schema<any, any> {
+  return schema(() => problems);
+}
+
 export function arrayof<T>(schema: Schema<any, T>): Schema<any, T[]> {
   return new ArrayOfSchema(schema);
 }
