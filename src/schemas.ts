@@ -191,6 +191,8 @@ export function tuple<A, B, C, D>(a: Schema<any, A>, b: Schema<any, B>, c: Schem
 
 export function tuple<A, B, C, D, E>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>, e: Schema<any, E>): Schema<any, [A, B, C, D, E]> & HasItemBehaviour;
 
+export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> & HasItemBehaviour ;
+
 export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> & HasItemBehaviour {
 
   return new TupleSchema(s, UnexpectedItemBehaviour.PROBLEM);
