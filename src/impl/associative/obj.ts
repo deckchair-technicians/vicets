@@ -10,8 +10,8 @@ import {
 import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
 import {RegExpSchema} from "../regexp";
-import {addGetter, copyGetters, mapGetters, merge} from "../util";
-import {Associative, conformInPlace, Pattern, StrictPattern} from "./associative";
+import {addGetter, copyGetters, merge} from "../util";
+import {Associative, conformInPlace, Pattern, PatternItem, StrictPattern} from "./associative";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
@@ -25,22 +25,29 @@ function objectEntries(object: object): [string, Schema][] {
   return result;
 }
 
-function valuesToSchemas<T extends object>(object: Pattern<T>,
+export function patternItemToSchema<T>(item: PatternItem<T>,
+                                unexpected: UnexpectedItemBehaviour,
+                                missing: MissingItemBehaviour): Schema {
+  if (typeof item !== 'object')
+    return new EqualsSchema(item);
+
+  if (item instanceof RegExp)
+    return new RegExpSchema(item);
+
+  if (typeof item['conform'] === 'function')
+    return item as Schema;
+
+  return new ObjectSchema(item, unexpected, missing);
+}
+
+function patternToSchemas<T extends object>(pattern: Pattern<T>,
                                            unexpected: UnexpectedItemBehaviour,
                                            missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
 
-  //object : {a:{b:1}}
   const result = {};
-  for (const k of Object.keys(object)) {
-    const s = object[k];
-    if (typeof s !== 'object')
-      result[k] = new EqualsSchema(s);
-    else if (s instanceof RegExp)
-      result[k] = new RegExpSchema(s);
-    else if (typeof s['conform'] === 'function')
-      result[k] = s;
-    else
-      result[k] = new ObjectSchema(s, unexpected, missing);
+  for (const k of Object.keys(pattern)) {
+    const s = pattern[k];
+    result[k] = patternItemToSchema(s, unexpected, missing);
   }
   return result as any;
 }
@@ -50,7 +57,7 @@ export class ObjectStrategies implements Associative<string, any> {
   }
 
   set(k: any, v: any): this {
-    addGetter(this.result, k , ()=>v);
+    addGetter(this.result, k, () => v);
     return this
   }
 
@@ -74,11 +81,11 @@ export class ObjectStrategies implements Associative<string, any> {
 export class ObjectSchema<T extends object> extends BaseSchema<any, T> implements HasItemBehaviour {
   public readonly fieldSchemaArray: [string, Schema][];
 
-  constructor(private readonly fieldSchemasAsObject: Pattern<T>,
+  constructor(private readonly pattern: Pattern<T>,
               private readonly unexpectedItems: UnexpectedItemBehaviour,
               private readonly missingItems: MissingItemBehaviour) {
     super();
-    this.fieldSchemaArray = objectEntries(valuesToSchemas(fieldSchemasAsObject, unexpectedItems, missingItems));
+    this.fieldSchemaArray = objectEntries(patternToSchemas(pattern, unexpectedItems, missingItems));
   }
 
   conform(value: any): ValidationResult<T> {
@@ -106,16 +113,16 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
   }
 
   intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U> {
-    const mergedSchemas = merge(this.fieldSchemasAsObject, other.fieldSchemasAsObject, (a: Schema, b: Schema) => a.and(b)) as StrictPattern<T & U>;
+    const mergedSchemas = merge(this.pattern, other.pattern, (a: Schema, b: Schema) => a.and(b)) as StrictPattern<T & U>;
     return new ObjectSchema<T & U>(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems));
   }
 
   onUnexpected(behaviour: UnexpectedItemBehaviour): this {
-    return new ObjectSchema(this.fieldSchemasAsObject, behaviour, this.missingItems) as this;
+    return new ObjectSchema(this.pattern, behaviour, this.missingItems) as this;
   }
 
   onMissing(behaviour: MissingItemBehaviour): this {
-    return new ObjectSchema(this.fieldSchemasAsObject, this.unexpectedItems, behaviour) as this;
+    return new ObjectSchema(this.pattern, this.unexpectedItems, behaviour) as this;
   }
 }
 
