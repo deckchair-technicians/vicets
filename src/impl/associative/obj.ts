@@ -7,9 +7,11 @@ import {
   strictestUnexpected,
   UnexpectedItemBehaviour
 } from "../../unexpected_items";
+import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
+import {RegExpSchema} from "../regexp";
 import {addGetter, copyGetters, merge} from "../util";
-import {Associative, conformInPlace, Pattern, patternItemToSchema, StrictPattern} from "./associative";
+import {Associative, conformInPlace, Pattern, PatternItem, StrictPattern} from "./associative";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
@@ -23,9 +25,24 @@ function objectEntries(object: object): [string, Schema][] {
   return result;
 }
 
+export function patternItemToSchema<T>(item: PatternItem<T>,
+                                       unexpected: UnexpectedItemBehaviour,
+                                       missing: MissingItemBehaviour): Schema {
+  if (typeof item !== 'object')
+    return new EqualsSchema(item);
+
+  if (item instanceof RegExp)
+    return new RegExpSchema(item);
+
+  if (typeof item['conform'] === 'function')
+    return item as Schema;
+
+  return new ObjectSchema(item, unexpected, missing);
+}
+
 function patternToSchemas<T extends object>(pattern: Pattern<T>,
-                                           unexpected: UnexpectedItemBehaviour,
-                                           missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
+                                            unexpected: UnexpectedItemBehaviour,
+                                            missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
 
   const result = {};
   for (const k of Object.keys(pattern)) {

@@ -1,10 +1,7 @@
 import {failure, isError, Problems, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
-import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
-import {RegExpSchema} from "../regexp";
-import {ObjectSchema} from "./obj";
 
 export interface Associative<K, V> {
   set(k: K, v: V): this;
@@ -61,21 +58,6 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
   }
 
   return problems.length > 0 ? problems : undefined;
-}
-
-export function patternItemToSchema<T>(item: PatternItem<T>,
-                                       unexpected: UnexpectedItemBehaviour,
-                                       missing: MissingItemBehaviour): Schema {
-  if (typeof item !== 'object')
-    return new EqualsSchema(item);
-
-  if (item instanceof RegExp)
-    return new RegExpSchema(item);
-
-  if (typeof item['conform'] === 'function')
-    return item as Schema;
-
-  return new ObjectSchema(item, unexpected, missing);
 }
 
 const isOptional = Symbol("isOptional");
