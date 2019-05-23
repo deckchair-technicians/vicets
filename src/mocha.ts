@@ -13,10 +13,15 @@ export type LikeOpts = {
 }
 
 /**
- * Compares actual to the expected pattern using object()
+ * Conforms actual to the schema, or to the expected pattern using object();
  *
- * If they match, returns the conformed version, otherwise throws an assertion Error,
- * compatible with mocha, with actual and expected.
+ * Returns the conformed value if successful.
+ *
+ * Otherwise throws an assertion Error, with actual, expected and showDiff, compatible with AssertionError, as used by
+ * mocha, WebStorm, etc.
+ *
+ * The 'expected' field on the error will produce a usable diff with the actual value. See documentation on
+ * intertwingle() for the shape of 'expected' on the error.
  */
 export function like<T extends object>(
   actual: any,

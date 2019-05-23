@@ -22,7 +22,8 @@ describe('vice mocha integration', () => {
         'right',
         'right',
         'incorrect value'],
-      right: 'right'
+      right: 'right',
+      notInPattern: 'right'
     };
 
     const pattern = {
@@ -60,7 +61,8 @@ describe('vice mocha integration', () => {
           missing: {
             value: undefined,
             errors: ["No value"]
-          }
+          },
+          notInPattern: "right"
         });
     }
   });
