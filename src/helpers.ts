@@ -1,5 +1,7 @@
+import {empty, wrapAssociative} from "./impl/associative/wrap";
+import {isPrimitive} from "./impl/util/types";
+import {Path, Problems, ValidationError, ValidationResult} from "./problems";
 import {Schema} from "./schema";
-import {Problems, ValidationError, ValidationResult} from "./problems";
 
 export function validate<IN, OUT>(schema: Schema<IN, OUT>, value: IN): OUT {
   const conformed = conform(schema, value);
@@ -14,4 +16,77 @@ export function conform<IN, OUT>(schema: Schema<IN, OUT>, value: IN): Validation
     throw new Error("No schema provided");
 
   return schema.conform(value);
+}
+
+export function pathsEq(a: Path, b: Path) {
+  return a.length === b.length
+    && a.every((v, i) => v === b[i]);
+}
+
+export function pathStartsWith(path: Path, startsWith: Path) {
+  return path.length >= startsWith.length
+    && startsWith.every((v, i) => v === path[i]);
+}
+
+export interface Errors {
+  value: any;
+  errors: string[];
+}
+
+export type Intertwingled<T> = T extends Array<infer I>
+  ? (T | Errors)[]
+  : T extends string | number | null | undefined
+    ? Errors
+    : { [k: string]: T | Errors };
+
+function intertwingledValue<T>(actual: any, problems: Problems, path: Path): Intertwingled<T> {
+  if (isPrimitive(actual))
+    return actual;
+
+  // Arrays or objects
+  const associative = wrapAssociative(actual);
+
+  const keys = new Set(associative.keys());
+
+  const missingKeys = problems.problems
+    .filter(p =>
+      // problems for direct children of path (but not ancestors)
+      p.path.length === path.length + 1
+      && pathStartsWith(p.path, path)
+
+      // ...that are not in actual
+      && !keys.has(p.path[-1]))
+    .map(p => p.path[p.path.length - 1]);
+
+  return [...keys, ...missingKeys]
+    .reduce((result, k) => {
+      result[k] = intertwingle(actual[k], problems, [...path, k]);
+      return result;
+    }, empty(actual));
+}
+
+/**
+ * Returns an object in the same shape as actual, but with invalid values replaced with an error report.
+ *
+ * e.g.
+ *
+ * const actual = {right: 'right', wrong:'wrong'};
+ * const problems = [{path: ['wrong'], message: 'error message'};
+ * intertwingle(actual, problems);
+ *
+ * will return
+ *
+ * {right: 'right', wrong: {value: 'wrong', errors: ['error message']}}
+ */
+export function intertwingle(actual: any, problems: Problems, path: Path = []): Intertwingled<any> {
+  const myProblems = problems.problems.filter(p => pathsEq(path, p.path));
+
+  const intertwingled = intertwingledValue(actual, problems, path);
+
+  return myProblems.length > 0
+    ? {
+      value: intertwingled,
+      errors: myProblems.map(p => p.message)
+    }
+    : intertwingled;
 }

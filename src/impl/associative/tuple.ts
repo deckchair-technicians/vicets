@@ -5,7 +5,7 @@ import {Associative, conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
 import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
 
-class TupleStrategies<T extends any[]> implements Associative<number, any> {
+export class TupleStrategies<T extends any[]> implements Associative<number, any> {
   private readonly deleted: number[] = [];
 
   constructor(private readonly resultIn: T) {
