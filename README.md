@@ -10,3 +10,8 @@
 * Schema can be separated from the class, and created without a class
 * Type safety ensure schema output matches intended field type
 * Provide some reassurance that if `x instanceof SomeDataClass`, then x conforms to the schema of SomeClass. Removes the need to consider whether `x` needs to be validated again.
+
+# How to run the tests in WebStorm
+
+Remember to add `--require require-ts-node.js` to Extra Mocha Options in 
+the runner config screen
