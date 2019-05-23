@@ -16,11 +16,11 @@ export type LikeOpts = {
  * Compares actual to the expected pattern using object()
  *
  * If they match, returns the conformed version, otherwise throws an assertion Error,
- * compatible with mocha, with actual and expected
+ * compatible with mocha, with actual and expected.
  */
-export function like<T extends object>(
+export function like<P extends object, T extends P>(
   actual: any,
-  expected: Pattern<T> | Schema<T, T>,
+  expected: Pattern<P> | Schema<any, T>,
   {
     message = undefined,
     unexpected = UnexpectedItemBehaviour.IGNORE,
