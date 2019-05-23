@@ -11,19 +11,24 @@ describe('Using build() on @data classes', () => {
   it('sets the right values', () => {
     expect(build(A, {field: "valid"})).deep.equals({field: "valid"});
   });
+
   it('returns the right type', () => {
     expect(build(A, {field: "valid"})).instanceOf(A);
   });
+
   it('has the right constructor name', () => {
     expect(Object.getPrototypeOf(build(A, {field: "valid"})).constructor.name).equals('A');
   });
+
   it('returns errors', () => {
     expect(() => build(A, {field: "some bad value"})).to.throw(/some bad value/);
   });
+
   it('complains when field is missing', () => {
     expect(conformAs(A, {}))
       .deep.equals(failure("No value", ["field"]));
   });
+
   it('complains when additional fields exist', () => {
     expect(conformAs(A, {field: "valid", additionalField: "should not be here"}))
       .deep.equals(failure("Unexpected item", ["additionalField"]));

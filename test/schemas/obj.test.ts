@@ -45,6 +45,7 @@ describe('object', () => {
       "Unexpected item",
       ['unexpected']));
   });
+
   it('Can specify additional fields should be deleted', () => {
     const s: Schema<object, object> = object({})
       .onUnexpected(UnexpectedItemBehaviour.DELETE);
@@ -52,6 +53,7 @@ describe('object', () => {
     expect(s.conform({unexpected: 'whatever'}))
       .deep.equals({});
   });
+
   it('Can specify additional fields should be ignored', () => {
     const s: Schema<object, object> = object({})
       .onUnexpected(UnexpectedItemBehaviour.IGNORE);
@@ -59,6 +61,7 @@ describe('object', () => {
     expect(s.conform({unexpected: 'whatever'}))
       .deep.equals({unexpected: 'whatever'});
   });
+
   it('Can be nested', () => {
     const s: Schema<object, object> = object({a: object({b: eq(1)})});
 
