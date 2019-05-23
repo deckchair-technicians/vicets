@@ -18,7 +18,7 @@ export type LikeOpts = {
  * If they match, returns the conformed version, otherwise throws an assertion Error,
  * compatible with mocha, with actual and expected
  */
-export function like<T>(
+export function like<T extends object>(
   actual: any,
   expected: Pattern<T> | Schema<T, T>,
   {
@@ -30,7 +30,7 @@ export function like<T>(
 
   const schema: Schema = isSchema(expected)
     ? expected
-    : object(expected, unexpected, missing);
+    : object(expected as any, unexpected, missing);
 
   const result = conform(schema, actual);
 
