@@ -1,6 +1,6 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
-import {typeDescription} from "../util";
+import {typeDescription} from "../util/types";
 import {Associative, conformInPlace} from "./associative";
 import {BaseSchema} from "../index";
 import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";

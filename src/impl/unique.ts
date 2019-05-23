@@ -1,6 +1,6 @@
 import {BaseSchema} from "./index";
 import {failure, problem, Problem, problems, ValidationResult} from "../problems";
-import {typeDescription} from "./util";
+import {typeDescription} from "./util/types";
 
 export class UniqueSchema<T, V> extends BaseSchema<T[], T[]> {
   constructor(private readonly keyfn: (t: T) => V) {

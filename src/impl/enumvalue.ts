@@ -1,6 +1,6 @@
-import {BaseSchema} from "./index";
 import {failure, ValidationResult} from "../problems";
-import {entries, typeDescription} from "./util";
+import {BaseSchema} from "./index";
+import {typeDescription} from "./util/types";
 
 enum EnumType {
   InitializedStrings,
@@ -26,7 +26,7 @@ export class EnumValueSchema<T extends object> extends BaseSchema<any, T[keyof T
     let someStringMembers = false;
 
     this.enumValues = new Set<any>();
-    for (let [k, v] of entries(this.e) as [string | number, any][]) {
+    for (let [k, v] of Object.entries(this.e) as [string | number, any][]) {
       if (!isNaN(Number(k)))
         k = Number(k);
 

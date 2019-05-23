@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {failure, Schema, isoDateOnly, validate} from "../../src/vice";
-import {utcDate} from "../../src/impl/util";
+import {utcDate} from "../../src/impl/util/dates";
 
 describe('isoDateOnly', () => {
   const s: Schema<any, Date> = isoDateOnly();

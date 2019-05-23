@@ -1,8 +1,11 @@
-import {Constructor, first, isPrimitive, mapKeyValue, PrimitiveValue, unsafeCast} from "../util";
+import {Constructor} from "../util/types";
 import {EqualsSchema} from "../eq";
 import * as os from "os";
 import {Schema} from "../../schema";
 import {schemaOf} from "../../hasschema";
+import {first} from "../util/iterables";
+import {mapKeyValue} from "../util/maps";
+import {isPrimitive, PrimitiveValue, unsafeCast} from "../util/types";
 
 class CandidateDiscriminators<T extends object> {
   private readonly constructors: Constructor<T>[] = [];

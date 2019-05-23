@@ -1,7 +1,7 @@
 import {failure, Problems, ValidationResult} from "../problems";
 import {BaseSchema} from "./index";
 import {Schema} from "../schema";
-import {typeDescription} from "./util";
+import {typeDescription} from "./util/types";
 
 export interface SchemaOverrides<IN, OUT> {
   failure?: string | ((value: IN) => Problems);

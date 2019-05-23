@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {typeDescription} from "../../src/impl/util";
+import {typeDescription} from "../../../src/impl/util/types";
 
 describe('typeDescription', () => {
   it('works for plain object', () => {

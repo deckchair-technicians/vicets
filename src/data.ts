@@ -2,7 +2,8 @@ import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
 import {BaseSchema, isSchema} from "./impl";
 import {StrictPattern} from "./impl/associative/associative";
 import {ObjectSchema} from "./impl/associative/obj";
-import {Constructor, entries, isPrimitive} from "./impl/util";
+import {Constructor} from "./impl/util/types";
+import {isPrimitive} from "./impl/util/types";
 import {failure, Problems, ValidationError, ValidationResult} from "./problems";
 import {schematizeEntries} from "./schematize";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
@@ -12,7 +13,7 @@ export function data<C extends Constructor>(c: C): C {
   // suspendValidation is required to allow calling parent constructor
   const objectWithDefaults = suspendValidation(() => new c() as StrictPattern<C>);
 
-  for (const [k, v] of entries(objectWithDefaults)) {
+  for (const [k, v] of Object.entries(objectWithDefaults)) {
     if (!(isSchema(v) || isPrimitive(v)))
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
@@ -87,7 +88,7 @@ export class DataSchema<T extends object> extends BaseSchema<any, T> {
 
     try {
       return build(this.c, value, this.unexpected)
-      ;
+        ;
     } catch (e) {
       if (e instanceof ValidationError) {
         return e.problems;

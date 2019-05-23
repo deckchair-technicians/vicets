@@ -1,15 +1,14 @@
-import {Schema} from "./schema";
-import {entries} from "./impl/util";
-import {EqualsSchema} from "./impl/eq";
-import {ObjectSchema} from "./impl/associative/obj";
-import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 import {StrictPattern} from "./impl/associative/associative";
+import {ObjectSchema} from "./impl/associative/obj";
+import {EqualsSchema} from "./impl/eq";
+import {Schema} from "./schema";
+import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
 export type Schemaish = Schema<any, any> | Function | number | string | boolean | object;
 
-export function schematizeEntries<T extends object>(object: Object) : StrictPattern<T>{
+export function schematizeEntries<T extends object>(object: Object): StrictPattern<T> {
   const fixed = <StrictPattern<T>>{};
-  for (const [k, v] of entries(object)) {
+  for (const [k, v] of Object.entries(object)) {
     fixed[k] = schematize(v);
   }
   return fixed;

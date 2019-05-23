@@ -1,7 +1,7 @@
 import {BaseSchema} from "./index";
 import {failure, Problems, ValidationResult} from "../problems";
 import {Schema} from "../schema";
-import {typeDescription} from "./util";
+import {typeDescription} from "./util/types";
 
 export class ArrayOfSchema<T> extends BaseSchema<any[], T[]> {
   constructor(private readonly itemSchema: Schema<any, T>) {

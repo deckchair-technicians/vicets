@@ -27,7 +27,9 @@ import {SelectSchema} from "./impl/select";
 import {SetOfSchema} from "./impl/setof";
 import {UniqueSchema} from "./impl/unique";
 import {IsURLOptions, UrlSchema} from "./impl/url";
-import {buildPredicateMessageFunction, Constructor, entries, identity, toMap, typeDescription} from "./impl/util";
+import {identity} from "./impl/util/functions";
+import {toMap} from "./impl/util/maps";
+import {Constructor, typeDescription} from "./impl/util/types";
 import {UuidSchema} from "./impl/uuid";
 import {failure, Problems} from "./problems";
 import {Schema} from "./schema";
@@ -85,7 +87,7 @@ export function enumvalue<T extends object>(e: T): Schema<any, T[keyof T]> {
 
 export function enumkey<T extends object>(e: T): Schema<any, T[keyof T]> {
   const stringKeysOnly = {};
-  for (let [k, v] of entries(e)) {
+  for (let [k, v] of Object.entries(e)) {
     if (isNaN(Number(k)))
       stringKeysOnly[k] = v;
   }
@@ -209,6 +211,19 @@ export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<
 
 export function predicate<T>(predicate: (value: T) => boolean,
                              failureMessage?: ((value: any) => string) | string): Schema<T, T> {
+
+  function buildPredicateMessageFunction(message: ((value: any) => string) | string | undefined, predicate: (x: any) => boolean): (value: any) => string {
+    switch (typeof  message) {
+      case 'string':
+        return () => message as string;
+      case 'function':
+        return message as () => string;
+      case 'undefined':
+        return () => predicate.toString();
+      default:
+        throw new Error(`Not a valid message ${message}`);
+    }
+  }
   const messageFn = buildPredicateMessageFunction(failureMessage, predicate);
   return schema(
     (x) => predicate(x) === true ? x : failure(messageFn(x)))

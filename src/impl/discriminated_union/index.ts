@@ -3,7 +3,9 @@ import {failure, Problems} from "../../problems";
 import {Schema} from "../../schema";
 import {UnexpectedItemBehaviour} from "../../unexpected_items";
 import {BaseSchema} from "../index";
-import {Constructor, mapValues, PrimitiveValue} from "../util";
+import {Constructor} from "../util/types";
+import {mapValues} from "../util/maps";
+import {PrimitiveValue} from "../util/types";
 import {discriminatorReports} from "./find_discriminators";
 
 export class DiscriminatedUnionSchema<T extends object> extends BaseSchema<any, T> {

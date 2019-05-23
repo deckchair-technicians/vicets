@@ -10,7 +10,8 @@ import {
 import {EqualsSchema} from "../eq";
 import {BaseSchema} from "../index";
 import {RegExpSchema} from "../regexp";
-import {addGetter, copyGetters, merge} from "../util";
+import {addGetter, copyGetters, merge} from "../util/magic";
+import {mapValues} from "../util/maps";
 import {Associative, conformInPlace, Pattern, PatternItem, StrictPattern} from "./associative";
 
 function objectEntries(object: object): [string, Schema][] {

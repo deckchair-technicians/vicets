@@ -1,6 +1,6 @@
 import {failure, ValidationResult} from "../problems";
 import {BaseSchema} from "./index";
-import {typeDescription} from "./util";
+import {typeDescription} from "./util/types";
 
 export class EqualsSchema<T> extends BaseSchema<any, T> {
   constructor(public readonly expected: T) {

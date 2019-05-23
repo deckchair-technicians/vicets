@@ -1,5 +1,5 @@
 import {failure, isSuccess, Problems, ValidationResult} from "../problems";
-import {typeDescription} from "./util";
+import {typeDescription} from "./util/types";
 import {Schema} from "../schema";
 
 export abstract class BaseSchema<IN=any, OUT=any> implements Schema<IN, OUT> {
@@ -76,5 +76,6 @@ export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
 }
 
 export function isSchema(value: any): value is Schema {
+  // TODO: probably wrong?
   return value instanceof BaseSchema;
 }

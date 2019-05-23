@@ -1,6 +1,6 @@
-import {ObjectSchema} from "./impl/associative/obj";
-import {Constructor, entries} from "./impl/util";
 import {isSchema} from "./impl";
+import {ObjectSchema} from "./impl/associative/obj";
+import {Constructor} from "./impl/util/types";
 import {Problems, ValidationError} from "./problems";
 
 const SCHEMA_SYMBOL = Symbol('schema');
@@ -15,6 +15,7 @@ export function schemaOf<T extends object>(ctor: Constructor<T>): ObjectSchema<T
 }
 
 let SUSPEND_VALIDATION = false;
+
 export function suspendValidation<T>(f: () => T): T {
   try {
     SUSPEND_VALIDATION = true;
@@ -26,7 +27,7 @@ export function suspendValidation<T>(f: () => T): T {
 
 
 // TODO: add generic constraints to IN/OUT on Schema?
-export function hasSchema<C extends { new(...args: any[]): object }>(schema: ObjectSchema<C> ): (c: C) => C {
+export function hasSchema<C extends { new(...args: any[]): object }>(schema: ObjectSchema<C>): (c: C) => C {
   return function <C extends { new(...args: any[]): object }>(c: C): C {
     const hackClassName = {};
     hackClassName[c.name] = class extends c {
@@ -35,7 +36,7 @@ export function hasSchema<C extends { new(...args: any[]): object }>(schema: Obj
         if (SUSPEND_VALIDATION)
           return;
 
-        for (const [k, v] of entries(this)) {
+        for (const [k, v] of Object.entries(this)) {
           if (isSchema(v))
             this[k] = undefined;
         }

@@ -1,6 +1,6 @@
 import {BaseSchema} from "./index";
 import {failure, ValidationResult} from "../problems";
-import {utcDate} from "./util";
+import {utcDate} from "./util/dates";
 
 const regex = /^([1-9][0-9]{3})-([0-1][0-9])-([0-3][0-9])(T([0-2][0-9]):([0-6][0-9])(:([0-6][0-9])(\.([0-9]{3}))?)?((Z)|(\+([0-2][0-9]):([0-6][0-9]))))?$/;
 

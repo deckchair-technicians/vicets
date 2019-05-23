@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import {fail} from "assert";
 
 import {eq, Schema, schematize} from "../../src/vice";
-import {typeDescription} from "../../src/impl/util";
+import {typeDescription} from "../../src/impl/util/types";
 
 describe('schematize', () => {
   xit('Returns InstanceOfSchema for classes', () => {

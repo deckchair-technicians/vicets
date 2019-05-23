@@ -1,6 +1,6 @@
 import {expect} from 'chai';
+import {addGetter} from "../../src/impl/util/magic";
 import {deepPartial, eq, failure, Schema} from "../../src/vice";
-import {addGetter} from "../../src/impl/util";
 
 describe('deepPartial()', () => {
   it('object with deepPartial', () => {

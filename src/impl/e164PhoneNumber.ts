@@ -1,5 +1,5 @@
 import {failure, ValidationResult} from "../problems";
-import {typeDescription} from "./util";
+import {typeDescription} from "./util/types";
 import {BaseSchema} from "./index";
 import phone from "phone";
 
