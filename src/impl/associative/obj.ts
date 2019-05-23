@@ -13,6 +13,7 @@ import {RegExpSchema} from "../regexp";
 import {addGetter, copyGetters, merge} from "../util/magic";
 import {mapValues} from "../util/maps";
 import {Associative, conformInPlace, Pattern, PatternItem, StrictPattern} from "./associative";
+import {TupleSchema} from "./tuple";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
@@ -34,6 +35,9 @@ export function patternItemToSchema<T>(item: PatternItem<T>,
 
   if (item instanceof RegExp)
     return new RegExpSchema(item);
+
+  if (item instanceof Array)
+    return new TupleSchema(item.map(v => patternItemToSchema(v, unexpected, missing)), unexpected);
 
   if (typeof item['conform'] === 'function')
     return item as Schema;
