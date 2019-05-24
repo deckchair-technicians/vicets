@@ -84,9 +84,6 @@ export function intertwingle(actual: any, problems: Problems, path: Path = []): 
   const intertwingled = intertwingledValue(actual, problems, path);
 
   return myProblems.length > 0
-    ? {
-      value: intertwingled,
-      errors: myProblems.map(p => p.message)
-    }
+    ? myProblems.map(p => p.message)
     : intertwingled;
 }
