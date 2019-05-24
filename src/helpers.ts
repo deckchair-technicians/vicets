@@ -28,18 +28,7 @@ export function pathStartsWith(path: Path, startsWith: Path) {
     && startsWith.every((v, i) => v === path[i]);
 }
 
-export interface Errors {
-  value: any;
-  errors: string[];
-}
-
-export type Intertwingled<T> = T extends Array<infer I>
-  ? (T | Errors)[]
-  : T extends string | number | null | undefined
-    ? Errors
-    : { [k: string]: T | Errors };
-
-function intertwingledValue<T>(actual: any, problems: Problems, path: Path): Intertwingled<T> {
+function intertwingledValue<T>(actual: any, problems: Problems, path: Path): any {
   if (isPrimitive(actual))
     return actual;
 
@@ -78,12 +67,16 @@ function intertwingledValue<T>(actual: any, problems: Problems, path: Path): Int
  *
  * {right: 'right', wrong: {value: 'wrong', errors: ['error message']}}
  */
-export function intertwingle(actual: any, problems: Problems, path: Path = []): Intertwingled<any> {
-  const myProblems = problems.problems.filter(p => pathsEq(path, p.path));
+export function intertwingle(actual: any, problems: Problems, path: Path = []): any {
+  const myProblems = problems.problems
+    .filter(p => pathsEq(path, p.path))
+    .map(p => p.message);
 
   const intertwingled = intertwingledValue(actual, problems, path);
 
-  return myProblems.length > 0
-    ? myProblems.map(p => p.message)
-    : intertwingled;
+  return myProblems.length === 0
+    ? intertwingled
+    : myProblems.length === 1
+      ? myProblems[0]
+      : myProblems;
 }

@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import {like} from "../src/mocha";
-import {arrayof, eq, object} from "../src/schemas";
+import {problem, problems} from "../src/problems";
+import {arrayof, eq, object, schema} from "../src/schemas";
 
 describe('vice mocha integration', () => {
   it('passes', () => {
@@ -15,7 +16,7 @@ describe('vice mocha integration', () => {
       {thing: 1});
   });
 
-  it('fails with an AssertionError expected, actual and ', () => {
+  it('fails with an AssertionError with expected, actual and showDiff=true', () => {
     const actual = {
       right: 'right',
       wrong: 'incorrect value',
@@ -27,7 +28,8 @@ describe('vice mocha integration', () => {
         right: 'right',
         wrong: 'incorrect value'
       }],
-      notInPattern: 'right'
+      notInPattern: 'right',
+      multipleProblems: 'incorrect value',
     };
 
     const pattern = {
@@ -35,10 +37,12 @@ describe('vice mocha integration', () => {
       wrong: 'right',
       nested: arrayof(object({
         right: 'right',
-        wrong: 'right'
+        wrong: 'right',
+        missing: 'right'
       })),
       array: ['right', /right/, eq('right')], // can use schemas and regexp as values
       missing: 'right',
+      multipleProblems : schema(()=>problems(problem("first problem"), problem("second problem")))
     };
 
     try {
@@ -55,19 +59,21 @@ describe('vice mocha integration', () => {
       expect(e.expected).deep.eq(
         {
           right: 'right',
-          wrong: ["expected 'right' but got string: \"incorrect value\""],
+          wrong: "expected 'right' but got string: \"incorrect value\"",
           nested: [
             {
               right: 'right',
-              wrong: ["expected 'right' but got string: \"incorrect value\""]
+              wrong: "expected 'right' but got string: \"incorrect value\"",
+              missing: "No value"
             }],
           array: [
             'right',
             'right',
-            ["expected 'right' but got string: \"incorrect value\""]
+            "expected 'right' but got string: \"incorrect value\""
           ],
-          missing: ["No value"],
-          notInPattern: "right"
+          missing: "No value",
+          notInPattern: "right",
+          multipleProblems: ["first problem","second problem"],
         });
     }
   });
