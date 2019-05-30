@@ -1,5 +1,6 @@
 import {failure, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
+import {isnull, isundefined} from "../../schemas";
 import {
   HasItemBehaviour,
   MissingItemBehaviour,
@@ -38,6 +39,12 @@ export function patternItemToSchema<T>(item: PatternItem<T>,
 
   if (item instanceof Array)
     return new TupleSchema(item.map(v => patternItemToSchema(v, unexpected, missing)), unexpected);
+
+  if (typeof item === 'undefined')
+    return isundefined();
+
+  if (item === null)
+    return isnull();
 
   if (typeof item['conform'] === 'function')
     return item as Schema;

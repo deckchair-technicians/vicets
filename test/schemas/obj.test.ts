@@ -70,4 +70,22 @@ describe('object', () => {
       ['a', 'b']));
     expect(s.conform({a: {b: 1}})).deep.equals({a: {b: 1}});
   });
+
+  it('works with nulls', () => {
+    const s: Schema<any, any> = object({a: null as any});
+
+    expect(s.conform({a: null} )).deep.equals({a: null});
+    expect(s.conform({a: 'not null'})).deep.equals(failure(
+      "expected 'null' but got string: \"not null\"",
+      ['a']));
+  });
+
+  it('works with undefined', () => {
+    const s: Schema<object, object> = object({a: undefined as any});
+
+    expect(s.conform({a: undefined})).deep.equals({a: undefined});
+    expect(s.conform({a: 'not undefined'})).deep.equals(failure(
+      "expected 'undefined' but got string: \"not undefined\"",
+      ['a']));
+  });
 });
