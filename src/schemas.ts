@@ -1,6 +1,6 @@
 import {DataSchema} from "./data";
 import {schemaOf} from "./hasschema";
-import {DelegatingSchema} from "./impl";
+import {DelegatingSchema, OrSchema} from "./impl";
 import {ArrayOfSchema} from "./impl/arrayof";
 import {Pattern, StrictPattern, TagSchemaAsOptional} from "./impl/associative/associative";
 import {MapSchema} from "./impl/associative/map";
@@ -51,6 +51,32 @@ export function isdata<T extends object>(constructor: Constructor<T>, unexpected
 export function partial<T extends object>(type: Constructor<T>): Schema<any, Partial<T>> {
   const objectSchema: ObjectSchema<T> = schemaOf(type);
   return objectSchema.onMissing(MissingItemBehaviour.IGNORE);
+}
+
+function deepNullablePattern(fieldSchemaArray: [string, Schema][]): Pattern<any> {
+  const nullableFieldsObjectPattern = {};
+  for (const [k, s] of fieldSchemaArray) {
+    if ("fieldSchemaArray" in s) { // TODO testing if schema represents an object should be different
+      const nullableFieldsObjectSchema = new ObjectSchema(deepNullablePattern((s as ObjectSchema<any>).fieldSchemaArray), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM)
+      nullableFieldsObjectPattern[k] = new OrSchema(nullableFieldsObjectSchema, isnull());
+    } else {
+      nullableFieldsObjectPattern[k] = new OrSchema(s, isnull());
+    }
+  }
+  return nullableFieldsObjectPattern
+}
+
+export function deepNullable<T extends object>(type: Constructor<T>): Schema<any, DeepNullable<T>> {
+  const objectSchema: ObjectSchema<T> = schemaOf(type);
+
+  return new ObjectSchema(deepNullablePattern(objectSchema.fieldSchemaArray),
+    UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
+}
+
+export type Nullable<T> = T | null
+
+export type DeepNullable<T extends object> = {
+  [P in keyof T]: T[P] extends object ? DeepNullable<T[P]> : Nullable<T>;
 }
 
 export function eq<T>(value: T): Schema<any, T> {
@@ -165,7 +191,7 @@ export function e164PhoneNumber(defaultCountryIso3166?: string): Schema<any, str
 export function object<T extends object>(
   pattern: StrictPattern<T>,
   unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM,
-  missing: MissingItemBehaviour = MissingItemBehaviour.PROBLEM
+  missing: MissingItemBehaviour = MissingItemBehaviour.PROBLEM,
 ): Schema<any, T> & HasItemBehaviour {
   return new ObjectSchema<T>(pattern, unexpected, missing);
 }
@@ -175,7 +201,7 @@ export function deepPartial<T extends object>(
   return new ObjectSchema<T>(pattern, UnexpectedItemBehaviour.IGNORE, MissingItemBehaviour.PROBLEM);
 }
 
-export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
+export function objof<T>(schema: Schema<any, T>): Schema<any, {[k: string]: T}> {
   return new ObjOfSchema(schema);
 }
 
@@ -189,7 +215,7 @@ export function map<K, V>(entryPattern: Pattern<{}> | Map<K, Schema<any, V>>): S
 
 export function tuple<A>(a: Schema<any, A>): Schema<any, [A]> & HasItemBehaviour;
 
-export function tuple<A, B>(a: Schema<any, A>, b: Schema<any, B>,): Schema<any, [A, B]> & HasItemBehaviour;
+export function tuple<A, B>(a: Schema<any, A>, b: Schema<any, B>): Schema<any, [A, B]> & HasItemBehaviour;
 
 export function tuple<A, B, C>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>): Schema<any, [A, B, C]> & HasItemBehaviour;
 
@@ -213,7 +239,7 @@ export function predicate<T>(predicate: (value: T) => boolean,
                              failureMessage?: ((value: any) => string) | string): Schema<T, T> {
 
   function buildPredicateMessageFunction(message: ((value: any) => string) | string | undefined, predicate: (x: any) => boolean): (value: any) => string {
-    switch (typeof  message) {
+    switch (typeof message) {
       case 'string':
         return () => message as string;
       case 'function':
@@ -224,6 +250,7 @@ export function predicate<T>(predicate: (value: T) => boolean,
         throw new Error(`Not a valid message ${message}`);
     }
   }
+
   const messageFn = buildPredicateMessageFunction(failureMessage, predicate);
   return schema(
     (x) => predicate(x) === true ? x : failure(messageFn(x)))
