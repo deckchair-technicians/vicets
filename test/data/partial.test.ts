@@ -2,7 +2,7 @@ import {expect} from "chai";
 import {__, data, eq, failure, partial, ValidationResult} from "../../src/vice";
 
 
-describe('Using build() on @data classes', () => {
+describe('Partial', () => {
   @data
   class Thing {
     a: string = __(eq("valid"));
