@@ -76,7 +76,7 @@ export function deepNullable<T extends object>(type: Constructor<T>): Schema<any
 export type Nullable<T> = T | null
 
 export type DeepNullable<T extends object> = {
-  [P in keyof T]: T[P] extends object ? DeepNullable<T[P]> : Nullable<T>;
+  [P in keyof T]: T[P] extends object ? DeepNullable<T[P]> : Nullable<T[P]>;
 }
 
 export function eq<T>(value: T): Schema<any, T> {
