@@ -42,7 +42,7 @@ describe('vice mocha integration', () => {
       })),
       array: ['right', /right/, eq('right')], // can use schemas and regexp as values
       missing: 'right',
-      multipleProblems : schema(()=>problems(problem("first problem"), problem("second problem")))
+      multipleProblems: schema(() => problems(problem("first problem"), problem("second problem")))
     };
 
     try {
@@ -73,8 +73,35 @@ describe('vice mocha integration', () => {
           ],
           missing: "No value",
           notInPattern: "right",
-          multipleProblems: ["first problem","second problem"],
+          multipleProblems: ["first problem", "second problem"],
         });
     }
   });
+
+  it('fails with an AssertionError when passed an array', () => {
+    const actual = [{
+      wrong: 'incorrect value',
+    }];
+
+    const pattern = [{
+      wrong: 'right',
+    }];
+
+    try {
+      like(actual, pattern);
+      throw new Error('Expected exception');
+
+    } catch (e) {
+
+      expect(e.message).contains('wrong').contains('incorrect value');
+
+      expect(e.actual).deep.eq(actual);
+
+      expect(e.expected).deep.eq([
+        {
+          wrong: "expected 'right' but got string: \"incorrect value\"",
+        }]);
+    }
+  });
+
 });
