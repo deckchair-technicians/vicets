@@ -1,7 +1,7 @@
 import {conform, intertwingle} from "./helpers";
 import {Pattern} from "./impl/associative/associative";
 import {patternItemToSchema} from "./impl/associative/obj";
-import {isError} from "./problems";
+import {isError, ValidationError} from "./problems";
 import {Schema} from "./schema";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
@@ -38,13 +38,10 @@ export function like<T extends Likeable>(
   const result = conform(schema, actual);
 
   if (isError(result)) {
-    throw Object.assign(
-      new Error(`${message ? `${message}\r\n` : ''}${result}\r\n`),
-      {
-        actual: actual,
-        expected: intertwingle(actual, result, []),
-        showDiff: true
-      });
+    throw new ValidationError(
+      actual,
+      result,
+      {leakActualValuesInError:true});
   }
 
   return result as T;

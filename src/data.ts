@@ -2,8 +2,7 @@ import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
 import {BaseSchema, isSchema} from "./impl";
 import {StrictPattern} from "./impl/associative/associative";
 import {ObjectSchema} from "./impl/associative/obj";
-import {Constructor} from "./impl/util/types";
-import {isPrimitive} from "./impl/util/types";
+import {Constructor, isPrimitive} from "./impl/util/types";
 import {failure, Problems, ValidationError, ValidationResult} from "./problems";
 import {schematizeEntries} from "./schematize";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
@@ -53,10 +52,24 @@ export function conformAs<T extends object>(c: Constructor<T>, obj: object, unex
   return makeInstance(c, result);
 }
 
-export function build<T extends object>(c: Constructor<T>, values: {}, unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM): T {
+export interface BuildOpts {
+  unexpected: UnexpectedItemBehaviour;
+  /**
+   *
+   */
+  leakActualValuesInError: boolean;
+}
+
+export function build<T extends object>(
+  c: Constructor<T>,
+  values: any,
+  {
+    unexpected = UnexpectedItemBehaviour.PROBLEM,
+    leakActualValuesInError = false
+  }: Partial<BuildOpts> = {}): T {
   const conformed = conformAs(c, values, unexpected);
   if (conformed instanceof Problems) {
-    throw new ValidationError(values, conformed);
+    throw new ValidationError(values, conformed, {leakActualValuesInError});
   }
   return conformed;
 }
@@ -72,8 +85,11 @@ export function build<T extends object>(c: Constructor<T>, values: {}, unexpecte
  * `construct(A, {})` WILL cause the compiler to complain if
  * `{}` is missing fields `A` requires.
  */
-export function construct<T extends object>(c: Constructor<T>, value: T): T {
-  return build(c, value);
+export function construct<T extends object>(
+  c: Constructor<T>,
+  value: T,
+  opts: Partial<BuildOpts> = {}): T {
+  return build(c, value, opts);
 }
 
 export class DataSchema<T extends object> extends BaseSchema<any, T> {
@@ -87,7 +103,7 @@ export class DataSchema<T extends object> extends BaseSchema<any, T> {
     if (typeof value !== 'object') return failure(`Expected an object but got a ${typeof value}`);
 
     try {
-      return build(this.c, value, this.unexpected)
+      return build(this.c, value, {unexpected:this.unexpected})
         ;
     } catch (e) {
       if (e instanceof ValidationError) {

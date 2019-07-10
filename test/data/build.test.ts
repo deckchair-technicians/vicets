@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {__, build, conformAs, data, eq, failure} from "../../src/vice";
+import {__, build, conformAs, data, eq, failure, ValidationError} from "../../src/vice";
 
 
 describe('Using build() on @data classes', () => {
@@ -39,6 +39,18 @@ describe('Using build() on @data classes', () => {
     }
 
     expect(() => build(NotData, {})).to.throw(/No schema/);
+  });
+
+  it('allows us to include actual and expected in validation failure', () => {
+    const actual = {field: "not valid"};
+    expect(()=>build(A, actual, {leakActualValuesInError:true}))
+      .to.throw(ValidationError).with.property('actual').eq(actual);
+
+    expect(()=>build(A, actual))
+      .to.throw(ValidationError).with.not.property('actual');
+
+    expect(()=>build(A, actual, {leakActualValuesInError:false}))
+      .to.throw(ValidationError).with.not.property('actual');
   });
 });
 
