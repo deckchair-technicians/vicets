@@ -1,6 +1,4 @@
-import {BaseSchema} from "./index";
-import {Schema} from "../schema";
-import {failure, Problems, ValidationResult} from "../problems";
+import {BaseSchema, failure, Problems, Schema, ValidationResult} from "./";
 
 export class SelectSchema<T> extends BaseSchema<any, T> {
   constructor(private readonly path: string[],

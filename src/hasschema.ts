@@ -1,7 +1,5 @@
-import {isSchema} from "./impl";
-import {ObjectSchema} from "./impl/associative/obj";
+import {isSchema, ObjectSchema, Problems, ValidationError} from "./impl";
 import {Constructor} from "./impl/util/types";
-import {Problems, ValidationError} from "./problems";
 
 const SCHEMA_SYMBOL = Symbol('schema');
 

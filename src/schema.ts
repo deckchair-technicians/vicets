@@ -1,4 +1,4 @@
-import {ValidationResult} from "./problems";
+import {ValidationResult} from "./impl";
 
 export interface Schema<IN=any, OUT=any> {
   conform(value: IN): ValidationResult<OUT>

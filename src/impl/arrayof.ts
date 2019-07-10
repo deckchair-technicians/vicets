@@ -1,6 +1,4 @@
-import {BaseSchema} from "./index";
-import {failure, Problems, ValidationResult} from "../problems";
-import {Schema} from "../schema";
+import {Schema, BaseSchema, failure, Problems, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class ArrayOfSchema<T> extends BaseSchema<any[], T[]> {

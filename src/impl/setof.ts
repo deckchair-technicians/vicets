@@ -1,6 +1,4 @@
-import {BaseSchema} from "./index";
-import {failure, Problems, ValidationResult} from "../problems";
-import {Schema} from "../schema";
+import {BaseSchema, failure, Problems, Schema, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class SetOfSchema<T> extends BaseSchema<any, Set<T>> {

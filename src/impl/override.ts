@@ -1,6 +1,4 @@
-import {failure, Problems, ValidationResult} from "../problems";
-import {BaseSchema} from "./index";
-import {Schema} from "../schema";
+import {BaseSchema, failure, Problems, Schema, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export interface SchemaOverrides<IN, OUT> {

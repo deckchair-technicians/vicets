@@ -1,5 +1,4 @@
-import {failure, ValidationResult} from "../problems";
-import {BaseSchema} from "./index";
+import {failure, BaseSchema,ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 enum EnumType {

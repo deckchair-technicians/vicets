@@ -1,11 +1,20 @@
-import {hasSchema, schemaOf, suspendValidation} from "./hasschema";
-import {BaseSchema, isSchema} from "./impl";
-import {StrictPattern} from "./impl/associative/associative";
-import {ObjectSchema} from "./impl/associative/obj";
+import {
+  BaseSchema,
+  failure,
+  hasSchema,
+  isSchema,
+  MissingItemBehaviour,
+  ObjectSchema,
+  Problems,
+  schemaOf,
+  schematizeEntries,
+  StrictPattern,
+  suspendValidation,
+  UnexpectedItemBehaviour,
+  ValidationError,
+  ValidationResult
+} from "./impl";
 import {Constructor, isPrimitive} from "./impl/util/types";
-import {failure, Problems, ValidationError, ValidationResult} from "./problems";
-import {schematizeEntries} from "./schematize";
-import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
 
 export function data<C extends Constructor>(c: C): C {
@@ -103,7 +112,7 @@ export class DataSchema<T extends object> extends BaseSchema<any, T> {
     if (typeof value !== 'object') return failure(`Expected an object but got a ${typeof value}`);
 
     try {
-      return build(this.c, value, {unexpected:this.unexpected})
+      return build(this.c, value, {unexpected: this.unexpected})
         ;
     } catch (e) {
       if (e instanceof ValidationError) {

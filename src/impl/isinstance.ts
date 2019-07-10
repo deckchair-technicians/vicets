@@ -1,7 +1,5 @@
-import {BaseSchema} from "./index";
-import {failure, ValidationResult} from "../problems";
-import {Constructor} from "./util/types";
-import {typeDescription} from "./util/types";
+import {BaseSchema, failure, ValidationResult} from "./";
+import {Constructor, typeDescription} from "./util/types";
 
 export class IsInstanceSchema<T> extends BaseSchema<any, T> {
   constructor(private readonly c: Constructor<T>) {

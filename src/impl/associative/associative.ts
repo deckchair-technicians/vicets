@@ -1,7 +1,7 @@
 import {failure, isError, Problems, ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
-import {BaseSchema} from "../index";
+import {BaseSchema} from "../";
 
 export interface Associative<K, V> {
   set(k: K, v: V): this;

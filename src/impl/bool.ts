@@ -1,5 +1,4 @@
-import {BaseSchema} from "./index";
-import {failure, ValidationResult} from "../problems";
+import {failure, ValidationResult,BaseSchema} from "./";
 
 export class BooleanSchema extends BaseSchema<any, boolean> {
   conform(value: any): ValidationResult<boolean> {

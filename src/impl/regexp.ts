@@ -1,5 +1,4 @@
-import {StringSchema} from "./index";
-import {failure, ValidationResult} from "../problems";
+import {failure, StringSchema, ValidationResult} from "./";
 
 export class RegExpSchema extends StringSchema {
   constructor(private readonly r: RegExp) {

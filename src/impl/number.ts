@@ -1,5 +1,4 @@
-import {BaseSchema, StringSchema} from "./index";
-import {failure, ValidationResult} from "../problems";
+import {BaseSchema, failure, ValidationResult} from "./";
 
 export class NumberSchema extends BaseSchema<any, number> {
   conform(value: any): ValidationResult<number> {

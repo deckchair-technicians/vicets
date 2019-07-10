@@ -10,4 +10,5 @@ export * from "./mocha";
 export * from "./impl";
 export {StrictPattern, StrictPatternItem, Pattern, PatternItem} from "./impl/associative/associative";
 export {patternItemToSchema} from "./impl/associative/obj";
+export * from "./ValidationError";
 

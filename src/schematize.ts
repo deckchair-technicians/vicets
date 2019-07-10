@@ -1,6 +1,4 @@
-import {StrictPattern} from "./impl/associative/associative";
-import {ObjectSchema} from "./impl/associative/obj";
-import {EqualsSchema} from "./impl/eq";
+import {EqualsSchema, ObjectSchema, StrictPattern} from "./impl";
 import {Schema} from "./schema";
 import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 

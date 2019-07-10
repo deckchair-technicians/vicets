@@ -2,7 +2,7 @@ import {DataSchema} from "../../data";
 import {failure, Problems} from "../../problems";
 import {Schema} from "../../schema";
 import {UnexpectedItemBehaviour} from "../../unexpected_items";
-import {BaseSchema} from "../index";
+import {BaseSchema} from "../";
 import {Constructor} from "../util/types";
 import {mapValues} from "../util/maps";
 import {PrimitiveValue} from "../util/types";

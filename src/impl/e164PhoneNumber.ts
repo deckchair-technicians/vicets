@@ -1,7 +1,6 @@
-import {failure, ValidationResult} from "../problems";
-import {typeDescription} from "./util/types";
-import {BaseSchema} from "./index";
 import phone from "phone";
+import {BaseSchema, failure, ValidationResult} from "./";
+import {typeDescription} from "./util/types";
 
 export class E164PhoneNumberSchema extends BaseSchema<any, string> {
   constructor(private readonly defaultCountryIso3166?: string) {

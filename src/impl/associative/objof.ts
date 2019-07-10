@@ -1,9 +1,13 @@
-import {BaseSchema} from "../index";
-import {Schema} from "../../schema";
-import {failure, ValidationResult} from "../../problems";
-import {conformInPlace} from "./associative";
-import {MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
-import {ObjectStrategies} from "./obj";
+import {
+  BaseSchema,
+  conformInPlace,
+  failure,
+  MissingItemBehaviour,
+  ObjectStrategies,
+  Schema,
+  UnexpectedItemBehaviour,
+  ValidationResult
+} from "../";
 
 export class ObjOfSchema<T> extends BaseSchema<any, { [k: string]: T }> {
   constructor(private readonly valueSchema: Schema<any, T>) {

@@ -1,6 +1,4 @@
-import {Associative} from "./associative";
-import {ObjectStrategies} from "./obj";
-import {TupleStrategies} from "./tuple";
+import {Associative, ObjectStrategies, TupleStrategies} from "../";
 
 export function wrapAssociative(actual: any): Associative<any, any> {
   if (actual instanceof Array)

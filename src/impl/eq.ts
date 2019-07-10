@@ -1,5 +1,4 @@
-import {failure, ValidationResult} from "../problems";
-import {BaseSchema} from "./index";
+import {BaseSchema,failure, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class EqualsSchema<T> extends BaseSchema<any, T> {

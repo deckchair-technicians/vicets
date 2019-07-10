@@ -1,11 +1,8 @@
-import {Constructor} from "../util/types";
-import {EqualsSchema} from "../eq";
 import * as os from "os";
-import {Schema} from "../../schema";
-import {schemaOf} from "../../hasschema";
+import {EqualsSchema, Schema, schemaOf} from "../";
 import {first} from "../util/iterables";
 import {mapKeyValue} from "../util/maps";
-import {isPrimitive, PrimitiveValue, unsafeCast} from "../util/types";
+import {Constructor, isPrimitive, PrimitiveValue, unsafeCast} from "../util/types";
 
 class CandidateDiscriminators<T extends object> {
   private readonly constructors: Constructor<T>[] = [];
@@ -22,7 +19,7 @@ class CandidateDiscriminators<T extends object> {
     }
   }
 
-  private static fieldsWithPrimitiveEquals<T  extends object>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
+  private static fieldsWithPrimitiveEquals<T extends object>(ctor: Constructor<T>): [keyof T, PrimitiveValue][] {
     return CandidateDiscriminators.fieldSchemas(ctor)
       .map(([field, schema]) => schema instanceof EqualsSchema && isPrimitive(schema.expected) ? [field, schema.expected] : undefined)
       .filter((x) => x)
@@ -69,7 +66,7 @@ class DiscriminatorReport<T> {
   }
 }
 
-export function detectDiscriminator<T  extends object>(ctors: Constructor<T>[]): keyof T {
+export function detectDiscriminator<T extends object>(ctors: Constructor<T>[]): keyof T {
   const report = discriminatorReports(ctors);
 
   if (report.validFields.size > 1)
@@ -87,7 +84,7 @@ export function detectDiscriminator<T  extends object>(ctors: Constructor<T>[]):
   throw new Error(`No discriminator field found. Considered:${os.EOL}${listOfFieldProblems.join(os.EOL)}`);
 }
 
-export function discriminatorReports<T  extends object>(ctors: Constructor<T>[]): DiscriminatorReport<T> {
+export function discriminatorReports<T extends object>(ctors: Constructor<T>[]): DiscriminatorReport<T> {
   const candidates = new CandidateDiscriminators<T>(ctors);
   const report = new DiscriminatorReport<T>();
   for (const k of candidates.keys()) {

@@ -1,15 +1,17 @@
-import {failure, ValidationResult} from "../../problems";
-import {Schema} from "../../schema";
 import {
+  Associative,
+  BaseSchema,
+  conformInPlace,
+  failure,
   HasItemBehaviour,
   MissingItemBehaviour,
+  Schema,
   strictestUnexpected,
-  UnexpectedItemBehaviour
-} from "../../unexpected_items";
-import {BaseSchema} from "../index";
-import {typeDescription} from "../util/types";
+  UnexpectedItemBehaviour,
+  ValidationResult
+} from "../";
 import {merge} from "../util/maps";
-import {Associative, conformInPlace} from "./associative";
+import {typeDescription} from "../util/types";
 
 export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> implements HasItemBehaviour {
   constructor(private readonly itemSchemas: Map<K, Schema<any, V>>,

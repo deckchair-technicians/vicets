@@ -1,9 +1,13 @@
-import {conform, intertwingle} from "./helpers";
-import {Pattern} from "./impl/associative/associative";
-import {patternItemToSchema} from "./impl/associative/obj";
-import {isError, ValidationError} from "./problems";
-import {Schema} from "./schema";
-import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
+import {
+  conform,
+  isError,
+  MissingItemBehaviour,
+  Pattern,
+  patternItemToSchema,
+  Schema,
+  UnexpectedItemBehaviour,
+  ValidationError
+} from "./impl";
 
 export type LikeOpts = {
   message: string,
@@ -12,6 +16,7 @@ export type LikeOpts = {
 }
 
 export type Likeable = Array<any> | object;
+
 /**
  * Conforms actual to the schema, or to the expected pattern using object();
  *
@@ -41,7 +46,7 @@ export function like<T extends Likeable>(
     throw new ValidationError(
       actual,
       result,
-      {leakActualValuesInError:true});
+      {leakActualValuesInError: true});
   }
 
   return result as T;

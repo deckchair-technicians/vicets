@@ -1,5 +1,4 @@
 import * as os from "os";
-import {intertwingle} from "./helpers";
 
 export type Path = any[];
 
@@ -67,26 +66,6 @@ export function failure(message: string, path: Path = []): Problems {
 export interface ValidationErrorOpts {
   readonly message?: string,
   readonly leakActualValuesInError?: boolean,
-}
-
-export class ValidationError extends Error {
-  public readonly actual?: any;
-  public readonly expected?: any;
-
-  constructor(actual: any,
-              public readonly problems: Problems,
-              {
-                message = 'Validation failed',
-                leakActualValuesInError = false,
-              }: ValidationErrorOpts = {}
-  ) {
-    super(`${message}:${os.EOL}${problems}`);
-    if (leakActualValuesInError) {
-      this.actual = actual;
-      this.expected = intertwingle(actual, problems, []);
-      showDiff: true
-    }
-  }
 }
 
 export type ValidationResult<T> = Problems | T;

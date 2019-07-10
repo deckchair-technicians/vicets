@@ -1,9 +1,9 @@
-import {failure, ValidationResult} from "../../problems";
-import {Schema} from "../../schema";
+import {failure, ValidationResult} from "../";
+import {Schema} from "../";
 import {typeDescription} from "../util/types";
-import {Associative, conformInPlace} from "./associative";
-import {BaseSchema} from "../index";
-import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
+import {Associative, conformInPlace} from "../";
+import {BaseSchema} from "../";
+import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "../";
 
 export class TupleStrategies<T extends any[]> implements Associative<number, any> {
   private readonly deleted: number[] = [];

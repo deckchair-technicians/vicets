@@ -1,6 +1,4 @@
-import {BaseSchema} from "./index";
-import {ValidationResult} from "../problems";
-import {Schema} from "../schema";
+import {BaseSchema, Schema, ValidationResult} from "./";
 
 export class DeferredSchema<IN, OUT> extends BaseSchema<IN, OUT> {
   constructor(private readonly deferred: () => Schema<IN, OUT>) {

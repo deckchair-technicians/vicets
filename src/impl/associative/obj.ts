@@ -1,19 +1,23 @@
-import {failure, ValidationResult} from "../../problems";
-import {Schema} from "../../schema";
 import {
+  Associative,
+  BaseSchema,
+  conformInPlace,
+  EqualsSchema,
+  failure,
   HasItemBehaviour,
   MissingItemBehaviour,
+  Pattern,
+  PatternItem,
+  RegExpSchema,
+  Schema,
   strictestMissing,
   strictestUnexpected,
-  UnexpectedItemBehaviour
-} from "../../unexpected_items";
-import {EqualsSchema} from "../eq";
-import {BaseSchema} from "../index";
-import {RegExpSchema} from "../regexp";
+  StrictPattern,
+  TupleSchema,
+  UnexpectedItemBehaviour,
+  ValidationResult
+} from "../";
 import {addGetter, copyGetters, merge} from "../util/magic";
-import {mapValues} from "../util/maps";
-import {Associative, conformInPlace, Pattern, PatternItem, StrictPattern} from "./associative";
-import {TupleSchema} from "./tuple";
 
 function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];

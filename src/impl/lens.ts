@@ -1,7 +1,4 @@
-import {BaseSchema} from "./index";
-import {Schema} from "../schema";
-import {SelectSchema} from "./select";
-import {failure, Problems, ValidationResult} from "../problems";
+import {BaseSchema, failure, Problems, Schema, SelectSchema, ValidationResult} from "./";
 
 export function setAtPath<T>(obj: T, path: string[], value: any): T {
   if (path.length === 1) {

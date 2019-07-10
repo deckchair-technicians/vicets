@@ -1,5 +1,4 @@
-import {BaseSchema} from "./index";
-import {failure, ValidationResult} from "../problems";
+import {BaseSchema, failure, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class LookupSchema<T extends object, V> extends BaseSchema<any, T[keyof T]> {

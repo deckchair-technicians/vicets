@@ -1,40 +1,52 @@
 import {DataSchema} from "./data";
 import {schemaOf} from "./hasschema";
-import {DelegatingSchema, OrSchema} from "./impl";
-import {ArrayOfSchema} from "./impl/arrayof";
-import {Pattern, StrictPattern, TagSchemaAsOptional} from "./impl/associative/associative";
-import {MapSchema} from "./impl/associative/map";
-import {ObjectSchema} from "./impl/associative/obj";
-import {ObjOfSchema} from "./impl/associative/objof";
-import {TupleSchema} from "./impl/associative/tuple";
-import {BooleanSchema} from "./impl/bool";
-import {DefaultValueSchema} from "./impl/defaultValue";
-import {DeferredSchema} from "./impl/deferred";
-import {DiscriminatedUnionSchema} from "./impl/discriminated_union";
-import {detectDiscriminator} from "./impl/discriminated_union/find_discriminators";
-import {E164PhoneNumberSchema} from "./impl/e164PhoneNumber";
-import {EnumValueSchema} from "./impl/enumvalue";
-import {EqualsSchema} from "./impl/eq";
-import {InSchema} from "./impl/isin";
-import {IsInstanceSchema} from "./impl/isinstance";
-import {IsoUtcDateSchema, TimeExpectation} from "./impl/isoUtcDateTime";
-import {LensBehaviour, LensSchema} from "./impl/lens";
-import {LookupSchema} from "./impl/lookup";
-import {NumberSchema} from "./impl/number";
-import {OverrideSchema, SchemaOverrides} from "./impl/override";
-import {RegExpSchema} from "./impl/regexp";
-import {SelectSchema} from "./impl/select";
-import {SetOfSchema} from "./impl/setof";
-import {UniqueSchema} from "./impl/unique";
-import {IsURLOptions, UrlSchema} from "./impl/url";
+import {
+  ArrayOfSchema,
+  BooleanSchema,
+  DefaultValueSchema,
+  DeferredSchema,
+  DelegatingSchema,
+  detectDiscriminator,
+  DiscriminatedUnionSchema,
+  E164PhoneNumberSchema,
+  EnumValueSchema,
+  EqualsSchema,
+  failure,
+  HasItemBehaviour,
+  InSchema,
+  IsInstanceSchema,
+  IsoUtcDateSchema,
+  IsURLOptions,
+  LensBehaviour,
+  LensSchema,
+  LookupSchema,
+  MapSchema,
+  MissingItemBehaviour,
+  NumberSchema,
+  ObjectSchema,
+  ObjOfSchema,
+  OrSchema,
+  OverrideSchema,
+  Pattern,
+  Problems,
+  RegExpSchema,
+  Schema,
+  SchemaOverrides,
+  schematizeEntries,
+  SelectSchema,
+  SetOfSchema,
+  StrictPattern,
+  TagSchemaAsOptional,
+  TimeExpectation,
+  TupleSchema,
+  UnexpectedItemBehaviour,
+  UniqueSchema,
+  UrlSchema,
+  UuidSchema
+} from "./impl";
 import {identity} from "./impl/util/functions";
 import {toMap} from "./impl/util/maps";
 import {Constructor, typeDescription} from "./impl/util/types";
-import {UuidSchema} from "./impl/uuid";
-import {failure, Problems} from "./problems";
-import {Schema} from "./schema";
-import {schematizeEntries} from "./schematize";
-import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -201,7 +213,7 @@ export function deepPartial<T extends object>(
   return new ObjectSchema<T>(pattern, UnexpectedItemBehaviour.IGNORE, MissingItemBehaviour.PROBLEM);
 }
 
-export function objof<T>(schema: Schema<any, T>): Schema<any, {[k: string]: T}> {
+export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
   return new ObjOfSchema(schema);
 }
 

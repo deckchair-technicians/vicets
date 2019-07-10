@@ -1,5 +1,4 @@
-import {failure, ValidationResult} from "../problems";
-import {BaseSchema} from "./index";
+import {BaseSchema, failure, ValidationResult} from "./";
 
 export class InSchema<T> extends BaseSchema<any, T> {
   private readonly values: Set<T>;

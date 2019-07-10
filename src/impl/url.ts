@@ -1,6 +1,5 @@
-import {StringSchema} from "./index";
-import {failure, ValidationResult} from "../problems";
 import validator from "validator";
+import {failure, StringSchema, ValidationResult} from "./";
 
 export interface IsURLOptions {
   protocols?: string[];

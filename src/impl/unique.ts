@@ -1,5 +1,4 @@
-import {BaseSchema} from "./index";
-import {failure, problem, Problem, problems, ValidationResult} from "../problems";
+import {BaseSchema, failure, problem, Problem, problems, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class UniqueSchema<T, V> extends BaseSchema<T[], T[]> {
