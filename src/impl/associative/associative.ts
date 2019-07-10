@@ -81,10 +81,10 @@ export type StrictPatternItem<T> = T extends object
   ? StrictPattern<T> | Schema<any, T> | T
   : PrimitivePattern<T>
 
-export type StrictPattern<T extends object> = { [K in keyof T]: StrictPatternItem<T[K]> };
+export type StrictPattern<T extends object> = { readonly [K in keyof T]: StrictPatternItem<T[K]> };
 
 export type PatternItem<T> = T extends object
   ? Pattern<T> | Schema<any, T> | T
   : PrimitivePattern<T>
 
-export type Pattern<T extends object> = { [K in keyof T]?: PatternItem<T[K]> };
+export type Pattern<T extends object> = { readonly [K in keyof T]?: PatternItem<T[K]> };
