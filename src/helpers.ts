@@ -1,9 +1,13 @@
-import {Problems, Schema, ValidationError, ValidationResult} from "./impl";
+import {Problems, Schema, ValidationError, ValidationErrorOpts, ValidationResult} from "./impl";
 
-export function validate<IN, OUT>(schema: Schema<IN, OUT>, value: IN): OUT {
+export function validate<IN, OUT>(
+  schema: Schema<IN, OUT>,
+  value: IN,
+  opts: ValidationErrorOpts = {}): OUT {
+
   const conformed = conform(schema, value);
   if (conformed instanceof Problems) {
-    throw new ValidationError(value, conformed);
+    throw new ValidationError(value, conformed,opts);
   }
   return conformed;
 }
