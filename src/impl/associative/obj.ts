@@ -92,7 +92,7 @@ export class ObjectStrategies implements Associative<string, any> {
 export class ObjectSchema<T extends object> extends BaseSchema<any, T> implements HasItemBehaviour {
   public readonly fieldSchemaArray: [string, Schema][];
 
-  constructor(private readonly pattern: Pattern<T>,
+  constructor(public readonly pattern: Pattern<T>,
               private readonly unexpectedItems: UnexpectedItemBehaviour,
               private readonly missingItems: MissingItemBehaviour) {
     super();
