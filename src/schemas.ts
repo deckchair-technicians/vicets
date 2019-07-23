@@ -1,8 +1,8 @@
-import {DataSchema} from "./data";
-import {schemaOf} from "./hasschema";
 import {
   ArrayOfSchema,
   BooleanSchema,
+  ConditionalSchema,
+  DataSchema,
   DefaultValueSchema,
   DeferredSchema,
   DelegatingSchema,
@@ -31,6 +31,7 @@ import {
   Problems,
   RegExpSchema,
   Schema,
+  schemaOf,
   SchemaOverrides,
   schematizeEntries,
   SelectSchema,
@@ -158,6 +159,10 @@ export function isinstance<T>(c: Constructor<T>): Schema<any, T> {
 
 export function matches(r: RegExp): Schema<any, string> {
   return new RegExpSchema(r);
+}
+
+export function match(): ConditionalSchema<any, any> {
+  return new ConditionalSchema([]);
 }
 
 export function isboolean(): Schema<any, boolean> {
