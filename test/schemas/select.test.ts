@@ -19,6 +19,6 @@ describe('select', () => {
   });
 
   it('complains if value does not conform', () => {
-    expect(conform(s, {a: {b: "not valid"}})).deep.eq(failure("expected 'valid' but got string: \"not valid\"", ["a", "b"]))
+    expect(conform(s, {a: {b: "not valid"}})).deep.eq(failure('expected "valid" but got string: "not valid"', ["a", "b"]))
   })
 });

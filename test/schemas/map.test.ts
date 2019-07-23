@@ -42,16 +42,13 @@ describe('map()', () => {
   });
   it('appends key to path in problems', () => {
     expect(s.conform(new Map().set('a', 2)))
-      .deep.equals(failure(
-      "expected '1' but got number: 2",
-      ['a']));
+      .deep.equals(failure( 'expected "1" but got number: 2', ['a']));
   });
   it('can be nested', () => {
     const nested: Schema<object, object> = map({a: map({b: eq(1)})});
 
-    expect(nested.conform(new Map().set('a', new Map().set('b', 2)))).deep.equals(failure(
-      "expected '1' but got number: 2",
-      ['a', 'b']));
+    expect(nested.conform(new Map().set('a', new Map().set('b', 2))))
+      .deep.equals(failure('expected "1" but got number: 2', ['a', 'b']));
 
     const validMap = new Map().set('a', new Map().set('b', 1));
     expect(nested.conform(validMap))

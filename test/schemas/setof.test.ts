@@ -32,7 +32,7 @@ describe('setof', () => {
     const s = setof(eq("valid"));
     expect(s.conform(new Set(["invalid value", "valid"])))
       .deep.equals(failure(
-      "expected 'valid' but got string: \"invalid value\"",
+      'expected "valid" but got string: "invalid value"',
       ["invalid value"]));
   });
 

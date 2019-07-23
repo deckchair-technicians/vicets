@@ -11,8 +11,7 @@ describe('deepPartial()', () => {
     const s: Schema<object, Example> = deepPartial<Example>({a: eq(1)});
 
     expect(s.conform({a: 2})).deep.equals(failure(
-      "expected '1' but got number: 2",
-      ['a']));
+      'expected "1" but got number: 2', ['a']));
     expect(s.conform({})).deep.equals(failure(
       "No value",
       ['a']));
@@ -25,8 +24,7 @@ describe('deepPartial()', () => {
     const s: Schema<object, Example> = deepPartial<Example>({a: {b: eq(1)}});
 
     expect(s.conform({a: {b: 2}})).deep.equals(failure(
-      "expected '1' but got number: 2",
-      ['a', 'b']));
+      'expected "1" but got number: 2', ['a', 'b']));
     expect(s.conform({a: {b: 1}, c: 1})).deep.equals({a: {b: 1}, c: 1});
   });
 
@@ -36,8 +34,7 @@ describe('deepPartial()', () => {
     const s: Schema<object, Example> = deepPartial<Example>({a: [1, 2, eq(3)]});
 
     expect(s.conform({a: [1, 2, 2]})).deep.equals(failure(
-      "expected '3' but got number: 2",
-      ['a', 2]));
+      'expected "3" but got number: 2', ['a', 2]));
 
     expect(s.conform({a: [1, 2]})).deep.equals(failure(
       "No value",

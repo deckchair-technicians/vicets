@@ -12,7 +12,7 @@ describe('Defining fields in constructor', () => {
   describe('Basics', () => {
     it('should allow fields to be defined in the constructor', () => {
       expect(new FieldsInConstructor(1)).deep.equals({field: 1});
-      expect(() => new FieldsInConstructor(0)).to.throw(/expected '1'/);
+      expect(() => new FieldsInConstructor(0)).to.throw(/expected "1"/);
     });
 
     it('returns the right type', () => {
@@ -26,13 +26,13 @@ describe('Defining fields in constructor', () => {
 
     it('still works with build', () => {
       expect(build(FieldsInConstructor, {field: 1})).deep.equals({field: 1});
-      expect(() => build(FieldsInConstructor, {field: 2})).to.throw(/expected '1'/);
+      expect(() => build(FieldsInConstructor, {field: 2})).to.throw(/expected "1"/);
     });
 
     it('does not keep constructor defaults if not overridden in constructor arguments', () => {
       // Without removing field values that are schemas, this would be complaining that field
       // is an EqualsSchema
-      expect(() => new FieldsInConstructor()).to.throw(/expected '1' but got undefined/);
+      expect(() => new FieldsInConstructor()).to.throw(/expected "1" but got undefined/);
     });
   });
 
@@ -58,8 +58,8 @@ describe('Defining fields in constructor', () => {
     });
     it('still works with build', () => {
       expect(build(ChildWithFieldsInConstructor, {field: 1, childField: 2})).deep.equals({field: 1, childField: 2});
-      expect(() => build(ChildWithFieldsInConstructor, {field: 2, childField: 2})).to.throw(/expected '1'/);
-      expect(() => build(ChildWithFieldsInConstructor, {field: 1, childField: 1})).to.throw(/expected '2'/);
+      expect(() => build(ChildWithFieldsInConstructor, {field: 2, childField: 2})).to.throw(/expected "1"/);
+      expect(() => build(ChildWithFieldsInConstructor, {field: 1, childField: 1})).to.throw(/expected "2"/);
     });
   });
 });

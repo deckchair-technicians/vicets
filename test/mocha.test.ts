@@ -59,17 +59,17 @@ describe('vice mocha integration', () => {
       expect(e.expected).deep.eq(
         {
           right: 'right',
-          wrong: "expected 'right' but got string: \"incorrect value\"",
+          wrong: 'expected "right" but got string: "incorrect value"',
           nested: [
             {
               right: 'right',
-              wrong: "expected 'right' but got string: \"incorrect value\"",
+              wrong: 'expected "right" but got string: "incorrect value"',
               missing: "No value"
             }],
           array: [
             'right',
             'right',
-            "expected 'right' but got string: \"incorrect value\""
+            'expected "right" but got string: "incorrect value"'
           ],
           missing: "No value",
           notInPattern: "right",
@@ -99,7 +99,7 @@ describe('vice mocha integration', () => {
 
       expect(e.expected).deep.eq([
         {
-          wrong: "expected 'right' but got string: \"incorrect value\"",
+          wrong: 'expected "right" but got string: "incorrect value"',
         }]);
     }
   });

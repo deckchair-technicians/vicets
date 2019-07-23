@@ -14,6 +14,6 @@ describe('defaultValue', () => {
   });
   it('fails if default is not valid', () => {
     const s = defaultValue(() => "not valid", eq("valid"));
-    expect(s.conform(undefined)).deep.eq(failure("expected 'valid' but got string: \"not valid\""));
+    expect(s.conform(undefined)).deep.eq(failure('expected "valid" but got string: "not valid"'));
   });
 });

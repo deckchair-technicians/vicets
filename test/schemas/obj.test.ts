@@ -6,7 +6,7 @@ describe('object', () => {
     const s: Schema<object, object> = object({a: eq(1)});
 
     expect(s.conform({a: 2})).deep.equals(failure(
-      "expected '1' but got number: 2",
+      'expected "1" but got number: 2',
       ['a']));
     expect(s.conform({a: 1})).deep.equals({a: 1});
   });
@@ -15,7 +15,7 @@ describe('object', () => {
     const s: Schema<object, object> = object({a: 1});
 
     expect(s.conform({a: 2})).deep.equals(failure(
-      "expected '1' but got number: 2",
+      'expected "1" but got number: 2',
       ['a']));
     expect(s.conform({a: 1})).deep.equals({a: 1});
   });
@@ -33,7 +33,7 @@ describe('object', () => {
     const s: Schema<object, object> = object({a: {b: 1}});
 
     expect(s.conform({a: {b: 2}})).deep.equals(failure(
-      "expected '1' but got number: 2",
+      'expected "1" but got number: 2',
       ['a', 'b']));
     expect(s.conform({a: {b: 1}})).deep.equals({a: {b: 1}});
   });
@@ -66,7 +66,7 @@ describe('object', () => {
     const s: Schema<object, object> = object({a: object({b: eq(1)})});
 
     expect(s.conform({a: {b: 2}})).deep.equals(failure(
-      "expected '1' but got number: 2",
+      'expected "1" but got number: 2',
       ['a', 'b']));
     expect(s.conform({a: {b: 1}})).deep.equals({a: {b: 1}});
   });
@@ -76,7 +76,7 @@ describe('object', () => {
 
     expect(s.conform({a: null} )).deep.equals({a: null});
     expect(s.conform({a: 'not null'})).deep.equals(failure(
-      "expected 'null' but got string: \"not null\"",
+      'expected "null" but got string: "not null"',
       ['a']));
   });
 
@@ -85,7 +85,7 @@ describe('object', () => {
 
     expect(s.conform({a: undefined})).deep.equals({a: undefined});
     expect(s.conform({a: 'not undefined'})).deep.equals(failure(
-      "expected 'undefined' but got string: \"not undefined\"",
+      'expected "undefined" but got string: "not undefined"',
       ['a']));
   });
 });

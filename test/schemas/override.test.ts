@@ -36,6 +36,6 @@ describe('override', () => {
       {});
 
     expect(noOverride.conform(2))
-      .deep.equals(failure("expected '1' but got number: 2"));
+      .deep.equals(failure('expected "1" but got number: 2'));
   });
 });

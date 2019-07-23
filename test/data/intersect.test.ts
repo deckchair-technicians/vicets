@@ -24,12 +24,12 @@ describe('Intersecting @data classes', () => {
   });
   it('reports errors from left @data class', () => {
     expect(conformAs(C, {a: "INVALID", b: "valid b"}))
-      .deep.equals(failure("expected 'valid a' but got string: \"INVALID\"", ["a"]));
+      .deep.equals(failure('expected "valid a" but got string: "INVALID"', ["a"]));
 
   });
   it('reports errors from right @data class', () => {
     expect(conformAs(C, {a: "valid a", b: "INVALID"}))
-      .deep.equals(failure("expected 'valid b' but got string: \"INVALID\"", ["b"]));
+      .deep.equals(failure('expected "valid b" but got string: "INVALID"', ["b"]));
 
   });
   it('instanceof does not work for source classes, if it needs saying', () => {

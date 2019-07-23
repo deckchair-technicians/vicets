@@ -18,7 +18,7 @@ describe('Partial', () => {
   });
   it('returns errors', () => {
     expect(s.conform({a: "valid", b: "not valid"}))
-      .deep.eq(failure("expected 'valid' but got string: \"not valid\"", ["b"]));
+      .deep.eq(failure('expected "valid" but got string: "not valid"', ["b"]));
   });
   it('does not complain when field is missing', () => {
     expect(s.conform({a: "valid"}))
@@ -26,7 +26,7 @@ describe('Partial', () => {
   });
   it('complains when one field is wrong, even if the other is missing', () => {
     expect(s.conform({a: "invalid"}))
-      .deep.eq(failure("expected 'valid' but got string: \"invalid\"", ["a"]));
+      .deep.eq(failure('expected "valid" but got string: "invalid"', ["a"]));
   });
   it('complains when additional fields exist', () => {
     expect(s.conform({a: "valid", b: "valid", additionalField: "should not be here"}))

@@ -23,7 +23,7 @@ describe('tuple()', () => {
   it('appends key to path in problems', () => {
     expect(s.conform(["valid", 2]))
       .deep.equals(failure(
-      "expected '1' but got number: 2",
+      'expected "1" but got number: 2',
       [1]));
   });
   it('can be nested', () => {
@@ -31,7 +31,7 @@ describe('tuple()', () => {
 
     expect(nested.conform([[2]]))
       .deep.equals(failure(
-      "expected '1' but got number: 2",
+      'expected "1" but got number: 2',
       [0, 0]));
 
     expect(nested.conform([[1]]))

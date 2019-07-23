@@ -44,7 +44,7 @@ describe('discriminated', () => {
       .deep.equals({
       problems: [
         {
-          message: "expected 'valid value' but got string: \"not valid\"",
+          message: 'expected "valid value" but got string: "not valid"',
           path: [
             "someOtherField"
           ]
@@ -186,7 +186,7 @@ describe('discriminatedBy', () => {
         .deep.equals({
         problems: [
           {
-            message: "expected '1' but got string: \"not valid\"",
+            message: 'expected "1" but got string: "not valid"',
             path: [
               "discriminator"
             ]

@@ -26,8 +26,8 @@ describe('Deep nullable', () => {
   it('returns errors', () => {
     expect(s.conform({a: "valid", b: "not valid"}))
       .deep.eq(problems(
-      problem("expected 'valid' but got string: \"not valid\"", ["b"]),
-      problem("expected 'null' but got string: \"not valid\"", ["b"]),
+      problem('expected "valid" but got string: "not valid"', ["b"]),
+      problem('expected "null" but got string: "not valid"', ["b"]),
     ));
   });
   it('does not complain when field is null', () => {
