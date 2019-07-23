@@ -12,6 +12,8 @@ import {
   EnumValueSchema,
   EqualsSchema,
   failure,
+  GteSchema,
+  GtSchema,
   HasItemBehaviour,
   InSchema,
   IsInstanceSchema,
@@ -20,6 +22,8 @@ import {
   LensBehaviour,
   LensSchema,
   LookupSchema,
+  LteSchema,
+  LtSchema,
   MapSchema,
   MissingItemBehaviour,
   NumberSchema,
@@ -29,6 +33,7 @@ import {
   OverrideSchema,
   Pattern,
   Problems,
+  RangeOpts,
   RegExpSchema,
   Schema,
   schemaOf,
@@ -94,6 +99,34 @@ export type DeepNullable<T extends object> = {
 
 export function eq<T>(value: T): Schema<any, T> {
   return new EqualsSchema(value);
+}
+
+export function gt(value: number): Schema<any, number> {
+  return new GtSchema(value);
+}
+
+export function lt(value: number): Schema<any, number> {
+  return new LtSchema(value);
+}
+
+export function gte(value: number): Schema<any, number> {
+  return new GteSchema(value);
+}
+
+export function lte(value: number): Schema<any, number> {
+  return new LteSchema(value);
+}
+
+export function range(
+  from: number,
+  to: number,
+  {lowerInclusive = true, upperInclusive = false}: Partial<RangeOpts> = {})
+  : Schema<any, number> {
+
+  const lower = lowerInclusive ? gte(from) : gt(from);
+  const upper = upperInclusive ? lte(to) : lt(to);
+
+  return lower.and(upper);
 }
 
 export function isnull(): Schema<any, null> {
