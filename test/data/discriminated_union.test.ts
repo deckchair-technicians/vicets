@@ -1,5 +1,5 @@
-import {__, build, data, discriminated, discriminatedBy, eq, failure, isdata} from "../../src/vice";
 import {expect} from "chai";
+import {__, build, conform, data, discriminated, discriminatedBy, eq, failure, isdata, isstring} from "../../src/vice";
 
 describe('discriminated', () => {
   @data
@@ -136,6 +136,46 @@ describe('discriminatedBy', () => {
       expect(explicitlyDiscriminated.conform({type: 2, discriminator: 2}))
         .deep.equals({type: 2, discriminator: 2}).instanceOf(MultipleDiscriminators_B);
     });
+
+    enum CatTypes {
+      Black = 0,
+      Ginger = 1,
+    }
+
+    type CatType = 'ginger' | 'black';
+
+    abstract class Cat<T extends CatTypes> {
+      abstract discriminator: T;
+      name:string=__(isstring());
+    }
+
+    @data
+    class Ginger extends Cat<CatTypes.Ginger> {
+      discriminator: CatTypes.Ginger = CatTypes.Ginger;
+    }
+
+    @data
+    class Black extends Cat<CatTypes.Black> {
+      discriminator: CatTypes.Black = CatTypes.Black;
+    }
+
+    type AllCats = Ginger | Black;
+
+    it('allows selecting discriminator fields from parent', () => {
+      const discriminateByFieldOnParent = discriminatedBy<AllCats>("discriminator", Ginger, Black);
+      expect(conform(discriminateByFieldOnParent, {
+        discriminator: CatTypes.Ginger,
+        name:"Ginger"}))
+        .deep.eq({
+        discriminator: CatTypes.Ginger,
+        name:"Ginger"
+      });
+      expect(conform(discriminateByFieldOnParent, {
+        discriminator: CatTypes.Ginger,
+        name:12345}))
+        .deep.eq(failure('expected a string but got number', ['name']))
+    });
+
     it('produces a useful error message if field does not exist', () => {
       expect(() => discriminatedBy("notOnClasses" as keyof MultipleDiscriminators_A, MultipleDiscriminators_A))
         .to.throw(/notOnClasses/)
