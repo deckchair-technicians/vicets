@@ -64,8 +64,8 @@ export function failure(message: string, path: Path = []): Problems {
 }
 
 export interface ValidationErrorOpts {
-  readonly message?: string,
-  readonly leakActualValuesInError?: boolean,
+  readonly message: string,
+  readonly leakActualValuesInError: boolean,
 }
 
 export type ValidationResult<T> = Problems | T;

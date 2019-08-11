@@ -1,6 +1,5 @@
 import {EqualsSchema, ObjectSchema, StrictPattern} from "./impl";
 import {Schema} from "./schema";
-import {MissingItemBehaviour, UnexpectedItemBehaviour} from "./unexpected_items";
 
 export type Schemaish = Schema<any, any> | Function | number | string | boolean | object;
 
@@ -29,9 +28,7 @@ export function schematize<IN, OUT>(x: Schemaish): Schema<IN, OUT> {
 
       else if (Object.getPrototypeOf(x) === Object.prototype)
         return new ObjectSchema<LiftObject<OUT>>(
-          schematizeEntries(obj),
-          UnexpectedItemBehaviour.PROBLEM,
-          MissingItemBehaviour.PROBLEM) as any as Schema<IN, OUT>;
+          schematizeEntries(obj)) as any as Schema<IN, OUT>;
       else
         throw Error(`Cannot build schema from non-plain object ${Object.getPrototypeOf(x).name}`);
 

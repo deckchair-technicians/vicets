@@ -4,17 +4,12 @@ import {
   conformInPlace,
   EqualsSchema,
   failure,
-  HasItemBehaviour,
-  MissingItemBehaviour,
   Pattern,
   PatternItem,
   RegExpSchema,
   Schema,
-  strictestMissing,
-  strictestUnexpected,
   StrictPattern,
   TupleSchema,
-  UnexpectedItemBehaviour,
   ValidationResult
 } from "../";
 import {addGetter, copyGetters, merge} from "../util/magic";
@@ -31,9 +26,7 @@ function objectEntries(object: object): [string, Schema][] {
   return result;
 }
 
-export function patternItemToSchema<T>(item: PatternItem<T>,
-                                       unexpected: UnexpectedItemBehaviour,
-                                       missing: MissingItemBehaviour): Schema {
+export function patternItemToSchema<T>(item: PatternItem<T>): Schema {
   if (typeof item !== 'object')
     return new EqualsSchema(item);
 
@@ -41,7 +34,7 @@ export function patternItemToSchema<T>(item: PatternItem<T>,
     return new RegExpSchema(item);
 
   if (item instanceof Array)
-    return new TupleSchema(item.map(v => patternItemToSchema(v, unexpected, missing)), unexpected);
+    return new TupleSchema(item.map(v => patternItemToSchema(v)));
 
   if (typeof item === 'undefined')
     return new EqualsSchema(undefined);
@@ -52,17 +45,15 @@ export function patternItemToSchema<T>(item: PatternItem<T>,
   if (typeof item['conform'] === 'function')
     return item as Schema;
 
-  return new ObjectSchema(item, unexpected, missing);
+  return new ObjectSchema(item);
 }
 
-function patternToSchemas<T extends object>(pattern: Pattern<T>,
-                                            unexpected: UnexpectedItemBehaviour,
-                                            missing: MissingItemBehaviour): { [K in keyof T]: Schema<T[K]> } {
+function patternToSchemas<T extends object>(pattern: Pattern<T>): { [K in keyof T]: Schema<T[K]> } {
 
   const result = {};
   for (const k of Object.keys(pattern)) {
     const s = pattern[k];
-    result[k] = patternItemToSchema(s, unexpected, missing);
+    result[k] = patternItemToSchema(s);
   }
   return result as any;
 }
@@ -93,14 +84,12 @@ export class ObjectStrategies implements Associative<string, any> {
   }
 }
 
-export class ObjectSchema<T extends object> extends BaseSchema<any, T> implements HasItemBehaviour {
+export class ObjectSchema<T extends object> extends BaseSchema<any, T> {
   public readonly fieldSchemaArray: [string, Schema][];
 
-  constructor(public readonly pattern: Pattern<T>,
-              private readonly unexpectedItems: UnexpectedItemBehaviour,
-              private readonly missingItems: MissingItemBehaviour) {
+  constructor(public readonly pattern: Pattern<T>) {
     super();
-    this.fieldSchemaArray = objectEntries(patternToSchemas(pattern, unexpectedItems, missingItems));
+    this.fieldSchemaArray = objectEntries(patternToSchemas(pattern));
   }
 
   conform(value: any): ValidationResult<T> {
@@ -119,8 +108,6 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
    */
   conformInPlace(instance: {}): ValidationResult<{}> {
     const problems = conformInPlace(
-      this.unexpectedItems,
-      this.missingItems,
       new ObjectStrategies(instance),
       this.fieldSchemaArray);
 
@@ -129,15 +116,7 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> implement
 
   intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U> {
     const mergedSchemas = merge(this.pattern, other.pattern, (a: Schema, b: Schema) => a.and(b)) as StrictPattern<T & U>;
-    return new ObjectSchema<T & U>(mergedSchemas, strictestUnexpected(this.unexpectedItems, other.unexpectedItems), strictestMissing(this.missingItems, other.missingItems));
-  }
-
-  onUnexpected(behaviour: UnexpectedItemBehaviour): this {
-    return new ObjectSchema(this.pattern, behaviour, this.missingItems) as this;
-  }
-
-  onMissing(behaviour: MissingItemBehaviour): this {
-    return new ObjectSchema(this.pattern, this.unexpectedItems, behaviour) as this;
+    return new ObjectSchema<T & U>(mergedSchemas);
   }
 }
 

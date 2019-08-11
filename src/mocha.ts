@@ -1,4 +1,5 @@
 import {
+  Behaviour,
   conform,
   isError,
   MissingItemBehaviour,
@@ -6,16 +7,16 @@ import {
   patternItemToSchema,
   Schema,
   UnexpectedItemBehaviour,
-  ValidationError
+  usingBehaviour,
+  ValidationError, ValidationOpts
 } from "./impl";
 
-export type LikeOpts = {
-  message: string,
-  unexpected: UnexpectedItemBehaviour,
-  missing: MissingItemBehaviour
-}
-
 export type Likeable = Array<any> | object;
+const DEFAULT_BEHAVIOUR: Behaviour = {
+  missing: MissingItemBehaviour.PROBLEM,
+  unexpected: UnexpectedItemBehaviour.IGNORE,
+  leakActualValuesInError: true,
+};
 
 /**
  * Conforms actual to the schema, or to the expected pattern using object();
@@ -31,22 +32,23 @@ export type Likeable = Array<any> | object;
 export function like<T extends Likeable>(
   actual: any,
   expected: Pattern<T> | Schema<any, T>,
-  {
-    message = undefined,
-    unexpected = UnexpectedItemBehaviour.IGNORE,
-    missing = MissingItemBehaviour.PROBLEM
-  }: Partial<LikeOpts> = {}
+  opts: Partial<ValidationOpts> = {}
 ): T {
+  const behaviour = Object.assign({}, DEFAULT_BEHAVIOUR, opts);
+  const schema: Schema = patternItemToSchema(expected as any);
 
-  const schema: Schema = patternItemToSchema(expected as any, unexpected, missing);
-
-  const result = conform(schema, actual);
+  const result = usingBehaviour(
+    behaviour,
+    () => conform(schema, actual));
 
   if (isError(result)) {
     throw new ValidationError(
       actual,
       result,
-      {leakActualValuesInError: true});
+      {
+        leakActualValuesInError: behaviour.leakActualValuesInError,
+        message: opts.message
+      });
   }
 
   return result as T;

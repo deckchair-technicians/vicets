@@ -1,7 +1,7 @@
 import {DataSchema} from "../../data";
 import {failure, Problems} from "../../problems";
 import {Schema} from "../../schema";
-import {UnexpectedItemBehaviour} from "../../unexpected_items";
+import {UnexpectedItemBehaviour} from "../associative/behaviour";
 import {BaseSchema} from "../";
 import {Constructor} from "../util/types";
 import {mapValues} from "../util/maps";

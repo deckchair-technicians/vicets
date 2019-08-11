@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, matches, object, deepPartial, Schema, UnexpectedItemBehaviour} from "../../src/vice";
+import {eq, failure, object, onUnexpected, Schema, UnexpectedItemBehaviour} from "../../src/vice";
 
 describe('object', () => {
   it('Appends key to path in problems', () => {
@@ -47,16 +47,20 @@ describe('object', () => {
   });
 
   it('Can specify additional fields should be deleted', () => {
-    const s: Schema<object, object> = object({})
-      .onUnexpected(UnexpectedItemBehaviour.DELETE);
+    const s: Schema<object, object> =
+      onUnexpected(
+        object({}),
+        UnexpectedItemBehaviour.DELETE);
 
     expect(s.conform({unexpected: 'whatever'}))
       .deep.equals({});
   });
 
   it('Can specify additional fields should be ignored', () => {
-    const s: Schema<object, object> = object({})
-      .onUnexpected(UnexpectedItemBehaviour.IGNORE);
+    const s: Schema<object, object> =
+      onUnexpected(
+        object({}),
+        UnexpectedItemBehaviour.IGNORE);
 
     expect(s.conform({unexpected: 'whatever'}))
       .deep.equals({unexpected: 'whatever'});
@@ -74,7 +78,7 @@ describe('object', () => {
   it('works with nulls', () => {
     const s: Schema<any, any> = object({a: null as any});
 
-    expect(s.conform({a: null} )).deep.equals({a: null});
+    expect(s.conform({a: null})).deep.equals({a: null});
     expect(s.conform({a: 'not null'})).deep.equals(failure(
       'expected "null" but got string: "not null"',
       ['a']));

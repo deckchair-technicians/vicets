@@ -43,13 +43,13 @@ describe('Using build() on @data classes', () => {
 
   it('allows us to include actual and expected in validation failure', () => {
     const actual = {field: "not valid"};
-    expect(()=>build(A, actual, {leakActualValuesInError:true}))
+    expect(() => build(A, actual, {leakActualValuesInError: true}))
       .to.throw(ValidationError).with.property('actual').eq(actual);
 
-    expect(()=>build(A, actual))
+    expect(() => build(A, actual))
       .to.throw(ValidationError).with.not.property('actual');
 
-    expect(()=>build(A, actual, {leakActualValuesInError:false}))
+    expect(() => build(A, actual, {leakActualValuesInError: false}))
       .to.throw(ValidationError).with.not.property('actual');
   });
 });

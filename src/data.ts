@@ -1,5 +1,6 @@
 import {
   BaseSchema,
+  Behaviour, conform,
   failure,
   hasSchema,
   isSchema,
@@ -10,8 +11,8 @@ import {
   schematizeEntries,
   StrictPattern,
   suspendValidation,
-  UnexpectedItemBehaviour,
-  ValidationError,
+  UnexpectedItemBehaviour, usingBehaviour,
+  ValidationError, ValidationOpts,
   ValidationResult
 } from "./impl";
 import {Constructor, isPrimitive} from "./impl/util/types";
@@ -26,7 +27,7 @@ export function data<C extends Constructor>(c: C): C {
       throw new Error(`Field '${k}' on ${c.name} is neither a schema nor a primitive value`);
   }
 
-  const schema = new ObjectSchema<C>(schematizeEntries(objectWithDefaults), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
+  const schema = new ObjectSchema<C>(schematizeEntries(objectWithDefaults));
   return hasSchema(schema)(c);
 }
 
@@ -54,31 +55,21 @@ export function makeInstance<T>(c: Constructor<T>, obj: object): T {
   return Object.assign(Object.create(c.prototype), obj);
 }
 
-export function conformAs<T extends object>(c: Constructor<T>, obj: object, unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM): ValidationResult<T> {
-  const result = schemaOf(c).onUnexpected(unexpected).conform(obj);
+export function conformAs<T extends object>(c: Constructor<T>, obj: object): ValidationResult<T> {
+  const result = conform(schemaOf(c),obj);
   if (result instanceof Problems)
     return result;
   return makeInstance(c, result);
 }
 
-export interface BuildOpts {
-  unexpected: UnexpectedItemBehaviour;
-  /**
-   *
-   */
-  leakActualValuesInError: boolean;
-}
 
 export function build<T extends object>(
   c: Constructor<T>,
   values: any,
-  {
-    unexpected = UnexpectedItemBehaviour.PROBLEM,
-    leakActualValuesInError = false
-  }: Partial<BuildOpts> = {}): T {
-  const conformed = conformAs(c, values, unexpected);
+  opts: Partial<ValidationOpts> = {}): T {
+  const conformed = usingBehaviour(opts, ()=>conformAs(c, values));
   if (conformed instanceof Problems) {
-    throw new ValidationError(values, conformed, {leakActualValuesInError});
+    throw new ValidationError(values, conformed, opts);
   }
   return conformed;
 }
@@ -97,7 +88,7 @@ export function build<T extends object>(
 export function construct<T extends object>(
   c: Constructor<T>,
   value: T,
-  opts: Partial<BuildOpts> = {}): T {
+  opts: Partial<ValidationOpts> = {}): T {
   return build(c, value, opts);
 }
 

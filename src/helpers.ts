@@ -1,21 +1,31 @@
-import {Problems, Schema, ValidationError, ValidationErrorOpts, ValidationResult} from "./impl";
+import {Behaviour, Problems, Schema, usingBehaviour, ValidationError, ValidationResult} from "./impl";
+
+export interface ValidationOpts extends Behaviour {
+  message: string;
+}
 
 export function validate<IN, OUT>(
   schema: Schema<IN, OUT>,
   value: IN,
-  opts: ValidationErrorOpts = {}): OUT {
+  opts: Partial<ValidationOpts> = {})
+  : OUT {
 
-  const conformed = conform(schema, value);
+  const conformed = usingBehaviour(opts, () => conform(schema, value));
   if (conformed instanceof Problems) {
-    throw new ValidationError(value, conformed,opts);
+    throw new ValidationError(value, conformed, opts);
   }
   return conformed;
 }
 
-export function conform<IN, OUT>(schema: Schema<IN, OUT>, value: IN): ValidationResult<OUT> {
+export function conform<IN, OUT>(
+  schema: Schema<IN, OUT>,
+  value: IN,
+  opts: Partial<ValidationOpts> = {})
+  : ValidationResult<OUT> {
+
   if (!schema)
     throw new Error("No schema provided");
 
-  return schema.conform(value);
+  return usingBehaviour(opts, () => schema.conform(value));
 }
 

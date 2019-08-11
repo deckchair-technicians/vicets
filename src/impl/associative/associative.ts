@@ -1,7 +1,13 @@
-import {failure, isError, Problems, ValidationResult} from "../../problems";
-import {Schema} from "../../schema";
-import {MissingItemBehaviour, UnexpectedItemBehaviour} from "../../unexpected_items";
-import {BaseSchema} from "../";
+import {
+  BaseSchema, behaviour,
+  failure,
+  isError,
+  MissingItemBehaviour,
+  Problems,
+  Schema,
+  UnexpectedItemBehaviour,
+  ValidationResult
+} from "../";
 
 export interface Associative<K, V> {
   set(k: K, v: V): this;
@@ -15,19 +21,17 @@ export interface Associative<K, V> {
   keys(): Iterable<K>;
 }
 
-export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
-                                     missingItems: MissingItemBehaviour,
-                                     thing: Associative<K, V>,
+export function conformInPlace<K, V>(thing: Associative<K, V>,
                                      itemSchemas: Iterable<[K, Schema]>): Problems | undefined {
 
   let problems = new Problems([]);
   const unmatchedThingKeys = new Set(thing.keys());
-
+  const {unexpected,missing}=behaviour();
   for (const [k, s] of itemSchemas) {
     const v: ValidationResult<any> = s.conform(thing.get(k));
 
     if (isError(v) && !thing.has(k)) {
-      if (s[isOptional] !== true && missingItems !== MissingItemBehaviour.IGNORE) {
+      if (s[isOptional] !== true && missing !== MissingItemBehaviour.IGNORE) {
         problems = problems.merge(failure("No value", [k]));
       }
       continue;
@@ -43,7 +47,7 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
   }
 
   for (const k of unmatchedThingKeys) {
-    switch (unexpectedItems) {
+    switch (unexpected) {
       case UnexpectedItemBehaviour.IGNORE:
         break;
       case UnexpectedItemBehaviour.DELETE:
@@ -53,7 +57,7 @@ export function conformInPlace<K, V>(unexpectedItems: UnexpectedItemBehaviour,
         problems = problems.merge(failure("Unexpected item", [k]));
         break;
       default:
-        throw new Error(`Not implemented- ${unexpectedItems}`);
+        throw new Error(`Not implemented- ${unexpected}`);
     }
   }
 
@@ -75,7 +79,7 @@ export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined
 
 }
 
-export type PrimitivePattern<T> = T extends string ? Schema<any, T> | T | RegExp: Schema<any, T> | T;
+export type PrimitivePattern<T> = T extends string ? Schema<any, T> | T | RegExp : Schema<any, T> | T;
 
 export type StrictPatternItem<T> = T extends object
   ? StrictPattern<T> | Schema<any, T> | T

@@ -1,10 +1,11 @@
 import {
   BaseSchema,
+  BehaviourSchema,
   conform,
-  DelegatingSchema, failure,
+  DelegatingSchema,
+  failure,
   isSchema,
   isSuccess,
-  MissingItemBehaviour,
   ObjectSchema,
   Pattern,
   predicate,
@@ -43,7 +44,7 @@ export class ConditionalSchema<IN extends object, OUT, MATCH = any> extends Base
       ? predicate(case_)
       : isSchema(case_)
         ? case_
-        : new ObjectSchema(case_, UnexpectedItemBehaviour.IGNORE, MissingItemBehaviour.PROBLEM);
+        : new BehaviourSchema({unexpected: UnexpectedItemBehaviour.IGNORE}, new ObjectSchema(case_));
 
     return new ConditionalSchema<IN, OUT | OTHER>(
       [...this.matches, [caseSchema, schema]]);

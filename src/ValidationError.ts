@@ -77,7 +77,7 @@ export class ValidationError extends Error {
               {
                 message = 'Validation failed',
                 leakActualValuesInError = false,
-              }: ValidationErrorOpts = {}
+              }: Partial<ValidationErrorOpts> = {}
   ) {
     super(`${message}:${os.EOL}${problems}`);
     if (leakActualValuesInError) {

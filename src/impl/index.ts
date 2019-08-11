@@ -1,4 +1,5 @@
 export * from './core';
+export * from "./associative/behaviour";
 export * from './associative/associative'
 export * from './associative/map'
 export * from './associative/obj'
@@ -21,7 +22,6 @@ export * from './isinstance'
 export * from './isoUtcDateTime'
 export * from './lens'
 export * from './lookup'
-export * from './match'
 export * from './number'
 export * from './override'
 export * from './range'
@@ -35,10 +35,10 @@ export * from './uuid'
 export * from '../data';
 export * from '../hasschema';
 export * from '../helpers';
-export * from '../mocha';
 export * from '../problems';
 export * from '../schema';
 export * from '../schemas';
 export * from '../schematize';
-export * from '../unexpected_items';
 export * from '../ValidationError';
+export * from '../mocha';
+export * from './match';

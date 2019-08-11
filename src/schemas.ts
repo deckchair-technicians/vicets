@@ -1,5 +1,7 @@
 import {
   ArrayOfSchema,
+  Behaviour,
+  BehaviourSchema,
   BooleanSchema,
   ConditionalSchema,
   DataSchema,
@@ -14,7 +16,6 @@ import {
   failure,
   GteSchema,
   GtSchema,
-  HasItemBehaviour,
   InSchema,
   IsInstanceSchema,
   IsoUtcDateSchema,
@@ -67,15 +68,26 @@ export function isdata<T extends object>(constructor: Constructor<T>, unexpected
 }
 
 export function partial<T extends object>(type: Constructor<T>): Schema<any, Partial<T>> {
-  const objectSchema: ObjectSchema<T> = schemaOf(type);
-  return objectSchema.onMissing(MissingItemBehaviour.IGNORE);
+  return onMissing(schemaOf(type), MissingItemBehaviour.IGNORE);
+}
+
+export function onMissing<IN, OUT>(schema: Schema<IN, OUT>, behaviour: MissingItemBehaviour): Schema<IN, OUT> {
+  return withBehaviour(schema, {missing: behaviour});
+}
+
+export function onUnexpected<IN, OUT>(schema: Schema<IN, OUT>, behaviour: UnexpectedItemBehaviour): Schema<IN, OUT> {
+  return withBehaviour(schema, {unexpected: behaviour});
+}
+
+export function withBehaviour<IN, OUT>(schema: Schema<IN, OUT>, behaviour: Partial<Behaviour>): Schema<IN, OUT> {
+  return new BehaviourSchema(behaviour, schema);
 }
 
 function deepNullablePattern(fieldSchemaArray: [string, Schema][]): Pattern<any> {
   const nullableFieldsObjectPattern = {};
   for (const [k, s] of fieldSchemaArray) {
     if ("fieldSchemaArray" in s) { // TODO testing if schema represents an object should be different
-      const nullableFieldsObjectSchema = new ObjectSchema(deepNullablePattern((s as ObjectSchema<any>).fieldSchemaArray), UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM)
+      const nullableFieldsObjectSchema = new ObjectSchema(deepNullablePattern((s as ObjectSchema<any>).fieldSchemaArray));
       nullableFieldsObjectPattern[k] = new OrSchema(nullableFieldsObjectSchema, isnull());
     } else {
       nullableFieldsObjectPattern[k] = new OrSchema(s, isnull());
@@ -87,8 +99,7 @@ function deepNullablePattern(fieldSchemaArray: [string, Schema][]): Pattern<any>
 export function deepNullable<T extends object>(type: Constructor<T>): Schema<any, DeepNullable<T>> {
   const objectSchema: ObjectSchema<T> = schemaOf(type);
 
-  return new ObjectSchema(deepNullablePattern(objectSchema.fieldSchemaArray),
-    UnexpectedItemBehaviour.PROBLEM, MissingItemBehaviour.PROBLEM);
+  return new ObjectSchema(deepNullablePattern(objectSchema.fieldSchemaArray));
 }
 
 export type Nullable<T> = T | null
@@ -239,45 +250,42 @@ export function e164PhoneNumber(defaultCountryIso3166?: string): Schema<any, str
 }
 
 export function object<T extends object>(
-  pattern: StrictPattern<T>,
-  unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM,
-  missing: MissingItemBehaviour = MissingItemBehaviour.PROBLEM,
-): Schema<any, T> & HasItemBehaviour {
-  return new ObjectSchema<T>(pattern, unexpected, missing);
+  pattern: StrictPattern<T>
+): Schema<any, T> {
+  return new ObjectSchema<T>(pattern);
 }
 
 export function deepPartial<T extends object>(
-  pattern: Pattern<T>): Schema<any, T> & HasItemBehaviour {
-  return new ObjectSchema<T>(pattern, UnexpectedItemBehaviour.IGNORE, MissingItemBehaviour.PROBLEM);
+  pattern: Pattern<T>): Schema<any, T> {
+  return onUnexpected<any, T>(new ObjectSchema<T>(pattern), UnexpectedItemBehaviour.IGNORE);
 }
 
 export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
   return new ObjOfSchema(schema);
 }
 
-export function map<K, V>(entryPattern: Pattern<{}> | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> & HasItemBehaviour {
+export function map<K, V>(entryPattern: Pattern<{}> | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> {
   return new MapSchema<K, V>(
     entryPattern instanceof Map
       ? entryPattern
-      : toMap(schematizeEntries(entryPattern)),
-    UnexpectedItemBehaviour.PROBLEM);
+      : toMap(schematizeEntries(entryPattern)));
 }
 
-export function tuple<A>(a: Schema<any, A>): Schema<any, [A]> & HasItemBehaviour;
+export function tuple<A>(a: Schema<any, A>): Schema<any, [A]>;
 
-export function tuple<A, B>(a: Schema<any, A>, b: Schema<any, B>): Schema<any, [A, B]> & HasItemBehaviour;
+export function tuple<A, B>(a: Schema<any, A>, b: Schema<any, B>): Schema<any, [A, B]>;
 
-export function tuple<A, B, C>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>): Schema<any, [A, B, C]> & HasItemBehaviour;
+export function tuple<A, B, C>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>): Schema<any, [A, B, C]>;
 
-export function tuple<A, B, C, D>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>): Schema<any, [A, B, C, D]> & HasItemBehaviour;
+export function tuple<A, B, C, D>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>): Schema<any, [A, B, C, D]> ;
 
-export function tuple<A, B, C, D, E>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>, e: Schema<any, E>): Schema<any, [A, B, C, D, E]> & HasItemBehaviour;
+export function tuple<A, B, C, D, E>(a: Schema<any, A>, b: Schema<any, B>, c: Schema<any, C>, d: Schema<any, D>, e: Schema<any, E>): Schema<any, [A, B, C, D, E]>;
 
-export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> & HasItemBehaviour ;
+export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> ;
 
-export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> & HasItemBehaviour {
+export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> {
 
-  return new TupleSchema(s, UnexpectedItemBehaviour.PROBLEM);
+  return new TupleSchema(s);
 }
 
 export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {

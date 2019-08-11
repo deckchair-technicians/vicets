@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, map, opt, Schema, UnexpectedItemBehaviour} from "../../src/vice";
+import {eq, failure, map, onUnexpected, opt, Schema, UnexpectedItemBehaviour} from "../../src/vice";
 
 describe('map()', () => {
   const s: Schema<any, Map<string, number>> = map<string, number>({a: eq(1)});
@@ -27,22 +27,26 @@ describe('map()', () => {
       .deep.equals(failure('Unexpected item', ['unexpected']));
   });
   it('Can specify additional fields should be deleted', () => {
-    const deleteAdditionalFields: Schema<any, Map<string, number>> = map<string, number>({a: eq(1)})
-      .onUnexpected(UnexpectedItemBehaviour.DELETE);
+    const deleteAdditionalFields: Schema<any, Map<string, number>> =
+      onUnexpected(
+        map<string, number>({a: eq(1)}),
+        UnexpectedItemBehaviour.DELETE);
 
     expect(deleteAdditionalFields.conform(new Map().set('a', 1).set('unexpected', 'whatever')))
       .deep.equals(new Map().set('a', 1));
   });
   it('Can specify additional fields should be ignored', () => {
-    const deleteAdditionalFields: Schema<any, Map<string, number>> = map<string, number>({a: eq(1)})
-      .onUnexpected(UnexpectedItemBehaviour.IGNORE);
+    const deleteAdditionalFields: Schema<any, Map<string, number>> =
+      onUnexpected(
+        map<string, number>({a: eq(1)}),
+        UnexpectedItemBehaviour.IGNORE);
 
     expect(deleteAdditionalFields.conform(new Map().set('a', 1).set('unexpected', 'whatever')))
       .deep.equals(new Map().set('a', 1).set('unexpected', 'whatever'));
   });
   it('appends key to path in problems', () => {
     expect(s.conform(new Map().set('a', 2)))
-      .deep.equals(failure( 'expected "1" but got number: 2', ['a']));
+      .deep.equals(failure('expected "1" but got number: 2', ['a']));
   });
   it('can be nested', () => {
     const nested: Schema<object, object> = map({a: map({b: eq(1)})});

@@ -1,8 +1,18 @@
 import {expect} from 'chai';
-import {HasItemBehaviour, UnexpectedItemBehaviour, problem, problems, eq, failure, opt, Schema, tuple} from "../../src/vice";
+import {
+  eq,
+  failure,
+  onUnexpected,
+  opt,
+  problem,
+  problems,
+  Schema,
+  tuple,
+  UnexpectedItemBehaviour
+} from "../../src/vice";
 
 describe('tuple()', () => {
-  const s: Schema<any, [string, number]> & HasItemBehaviour = tuple(eq("valid"), eq(1));
+  const s: Schema<any, [string, number]> = tuple(eq("valid"), eq(1));
 
   it('passes valid values through', () => {
     expect(s.conform(["valid", 1]))
@@ -48,13 +58,13 @@ describe('tuple()', () => {
         [3])));
   });
   it('Can specify additional fields should be deleted', () => {
-    expect(s.onUnexpected(UnexpectedItemBehaviour.DELETE).conform(["valid", 1, "should not be here"]))
+    expect(onUnexpected(s, UnexpectedItemBehaviour.DELETE).conform(["valid", 1, "should not be here"]))
       .deep.equals(["valid", 1]);
-    expect(s.onUnexpected(UnexpectedItemBehaviour.DELETE).conform(["valid", 1, "should not be here", "should not be here"]))
+    expect(onUnexpected(s, UnexpectedItemBehaviour.DELETE).conform(["valid", 1, "should not be here", "should not be here"]))
       .deep.equals(["valid", 1]);
   });
   it('Can specify additional fields should be ignored', () => {
-    expect(s.onUnexpected(UnexpectedItemBehaviour.IGNORE).conform(["valid", 1, "should not be here", "should not be here"]))
+    expect(onUnexpected(s, UnexpectedItemBehaviour.IGNORE).conform(["valid", 1, "should not be here", "should not be here"]))
       .deep.equals(["valid", 1, "should not be here", "should not be here"]);
   });
 });

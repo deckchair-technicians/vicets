@@ -1,9 +1,5 @@
-import {failure, ValidationResult} from "../";
-import {Schema} from "../";
+import {Associative, BaseSchema, conformInPlace, failure, Schema, ValidationResult} from "../";
 import {typeDescription} from "../util/types";
-import {Associative, conformInPlace} from "../";
-import {BaseSchema} from "../";
-import {HasItemBehaviour, MissingItemBehaviour, UnexpectedItemBehaviour} from "../";
 
 export class TupleStrategies<T extends any[]> implements Associative<number, any> {
   private readonly deleted: number[] = [];
@@ -40,11 +36,10 @@ export class TupleStrategies<T extends any[]> implements Associative<number, any
   }
 }
 
-export class TupleSchema<T extends any[]> extends BaseSchema<T> implements HasItemBehaviour {
+export class TupleSchema<T extends any[]> extends BaseSchema<T> {
   private readonly itemSchemas: [number, Schema][];
 
-  constructor(schemas: Schema[],
-              private readonly unexpectedItems: UnexpectedItemBehaviour) {
+  constructor(schemas: Schema[]) {
     super();
     this.itemSchemas = schemas.map((v, i) => [i, v] as [number, Schema]);
   }
@@ -61,15 +56,7 @@ export class TupleSchema<T extends any[]> extends BaseSchema<T> implements HasIt
       instance[i] = value[i];
     }
     const result = new TupleStrategies(instance);
-    const problems = conformInPlace(this.unexpectedItems, MissingItemBehaviour.PROBLEM, result, this.itemSchemas);
+    const problems = conformInPlace(result, this.itemSchemas);
     return problems ? problems : result.result;
-  }
-
-  onUnexpected(behaviour: UnexpectedItemBehaviour): this {
-    return new TupleSchema(this.itemSchemas.map(([n, s]) => s), behaviour) as this;
-  }
-
-  onMissing(behaviour: MissingItemBehaviour): this {
-    throw new Error("Not implemented");
   }
 }
