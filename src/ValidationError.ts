@@ -78,7 +78,7 @@ export class ValidationError extends Error {
                 leakActualValuesInError = false,
               }: Partial<ValidationErrorOpts> = {}
   ) {
-    super(`${message}:\n${problems}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual)}\n` : ''}`);
+    super(`${message}:\n${problems}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual, null, 2)}\n` : ''}`);
     if (leakActualValuesInError) {
       this.actual = actual;
       this.expected = intertwingle(actual, problems, []);
