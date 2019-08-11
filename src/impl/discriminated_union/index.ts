@@ -11,7 +11,7 @@ export class DiscriminatedUnionSchema<T extends object> extends BaseSchema<any, 
   private readonly discriminator: keyof T;
   private readonly schemasByDiscriminatorValue: Map<PrimitiveValue, Schema<any, T>>;
 
-  constructor(private readonly ctors: Constructor<T>[], discriminator: keyof T, unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM) {
+  constructor(private readonly ctors: Constructor<T>[], discriminator: keyof T) {
     super();
 
     this.discriminator = discriminator;
@@ -21,7 +21,7 @@ export class DiscriminatedUnionSchema<T extends object> extends BaseSchema<any, 
     if (schemasByValue === undefined)
       throw new Error(`Discriminator '${discriminator}' is not valid: ${report.problems.get(discriminator) || 'not found in classes'}.`);
 
-    this.schemasByDiscriminatorValue = mapValues((v) => new DataSchema(v, unexpected), schemasByValue);
+    this.schemasByDiscriminatorValue = mapValues((v) => new DataSchema(v), schemasByValue);
   }
 
   conform(value: object): Problems | T {
