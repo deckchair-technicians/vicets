@@ -1,4 +1,3 @@
-import * as os from "os";
 import {empty, Path, Problems, ValidationErrorOpts, wrapAssociative} from "./impl";
 import {isPrimitive} from "./impl/util/types";
 
@@ -79,11 +78,13 @@ export class ValidationError extends Error {
                 leakActualValuesInError = false,
               }: Partial<ValidationErrorOpts> = {}
   ) {
-    super(`${message}:${os.EOL}${problems}`);
+    super(`${message}:\n${problems}${leakActualValuesInError ? `\nactual:${JSON.stringify(actual)}\n` : ''}`);
     if (leakActualValuesInError) {
       this.actual = actual;
       this.expected = intertwingle(actual, problems, []);
       showDiff: true
     }
   }
+
+
 }
