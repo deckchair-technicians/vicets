@@ -19,6 +19,7 @@ import {
   InSchema,
   IsInstanceSchema,
   IsoUtcDateSchema,
+  isSchema,
   IsURLOptions,
   LensBehaviour,
   LensSchema,
@@ -334,6 +335,15 @@ export function uniqueBy<T, V = any>(fn: (t: T) => V): Schema<T[], T[]> {
 
 export function select<T>(path: string[], s: Schema<any, T>): Schema<any, T> {
   return new SelectSchema(path, s);
+}
+
+export function oneOf<T>(...items: (T | Schema<any, T>)[]): Schema<any, T> {
+  const result: Schema<any, T> | undefined = items.reduce(
+    (result: Schema<any, T> | undefined, item: Schema<any, T> | T): Schema<any, T> => {
+      const schema = isSchema(item) ? item : eq(item);
+      return result ? result.or(schema) : schema;
+    }, undefined);
+  return result || fail(failure('oneOf() with no values provided'));
 }
 
 
