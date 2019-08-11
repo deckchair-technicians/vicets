@@ -1,5 +1,19 @@
 import {expect} from "chai";
-import {__, build, conform, data, discriminated, discriminatedBy, eq, failure, isdata, isstring} from "../../src/vice";
+import {
+  __,
+  build,
+  conform,
+  data,
+  discriminated,
+  discriminatedBy,
+  eq,
+  failure,
+  isdata,
+  isstring,
+  problem,
+  problems,
+  Schema
+} from "../../src/vice";
 
 describe('discriminated', () => {
   @data
@@ -138,15 +152,15 @@ describe('discriminatedBy', () => {
     });
 
     enum CatTypes {
-      Black = 0,
-      Ginger = 1,
+      Black = 'black',
+      Ginger = 'ginger',
+      Tiger = 'tiger',
+      Lion = 'lion',
     }
-
-    type CatType = 'ginger' | 'black';
 
     abstract class Cat<T extends CatTypes> {
       abstract discriminator: T;
-      name:string=__(isstring());
+      name: string = __(isstring());
     }
 
     @data
@@ -159,21 +173,54 @@ describe('discriminatedBy', () => {
       discriminator: CatTypes.Black = CatTypes.Black;
     }
 
-    type AllCats = Ginger | Black;
+    type DomesticCats = Ginger | Black;
+
+    const isDomesticCat = discriminatedBy<DomesticCats>("discriminator", Ginger, Black);
 
     it('allows selecting discriminator fields from parent', () => {
-      const discriminateByFieldOnParent = discriminatedBy<AllCats>("discriminator", Ginger, Black);
-      expect(conform(discriminateByFieldOnParent, {
+      expect(conform(isDomesticCat, {
         discriminator: CatTypes.Ginger,
-        name:"Ginger"}))
+        name: "Ginger"
+      }))
         .deep.eq({
         discriminator: CatTypes.Ginger,
-        name:"Ginger"
+        name: "Ginger"
       });
-      expect(conform(discriminateByFieldOnParent, {
+      expect(conform(isDomesticCat, {
         discriminator: CatTypes.Ginger,
-        name:12345}))
+        name: 12345
+      }))
         .deep.eq(failure('expected a string but got number', ['name']))
+    });
+
+    @data
+    class Tiger extends Cat<CatTypes.Tiger> {
+      discriminator: CatTypes.Tiger = CatTypes.Tiger;
+    }
+
+    @data
+    class Lion extends Cat<CatTypes.Lion> {
+      discriminator: CatTypes.Lion = CatTypes.Lion;
+    }
+
+    type BigCats = Tiger | Lion;
+    type AllCats = BigCats | DomesticCats;
+
+    const isBigCat = discriminatedBy<BigCats>("discriminator", Tiger, Lion);
+
+    const isCat: Schema<any, AllCats> = isDomesticCat.or(isBigCat);
+
+    it('DiscriminatedUnionSchema.or() combines DiscriminatedUnionSchemas, for better error messages', () => {
+      expect(conform(isCat, {discriminator: 'Iguana'}))
+        .deep.eq(failure("expected one of [ginger, black, tiger, lion]", ["discriminator"]));
+    });
+
+    it('DiscriminatedUnionSchema.or() does not combine with conflicting DiscriminatedUnionSchema', () => {
+      expect(conform(isBigCat.or(isBigCat), {discriminator: 'Iguana'}))
+        .deep.eq(problems(
+        problem("expected one of [tiger, lion]", ["discriminator"]),
+        problem("expected one of [tiger, lion]", ["discriminator"]),
+      ));
     });
 
     it('produces a useful error message if field does not exist', () => {

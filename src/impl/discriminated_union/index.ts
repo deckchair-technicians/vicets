@@ -1,18 +1,17 @@
+import {BaseSchema} from "../";
 import {DataSchema} from "../../data";
 import {failure, Problems} from "../../problems";
 import {Schema} from "../../schema";
-import {UnexpectedItemBehaviour} from "../associative/behaviour";
-import {BaseSchema} from "../";
-import {Constructor} from "../util/types";
+import {UnexpectedItemBehaviour} from "..";
 import {mapValues} from "../util/maps";
-import {PrimitiveValue} from "../util/types";
+import {Constructor, PrimitiveValue} from "../util/types";
 import {discriminatorReports} from "./find_discriminators";
 
 export class DiscriminatedUnionSchema<T extends object> extends BaseSchema<any, T> {
   private readonly discriminator: keyof T;
   private readonly schemasByDiscriminatorValue: Map<PrimitiveValue, Schema<any, T>>;
 
-  constructor(ctors: Constructor<T>[], discriminator: keyof T, unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM) {
+  constructor(private readonly ctors: Constructor<T>[], discriminator: keyof T, unexpected: UnexpectedItemBehaviour = UnexpectedItemBehaviour.PROBLEM) {
     super();
 
     this.discriminator = discriminator;
@@ -41,6 +40,25 @@ export class DiscriminatedUnionSchema<T extends object> extends BaseSchema<any, 
         [this.discriminator]);
 
     return schema.conform(value);
+  }
+
+
+  or<NEWIN extends any, NEWOUT>(that: Schema<any, NEWOUT>): Schema<any, T | NEWOUT> {
+    if (that instanceof DiscriminatedUnionSchema
+      && this.discriminator === that.discriminator) {
+      try {
+        // This will give much better error messages, if it's possible
+        // to combine the schemas.
+        return new DiscriminatedUnionSchema(
+          [...this.ctors, ...that.ctors],
+          this.discriminator)
+      } catch (e) {
+        //lean on constructor validation logic
+      }
+    }
+
+    return super.or(that);
+
   }
 
   private schemaFor(value: object): Schema<any, T> | undefined {
