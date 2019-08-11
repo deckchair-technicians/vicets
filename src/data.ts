@@ -1,18 +1,18 @@
 import {
   BaseSchema,
-  Behaviour, conform,
+  conform,
   failure,
   hasSchema,
   isSchema,
-  MissingItemBehaviour,
   ObjectSchema,
   Problems,
   schemaOf,
   schematizeEntries,
   StrictPattern,
   suspendValidation,
-  UnexpectedItemBehaviour, usingBehaviour,
-  ValidationError, ValidationOpts,
+  usingBehaviour,
+  ValidationError,
+  ValidationOpts,
   ValidationResult
 } from "./impl";
 import {Constructor, isPrimitive} from "./impl/util/types";
@@ -56,7 +56,7 @@ export function makeInstance<T>(c: Constructor<T>, obj: object): T {
 }
 
 export function conformAs<T extends object>(c: Constructor<T>, obj: object): ValidationResult<T> {
-  const result = conform(schemaOf(c),obj);
+  const result = conform(schemaOf(c), obj);
   if (result instanceof Problems)
     return result;
   return makeInstance(c, result);
@@ -67,7 +67,7 @@ export function build<T extends object>(
   c: Constructor<T>,
   values: any,
   opts: Partial<ValidationOpts> = {}): T {
-  const conformed = usingBehaviour(opts, ()=>conformAs(c, values));
+  const conformed = usingBehaviour(opts, () => conformAs(c, values));
   if (conformed instanceof Problems) {
     throw new ValidationError(values, conformed, opts);
   }
@@ -93,7 +93,7 @@ export function construct<T extends object>(
 }
 
 export class DataSchema<T extends object> extends BaseSchema<any, T> {
-  constructor(private readonly c: Constructor<T>, private readonly unexpected: UnexpectedItemBehaviour) {
+  constructor(private readonly c: Constructor<T>) {
     super();
     schemaOf(c);
   }
@@ -103,7 +103,7 @@ export class DataSchema<T extends object> extends BaseSchema<any, T> {
     if (typeof value !== 'object') return failure(`Expected an object but got a ${typeof value}`);
 
     try {
-      return build(this.c, value, {unexpected: this.unexpected})
+      return build(this.c, value)
         ;
     } catch (e) {
       if (e instanceof ValidationError) {
