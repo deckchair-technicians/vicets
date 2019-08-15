@@ -1,4 +1,4 @@
-import {Schema, BaseSchema, failure, Problems, ValidationResult} from "./";
+import {BaseSchema, failure, Problems, Schema, subSchemaJson, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class ArrayOfSchema<T> extends BaseSchema<any[], T[]> {
@@ -23,5 +23,14 @@ export class ArrayOfSchema<T> extends BaseSchema<any[], T[]> {
       return problems;
 
     return conformed;
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    return {
+      type: "array",
+      contains: subSchemaJson(
+        this.itemSchema,
+        toJson),
+    }
   }
 }

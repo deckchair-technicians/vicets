@@ -1,4 +1,4 @@
-import {Associative, BaseSchema, conformInPlace, failure, Schema, ValidationResult} from "../";
+import {Associative, BaseSchema, conformInPlace, failure, Schema, subSchemaJson, ValidationResult} from "../";
 import {typeDescription} from "../util/types";
 
 export class TupleStrategies<T extends any[]> implements Associative<number, any> {
@@ -58,5 +58,12 @@ export class TupleSchema<T extends any[]> extends BaseSchema<T> {
     const result = new TupleStrategies(instance);
     const problems = conformInPlace(result, this.itemSchemas);
     return problems ? problems : result.result;
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    return {
+      type: "array",
+      items: subSchemaJson(this.itemSchemas.map(([k, v]) => v), toJson)
+    }
   }
 }

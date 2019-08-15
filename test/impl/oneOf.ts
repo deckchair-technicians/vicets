@@ -1,14 +1,15 @@
 import {expect} from "chai";
 import {conform} from "../../src/helpers";
 import {problem, problems} from "../../src/problems";
-import {eq, gte, lt, oneOf} from "../../src/schemas";
+import {eq, gte, lt, anyOf} from "../../src/schemas";
 
-describe('oneOf()', async () => {
+describe('anyOf()', async () => {
   it('works with values', async () => {
-    expect(conform(oneOf(1, 2, 3), 2)).deep.eq(2);
+    expect(conform(anyOf(1, 2, 3), 2)).deep.eq(2);
   });
+
   it('works with schemas', async () => {
-    const s = oneOf(lt(2), gte(3));
+    const s = anyOf(lt(2), gte(3));
 
     expect(conform(s, 1))
       .deep.eq(1);
@@ -22,8 +23,9 @@ describe('oneOf()', async () => {
     expect(conform(s, 3))
       .deep.eq(3);
   });
+
   it('works with mix of values and schemas', async () => {
-    const s = oneOf(1, eq(2));
+    const s = anyOf(1, eq(2));
 
     expect(conform(s, 1))
       .deep.eq(1);

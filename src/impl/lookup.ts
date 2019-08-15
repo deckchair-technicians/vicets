@@ -2,7 +2,7 @@ import {BaseSchema, failure, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class LookupSchema<T extends object, V> extends BaseSchema<any, T[keyof T]> {
-  constructor(private readonly e: T) {
+  constructor(private readonly lookup: T) {
     super();
   }
 
@@ -10,9 +10,16 @@ export class LookupSchema<T extends object, V> extends BaseSchema<any, T[keyof T
     if (typeof value !== 'string')
       return failure(`expected a string but got ${typeDescription(value)}`);
 
-    if (value in this.e)
-      return this.e[value];
+    if (value in this.lookup)
+      return this.lookup[value];
 
-    return failure(`expected one of [${Object.keys(this.e).map((k) => JSON.stringify(k)).join(', ')}]`)
+    return failure(`expected one of [${Object.keys(this.lookup).map((k) => JSON.stringify(k)).join(', ')}]`)
+  }
+
+  toJSON(): any {
+    return {
+      type: "string",
+      enum: Object.keys(this.lookup)
+    }
   }
 }

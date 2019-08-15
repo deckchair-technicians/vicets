@@ -56,6 +56,7 @@ describe('Intersecting @data classes', () => {
       const valid = conformAs(AbcDef, {a: "abcdef"});
       expect(valid).deep.equals({a: "abcdef"});
     });
+
     it('conformed result is passed left to right', () => {
       @data
       class CoerceToUpper {

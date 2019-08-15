@@ -14,6 +14,7 @@ describe('enumkey', () => {
       expect(s.conform('a')).to.equals(WithStringValues.a);
       expect(s.conform('b')).to.equals(WithStringValues.b);
     });
+
     it('does not work for values', () => {
       expect(s.conform('a value')).deep.equals({
         problems: [

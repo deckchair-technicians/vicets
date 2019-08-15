@@ -1,14 +1,17 @@
-import {failure, isSuccess, Problems, ValidationResult} from "../problems";
+import {conform} from "../helpers";
+import {failure, isError, isSuccess, Problems, ValidationResult} from "../problems";
 import {Schema} from "../schema";
+import {subSchemaJson} from "./";
 import {typeDescription} from "./util/types";
 
-export abstract class BaseSchema<IN=any, OUT=any> implements Schema<IN, OUT> {
-  or<NEWIN extends IN, NEWOUT>(s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
-    return new OrSchema<IN, OUT, NEWOUT>(this, s);
+export abstract class BaseSchema<IN = any, OUT = any> implements Schema<IN, OUT> {
+
+  or<NEWOUT>(s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
+    return new OrSchema<IN, OUT | NEWOUT>([this, s]);
   }
 
   and<NEWOUT>(s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT> {
-    return new AndSchema(this, s)
+    return new AndSchema([this, s])
   }
 
   __<FAKED extends OUT>(): FAKED {
@@ -17,32 +20,45 @@ export abstract class BaseSchema<IN=any, OUT=any> implements Schema<IN, OUT> {
 
   abstract conform(value: IN): ValidationResult<OUT>;
 
+  abstract toJSON(toJson?: (s: Schema) => any): any;
+
+
 }
 
-export class AndSchema<IN, INTERMEDIATE, OUT> extends BaseSchema<IN, OUT> {
-  constructor(private readonly first: Schema<IN, INTERMEDIATE>,
-              private readonly second: Schema<INTERMEDIATE, OUT>) {
+export class AndSchema<IN, OUT> extends BaseSchema<IN, OUT> {
+  constructor(private readonly subSchemas: Schema[]) {
     super();
   }
 
   conform(value: IN): ValidationResult<OUT> {
-    const intermediate = this.first.conform(value);
+    return this.subSchemas.reduce((result, schema) => {
+      if (isError(result))
+        return result;
+      return conform(schema, result);
+    }, value);
+  }
 
-    if (intermediate instanceof Problems) return intermediate;
+  and<NEWOUT>(s: Schema<OUT, NEWOUT>): Schema<IN, NEWOUT> {
+    return s instanceof AndSchema
+      ? new AndSchema([...this.subSchemas, ...s.subSchemas])
+      : new AndSchema([...this.subSchemas, s])
+  }
 
-    return this.second.conform(intermediate)
+  toJSON(toJson?: (s: Schema) => any) {
+    return {
+      allOf: subSchemaJson(this.subSchemas,toJson)
+    };
   }
 }
 
-export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
-  constructor(private readonly first: Schema<IN, OUT1>,
-              private readonly second: Schema<IN, OUT2>) {
+export class OrSchema<IN, OUT> extends BaseSchema<IN, OUT> {
+  constructor(private readonly subSchemas: Schema<IN, OUT>[]) {
     super();
   }
 
-  conform(value: IN): ValidationResult<OUT1 | OUT2> {
+  conform(value: IN): ValidationResult<OUT> {
     const failures: Problems[] = [];
-    for (const s of [this.first, this.second]) {
+    for (const s of this.subSchemas) {
       const result = s.conform(value);
 
       if (isSuccess(result)) return result;
@@ -52,9 +68,22 @@ export class OrSchema<IN, OUT1, OUT2> extends BaseSchema<IN, OUT1 | OUT2> {
     return failures.reduce((a: Problems | null, ps: Problems) => a ? a.merge(ps) : ps);
   }
 
+
+  or<NEWOUT>(s: Schema<IN, NEWOUT>): Schema<IN, OUT | NEWOUT> {
+    return s instanceof OrSchema
+      ? new OrSchema<IN, OUT | NEWOUT>([...this.subSchemas, ...s.subSchemas])
+      : new OrSchema<IN, OUT | NEWOUT>([...this.subSchemas, s])
+  }
+
+  toJSON(toJson?: (s: Schema) => any) {
+    return {
+      anyOf: subSchemaJson(this.subSchemas, toJson)
+    }
+  }
+
 }
 
-export abstract class StringSchema extends BaseSchema<any, string> {
+export abstract class BaseStringSchema extends BaseSchema<any, string> {
   conform(value: any): ValidationResult<string> {
     if (typeof value === 'string' || value instanceof String)
       return this.conformString(value as string);
@@ -62,11 +91,24 @@ export abstract class StringSchema extends BaseSchema<any, string> {
   }
 
   abstract conformString(value: string): ValidationResult<string>;
+
+  toJSON(): any {
+    return {type: "string"}
+  }
+}
+
+export class StringSchema extends BaseStringSchema {
+  conformString(value: string): ValidationResult<string> {
+    return value;
+  }
 }
 
 
 export class DelegatingSchema<IN, OUT> extends BaseSchema<IN, OUT> {
-  constructor(private readonly delegatedConform: (value: IN) => Problems | OUT) {
+  constructor(private readonly delegatedConform: (value: IN) => Problems | OUT,
+              public readonly toJSON: () => any = () => {
+                throw new Error('toJSON not implemented')
+              }) {
     super();
   }
 

@@ -1,4 +1,4 @@
-import {failure, ValidationResult,BaseSchema} from "./";
+import {BaseSchema, failure, ValidationResult} from "./";
 
 export class BooleanSchema extends BaseSchema<any, boolean> {
   conform(value: any): ValidationResult<boolean> {
@@ -13,5 +13,9 @@ export class BooleanSchema extends BaseSchema<any, boolean> {
       return s === 'true';
     }
     return failure(`expected a boolean`);
+  }
+
+  toJSON(): any {
+    return {type: "boolean"}
   }
 }

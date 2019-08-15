@@ -1,9 +1,17 @@
-import {Associative, BaseSchema, conformInPlace, failure, Schema, ValidationResult} from "../";
-import {merge} from "../util/maps";
+import {
+  Associative,
+  BaseSchema,
+  conformInPlace,
+  failure,
+  ObjectSchema,
+  Schema,
+  subSchemaJson,
+  ValidationResult
+} from "../";
 import {typeDescription} from "../util/types";
 
-export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> {
-  constructor(private readonly itemSchemas: Map<K, Schema<any, V>>) {
+export class MapSchema<K, V> extends BaseSchema<any, Map<K, V>> {
+  constructor(private readonly subSchema: ObjectSchema<any>) {
     super();
   }
 
@@ -19,13 +27,14 @@ export class MapSchema<K, V> extends BaseSchema<string, Map<K, V>> {
     for (let [k, v] of kvs) {
       instance.set(k, v);
     }
-    const problems = conformInPlace(instance as any as Associative<K, V>, this.itemSchemas.entries());
+    const problems = conformInPlace(
+      instance as any as Associative<K, V>,
+      this.subSchema.fieldSchemaArray as any);
     return problems ? problems : instance;
   }
 
-  intersect(other: this): this {
-    const mergedSchemas = merge(this.itemSchemas, other.itemSchemas, (a: Schema, b: Schema) => a.and(b));
-    return new MapSchema(mergedSchemas) as this;
+  toJSON(toJson?: (s: Schema) => any): any {
+    return subSchemaJson(this.subSchema, toJson);
   }
 }
 

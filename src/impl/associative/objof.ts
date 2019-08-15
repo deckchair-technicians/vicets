@@ -1,4 +1,4 @@
-import {BaseSchema, conformInPlace, failure, ObjectStrategies, Schema, ValidationResult} from "../";
+import {BaseSchema, conformInPlace, failure, ObjectStrategies, Schema, subSchemaJson, ValidationResult} from "../";
 
 export class ObjOfSchema<T> extends BaseSchema<any, { [k: string]: T }> {
   constructor(private readonly valueSchema: Schema<any, T>) {
@@ -17,5 +17,14 @@ export class ObjOfSchema<T> extends BaseSchema<any, { [k: string]: T }> {
     Object.assign(instance, value);
     const problems = conformInPlace(new ObjectStrategies(instance), itemSchemas);
     return problems ? problems : instance;
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    return {
+      type: "object",
+      patternProperties: {
+        ".*": subSchemaJson(this.valueSchema, toJson)
+      }
+    }
   }
 }

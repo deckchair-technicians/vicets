@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {arrayof, matches, object, schema} from "../../src/vice";
+import {arrayof, eq, matches, object, schema} from "../../src/vice";
 
 describe('arrayof', () => {
   it('returns array of conformed values', () => {
@@ -52,5 +52,11 @@ describe('arrayof', () => {
       ]
     })
   });
+  it('json schema', () => {
+    const s = arrayof(eq("hello"));
+    expect(s.toJSON())
+      .deep.equals({type:"array", contains:{const:"hello"}})
+  });
+
 
 });

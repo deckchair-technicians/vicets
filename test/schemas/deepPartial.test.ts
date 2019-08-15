@@ -60,4 +60,25 @@ describe('deepPartial()', () => {
     expect(conformed).deep.equals({a: 1, b: 3});
     expect(bGetterCalled).eq(true);
   });
+
+  it('json schema', () => {
+    type Example = { a: number }
+
+    const s: Schema<object, Example> = deepPartial<Example>({a: eq(1)});
+
+    expect(s.toJSON())
+      .deep.equals({
+      type: "object",
+      additionalProperties: true,
+      properties: {
+        a: {
+          const: 1
+        }
+      },
+      required: [
+        "a"
+      ]
+    });
+  });
+
 });

@@ -1,8 +1,8 @@
 import {expect} from "chai";
-import {conform, isstring, match, object, problem, problems} from "../src/vice";
+import {conform, isstring, conditional, object, problem, problems} from "../src/vice";
 
-describe('match()', () => {
-  const animal = match()
+describe('conditional()', () => {
+  const animal = conditional()
     .case(
       {type: "cat"},
       object({

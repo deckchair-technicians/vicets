@@ -11,3 +11,4 @@ export {StrictPattern, StrictPatternItem, Pattern, PatternItem} from "./impl/ass
 export {patternItemToSchema} from "./impl/associative/obj";
 export * from "./ValidationError";
 export {MissingItemBehaviour,UnexpectedItemBehaviour} from "./impl/associative/behaviour";
+export * from "./jsonSchema";

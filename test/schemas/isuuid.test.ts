@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {isuuid, Schema} from "../../src/vice";
 const uuid = require("uuid");
 
-describe('isuuid', () => {
+describe('isuuid()', () => {
   const s: Schema<any, string> = isuuid();
   const knownValid:string = "ea679ebd-955f-4032-909b-c4fc9d0f0080";
   const randomValid:string = uuid.v4();

@@ -1,8 +1,7 @@
+import {conform} from "../helpers"
 import {
   BaseSchema,
   BehaviourSchema,
-  conform,
-  DelegatingSchema,
   failure,
   isSchema,
   isSuccess,
@@ -14,17 +13,12 @@ import {
   UnexpectedItemBehaviour,
   ValidationResult
 } from "../impl";
+import {subSchemaJson} from "../jsonSchema";
 
 export class ConditionalSchema<IN extends object, OUT, MATCH = any> extends BaseSchema<IN, OUT> {
-  private readonly matchesAnyCondition: Schema<IN>;
-
   constructor(
     private readonly matches: [Schema<IN>, Schema<IN, OUT>][]) {
     super();
-    this.matchesAnyCondition = matches
-      .map(([case_,]) => case_)
-      .reduce((s, c) => s.or(c),
-        new DelegatingSchema((x) => x));
   }
 
   conform(value: IN): ValidationResult<OUT> {
@@ -48,6 +42,20 @@ export class ConditionalSchema<IN extends object, OUT, MATCH = any> extends Base
 
     return new ConditionalSchema<IN, OUT | OTHER>(
       [...this.matches, [caseSchema, schema]]);
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    if (this.matches.length === 0)
+      return false;
+    return this.matches
+      .reverse()
+      .reduce((result, [condition, schema]) => {
+        return {
+          if: subSchemaJson(condition, toJson),
+          then: subSchemaJson(schema, toJson),
+          ...(result ? {else: result} : {})
+        };
+      }, {});
   }
 }
 

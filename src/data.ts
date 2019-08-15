@@ -1,11 +1,11 @@
 import {
-  BaseSchema,
   conform,
   failure,
   hasSchema,
   isSchema,
   ObjectSchema,
   Problems,
+  Schema,
   schemaOf,
   schematizeEntries,
   StrictPattern,
@@ -15,8 +15,8 @@ import {
   ValidationOpts,
   ValidationResult
 } from "./impl";
+import {BaseSchema} from "./impl/core";
 import {Constructor, isPrimitive} from "./impl/util/types";
-
 
 export function data<C extends Constructor>(c: C): C {
   // suspendValidation is required to allow calling parent constructor
@@ -93,9 +93,11 @@ export function construct<T extends object>(
 }
 
 export class DataSchema<T extends object> extends BaseSchema<any, T> {
+  public readonly subSchema: Readonly<ObjectSchema<T>>;
+
   constructor(private readonly c: Constructor<T>) {
     super();
-    schemaOf(c);
+    this.subSchema = schemaOf(c);
   }
 
   conform(value: any): Problems | T {
@@ -111,5 +113,9 @@ export class DataSchema<T extends object> extends BaseSchema<any, T> {
       }
       throw e;
     }
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    return this.subSchema.toJSON(toJson);
   }
 }

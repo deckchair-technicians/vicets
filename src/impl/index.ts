@@ -24,7 +24,6 @@ export * from './lens'
 export * from './lookup'
 export * from './number'
 export * from './override'
-export * from './range'
 export * from './regexp'
 export * from './select'
 export * from './setof'
@@ -41,4 +40,5 @@ export * from '../schemas';
 export * from '../schematize';
 export * from '../ValidationError';
 export * from '../mocha';
-export * from './match';
+export * from './conditional';
+export * from "../jsonSchema";

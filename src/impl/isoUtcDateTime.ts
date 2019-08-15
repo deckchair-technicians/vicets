@@ -72,4 +72,8 @@ export class IsoUtcDateSchema extends BaseSchema<any, Date> {
 
     return value;
   }
+
+  toJSON(): any {
+    return {type: "string", format: "date-time"}
+  }
 }

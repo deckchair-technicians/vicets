@@ -1,8 +1,7 @@
-import {BaseSchema} from "../";
+import {BaseSchema, subSchemaJson} from "../";
 import {DataSchema} from "../../data";
 import {failure, Problems} from "../../problems";
 import {Schema} from "../../schema";
-import {UnexpectedItemBehaviour} from "..";
 import {mapValues} from "../util/maps";
 import {Constructor, PrimitiveValue} from "../util/types";
 import {discriminatorReports} from "./find_discriminators";
@@ -64,6 +63,23 @@ export class DiscriminatedUnionSchema<T extends object> extends BaseSchema<any, 
   private schemaFor(value: object): Schema<any, T> | undefined {
     const discriminatorValue = value[this.discriminator as string | symbol];
     return this.schemasByDiscriminatorValue.get(discriminatorValue);
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    const allOf: object[] = [];
+    for (const [v, schema] of this.schemasByDiscriminatorValue.entries()) {
+      allOf.push({
+        if: {properties: {[this.discriminator]: {const: v}}},
+        then: subSchemaJson(schema, toJson),
+      })
+    }
+    return {
+      type: "object",
+      properties: {
+        [this.discriminator]: true
+      },
+      allOf
+    }
   }
 }
 

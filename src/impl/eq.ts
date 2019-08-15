@@ -1,4 +1,4 @@
-import {BaseSchema,failure, ValidationResult} from "./";
+import {BaseSchema, failure, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class EqualsSchema<T> extends BaseSchema<any, T> {
@@ -10,6 +10,10 @@ export class EqualsSchema<T> extends BaseSchema<any, T> {
     if (value !== this.expected)
       return failure(`expected "${this.expected}" but got ${typeDescription(value)}: ${JSON.stringify(value)}`);
     return value;
+  }
+
+  toJSON(): object {
+    return {const: this.expected};
   }
 
 }

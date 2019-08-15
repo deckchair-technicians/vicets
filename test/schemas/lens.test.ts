@@ -1,12 +1,11 @@
 import {expect} from "chai";
-import {failure, conform, eq, lens, validate, LensBehaviour} from "../../src/vice";
+import {conform, eq, failure, lens, validate} from "../../src/vice";
 
 
 describe('lens', () => {
   const s = lens(
     ["a", "b"],
-    eq("valid"),
-    LensBehaviour.MODIFY_IN_PLACE);
+    eq("valid"));
 
   it('passes through correct values', () => {
     expect(validate(

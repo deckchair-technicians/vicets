@@ -16,4 +16,16 @@ describe('defaultValue', () => {
     const s = defaultValue(() => "not valid", eq("valid"));
     expect(s.conform(undefined)).deep.eq(failure('expected "valid" but got string: "not valid"'));
   });
+  it('json schema', () => {
+    expect(s.toJSON())
+      .deep.equals({
+      type:"string",
+      default: "default",
+      enum: [
+        "default",
+        "also valid",
+      ]
+    });
+  });
+
 });

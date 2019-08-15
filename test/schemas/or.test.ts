@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {predicate, problem, problems} from "../../src/vice";
+import {eq, isnumber, isstring, matches, predicate, problem, problems} from "../../src/vice";
 
 describe('or', () => {
   it('Returns the result of the first schema that passes, or all problems from all schemas', () => {
@@ -19,4 +19,19 @@ describe('or', () => {
       problem("failed second predicate")
     ));
   });
-})
+
+  it('json schema', () => {
+    const s =
+      eq("a")
+        .or(eq("b"))
+        .or(eq("c"));
+
+    expect(s.toJSON()).deep.equals({
+      anyOf: [
+        {const: "a"},
+        {const: "b"},
+        {const: "c"},
+      ]
+    });
+  });
+});

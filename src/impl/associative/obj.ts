@@ -4,17 +4,18 @@ import {
   conformInPlace,
   EqualsSchema,
   failure,
+  isOptional,
   Pattern,
   PatternItem,
   RegExpSchema,
   Schema,
-  StrictPattern,
+  StrictPattern, subSchemaJson,
   TupleSchema,
   ValidationResult
 } from "../";
 import {addGetter, copyGetters, merge} from "../util/magic";
 
-function objectEntries(object: object): [string, Schema][] {
+export function objectEntries(object: object): [string, Schema][] {
   const result: [string, Schema][] = [];
   for (const k of Object.keys(object)) {
     const s = object[k];
@@ -48,7 +49,7 @@ export function patternItemToSchema<T>(item: PatternItem<T>): Schema {
   return new ObjectSchema(item);
 }
 
-function patternToSchemas<T extends object>(pattern: Pattern<T>): { [K in keyof T]: Schema<T[K]> } {
+export function patternToSchemas<T extends object>(pattern: Pattern<T>): { [K in keyof T]: Schema<T[K]> } {
 
   const result = {};
   for (const k of Object.keys(pattern)) {
@@ -117,6 +118,23 @@ export class ObjectSchema<T extends object> extends BaseSchema<any, T> {
   intersect<U extends object>(other: ObjectSchema<U>): ObjectSchema<T & U> {
     const mergedSchemas = merge(this.pattern, other.pattern, (a: Schema, b: Schema) => a.and(b)) as StrictPattern<T & U>;
     return new ObjectSchema<T & U>(mergedSchemas);
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    const properties = this.fieldSchemaArray.reduce((result, [k, subSchema]) => {
+      result[k] = subSchemaJson(subSchema,toJson);
+      return result;
+    }, {});
+
+    const required = this.fieldSchemaArray
+      .filter(([k, schema]) => !isOptional(schema))
+      .map(([k]) => k);
+
+    return {
+      type: "object",
+      properties: properties,
+      required: required,
+    }
   }
 }
 

@@ -14,7 +14,7 @@ export function setAtPath<T>(obj: T, path: string[], value: any): T {
 export class LensSchema<T, U> extends BaseSchema<any, T> {
   private readonly subschema: Schema<any, U>;
 
-  constructor(private readonly path: string[], subschema: Schema<any, U>, behaviour: LensBehaviour) {
+  constructor(private readonly path: string[], subschema: Schema<any, U>) {
     super();
     this.subschema = new SelectSchema(path, subschema)
   }
@@ -28,6 +28,10 @@ export class LensSchema<T, U> extends BaseSchema<any, T> {
       return conformed;
 
     return setAtPath(value, this.path, conformed);
+  }
+
+  toJSON(): any {
+    throw new Error("Not implemented");
   }
 }
 

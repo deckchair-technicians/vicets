@@ -21,4 +21,11 @@ export class E164PhoneNumberSchema extends BaseSchema<any, string> {
     }
 
   }
+
+  toJSON(): any {
+    return {
+      type: "string",
+      description: "Phone number",
+    }
+  }
 }

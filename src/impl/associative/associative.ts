@@ -1,10 +1,12 @@
 import {
-  BaseSchema, behaviour,
+  BaseSchema,
+  behaviour,
   failure,
   isError,
   MissingItemBehaviour,
   Problems,
   Schema,
+  subSchemaJson,
   UnexpectedItemBehaviour,
   ValidationResult
 } from "../";
@@ -26,12 +28,12 @@ export function conformInPlace<K, V>(thing: Associative<K, V>,
 
   let problems = new Problems([]);
   const unmatchedThingKeys = new Set(thing.keys());
-  const {unexpected,missing}=behaviour();
+  const {unexpected, missing} = behaviour();
   for (const [k, s] of itemSchemas) {
     const v: ValidationResult<any> = s.conform(thing.get(k));
 
     if (isError(v) && !thing.has(k)) {
-      if (s[isOptional] !== true && missing !== MissingItemBehaviour.IGNORE) {
+      if (s[optional] !== true && missing !== MissingItemBehaviour.IGNORE) {
         problems = problems.merge(failure("No value", [k]));
       }
       continue;
@@ -64,10 +66,10 @@ export function conformInPlace<K, V>(thing: Associative<K, V>,
   return problems.length > 0 ? problems : undefined;
 }
 
-const isOptional = Symbol("isOptional");
+export const optional = Symbol("optional");
 
 export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined> {
-  [isOptional] = true;
+  [optional] = true;
 
   constructor(private readonly subschema: Schema<IN, OUT>) {
     super();
@@ -77,6 +79,14 @@ export class TagSchemaAsOptional<IN, OUT> extends BaseSchema<IN, OUT | undefined
     return value === undefined ? undefined : this.subschema.conform(value);
   }
 
+  toJSON(toJson?: (s: Schema) => any): any {
+    return subSchemaJson(this.subschema, toJson)
+  }
+
+}
+
+export function isOptional(schema: Schema): boolean {
+  return schema[optional];
 }
 
 export type PrimitivePattern<T> = T extends string ? Schema<any, T> | T | RegExp : Schema<any, T> | T;

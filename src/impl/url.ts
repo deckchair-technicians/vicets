@@ -1,5 +1,5 @@
 import validator from "validator";
-import {failure, StringSchema, ValidationResult} from "./";
+import {failure, BaseStringSchema, ValidationResult} from "./";
 
 export interface IsURLOptions {
   protocols?: string[];
@@ -13,7 +13,7 @@ export interface IsURLOptions {
   allow_protocol_relative_urls?: boolean;
 }
 
-export class UrlSchema extends StringSchema {
+export class UrlSchema extends BaseStringSchema {
   constructor(private readonly opts: IsURLOptions) {
     super();
   }
@@ -21,5 +21,9 @@ export class UrlSchema extends StringSchema {
   conformString(value: string): ValidationResult<string> {
     if (validator.isURL(value, this.opts)) return value;
     return failure(`not a valid url: ${value}`)
+  }
+
+  toJSON(): any {
+    return {...super.toJSON(), format: "url"}
   }
 }

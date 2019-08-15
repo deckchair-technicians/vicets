@@ -30,4 +30,10 @@ export class UniqueSchema<T, V> extends BaseSchema<T[], T[]> {
     return p.length > 0 ? problems(...p) : value;
   }
 
+  toJSON(): any {
+    return {
+      type: "array",
+      description: "unique values"
+    }
+  }
 }

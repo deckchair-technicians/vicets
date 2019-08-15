@@ -23,4 +23,8 @@ export class SelectSchema<T> extends BaseSchema<any, T> {
       ? result.prefixPath(this.path)
       : result;
   }
+
+  toJSON(): any {
+    throw new Error("Not implemented");
+  }
 }

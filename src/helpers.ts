@@ -10,7 +10,7 @@ export function validate<IN, OUT>(
   opts: Partial<ValidationOpts> = {})
   : OUT {
 
-  const conformed = usingBehaviour(opts, () => conform(schema, value));
+  const conformed = conform(schema, value, opts);
   if (conformed instanceof Problems) {
     throw new ValidationError(value, conformed, opts);
   }

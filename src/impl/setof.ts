@@ -1,4 +1,4 @@
-import {BaseSchema, failure, Problems, Schema, ValidationResult} from "./";
+import {BaseSchema, failure, Problems, Schema, subSchemaJson, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export class SetOfSchema<T> extends BaseSchema<any, Set<T>> {
@@ -25,6 +25,13 @@ export class SetOfSchema<T> extends BaseSchema<any, Set<T>> {
       return problems;
 
     return conformed;
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    return {
+      type: "array",
+      items: subSchemaJson(this.itemSchema, toJson)
+    }
   }
 
 }

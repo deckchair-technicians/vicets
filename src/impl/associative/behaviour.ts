@@ -2,6 +2,7 @@ import {conform} from "../../helpers";
 import {ValidationResult} from "../../problems";
 import {Schema} from "../../schema";
 import {BaseSchema} from "../core";
+import {subSchemaJson} from "../../jsonSchema";
 
 export enum UnexpectedItemBehaviour {
   DELETE = "delete",
@@ -23,7 +24,7 @@ export interface Behaviour {
 let BEHAVIOUR: Behaviour = {
   unexpected: UnexpectedItemBehaviour.PROBLEM,
   missing: MissingItemBehaviour.PROBLEM,
-  leakActualValuesInError:false,
+  leakActualValuesInError: false,
 };
 
 export function behaviour(): Behaviour {
@@ -52,5 +53,12 @@ export class BehaviourSchema<IN, OUT> extends BaseSchema<IN, OUT> {
     return usingBehaviour(
       this.behaviour,
       () => conform(this.subSchema, value));
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    return {
+      ...subSchemaJson(this.subSchema, toJson),
+      additionalProperties: this.behaviour.unexpected !== UnexpectedItemBehaviour.PROBLEM
+    };
   }
 }

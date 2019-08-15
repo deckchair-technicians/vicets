@@ -1,4 +1,4 @@
-import {BaseSchema, failure, Problems, Schema, ValidationResult} from "./";
+import {BaseSchema, failure, Problems, Schema, subSchemaJson, ValidationResult} from "./";
 import {typeDescription} from "./util/types";
 
 export interface SchemaOverrides<IN, OUT> {
@@ -33,5 +33,9 @@ export class OverrideSchema<IN, OUT> extends BaseSchema<IN, OUT> {
     else {
       throw new Error(`Not implemented for ${typeDescription(f)}`);
     }
+  }
+
+  toJSON(toJson?: (s: Schema) => any): any {
+    return subSchemaJson(this.subschema, toJson);
   }
 }

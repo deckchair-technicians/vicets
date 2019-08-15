@@ -4,7 +4,6 @@ import {
   BehaviourSchema,
   BooleanSchema,
   ConditionalSchema,
-  DataSchema,
   DefaultValueSchema,
   DeferredSchema,
   DelegatingSchema,
@@ -14,8 +13,6 @@ import {
   EnumValueSchema,
   EqualsSchema,
   failure,
-  GteSchema,
-  GtSchema,
   InSchema,
   IsInstanceSchema,
   IsoUtcDateSchema,
@@ -24,18 +21,16 @@ import {
   LensBehaviour,
   LensSchema,
   LookupSchema,
-  LteSchema,
-  LtSchema,
   MapSchema,
   MissingItemBehaviour,
   NumberSchema,
   ObjectSchema,
   ObjOfSchema,
+  Opts,
   OrSchema,
   OverrideSchema,
   Pattern,
   Problems,
-  RangeOpts,
   RegExpSchema,
   Schema,
   schemaOf,
@@ -44,22 +39,40 @@ import {
   SelectSchema,
   SetOfSchema,
   StrictPattern,
+  StringSchema,
   TagSchemaAsOptional,
   TimeExpectation,
   TupleSchema,
   UnexpectedItemBehaviour,
   UniqueSchema,
   UrlSchema,
-  UuidSchema
+  UuidSchema,
 } from "./impl";
 import {identity} from "./impl/util/functions";
-import {toMap} from "./impl/util/maps";
-import {Constructor, typeDescription} from "./impl/util/types";
+import {Constructor} from "./impl/util/types";
+import {DataSchema} from "./data";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
 }
 
+/**
+ * Marks a field as optional. MUST be used as the outer schema:
+ *
+ * Ok:
+ *
+ * @data
+ * class Cat {
+ *   name?:string =__(opt(isstring().or(isnumber())))
+ * }
+ *
+ * Not ok:
+ *
+ * @data
+ * class Cat {
+ *   name?:string =__(opt(isstring()).or(isnumber())
+ * }
+ */
 export function opt<IN, OUT>(s: Schema<any, OUT>): Schema<any, OUT | undefined> {
   return new TagSchemaAsOptional(s);
 }
@@ -89,9 +102,9 @@ function deepNullablePattern(fieldSchemaArray: [string, Schema][]): Pattern<any>
   for (const [k, s] of fieldSchemaArray) {
     if ("fieldSchemaArray" in s) { // TODO testing if schema represents an object should be different
       const nullableFieldsObjectSchema = new ObjectSchema(deepNullablePattern((s as ObjectSchema<any>).fieldSchemaArray));
-      nullableFieldsObjectPattern[k] = new OrSchema(nullableFieldsObjectSchema, isnull());
+      nullableFieldsObjectPattern[k] = new OrSchema([nullableFieldsObjectSchema, isnull()]);
     } else {
-      nullableFieldsObjectPattern[k] = new OrSchema(s, isnull());
+      nullableFieldsObjectPattern[k] = new OrSchema([s, isnull()]);
     }
   }
   return nullableFieldsObjectPattern
@@ -114,19 +127,24 @@ export function eq<T>(value: T): Schema<any, T> {
 }
 
 export function gt(value: number): Schema<any, number> {
-  return new GtSchema(value);
+  return new NumberSchema({exclusiveMinimum: value});
 }
 
 export function lt(value: number): Schema<any, number> {
-  return new LtSchema(value);
+  return new NumberSchema({exclusiveMaximum: value});
 }
 
 export function gte(value: number): Schema<any, number> {
-  return new GteSchema(value);
+  return new NumberSchema({minimum: value});
 }
 
 export function lte(value: number): Schema<any, number> {
-  return new LteSchema(value);
+  return new NumberSchema({maximum: value});
+}
+
+export interface RangeOpts {
+  lowerInclusive: boolean;
+  upperInclusive: boolean;
 }
 
 export function range(
@@ -135,10 +153,15 @@ export function range(
   {lowerInclusive = true, upperInclusive = false}: Partial<RangeOpts> = {})
   : Schema<any, number> {
 
-  const lower = lowerInclusive ? gte(from) : gt(from);
-  const upper = upperInclusive ? lte(to) : lt(to);
+  const min: Opts = lowerInclusive
+    ? {minimum: from}
+    : {exclusiveMinimum: from};
 
-  return lower.and(upper);
+  const max: Opts = upperInclusive
+    ? {maximum: to}
+    : {exclusiveMaximum: to};
+
+  return isnumber({...min, ...max});
 }
 
 export function isnull(): Schema<any, null> {
@@ -150,11 +173,11 @@ export function isundefined(): Schema<any, undefined> {
 }
 
 export function isany(): Schema<any, any> {
-  return schema((x) => x);
+  return schema((x) => x, () => true);
 }
 
-export function fail(problems: Problems): Schema<any, any> {
-  return schema(() => problems);
+export function fail(problems: Problems = failure('always fails')): Schema<any, any> {
+  return schema(() => problems, () => false);
 }
 
 export function arrayof<T>(schema: Schema<any, T>): Schema<any, T[]> {
@@ -193,9 +216,7 @@ export function discriminatedBy<T extends object>(discriminator: keyof T,
 }
 
 export function isstring(): Schema<any, string> {
-  return predicate<any>(
-    (x) => x instanceof String || typeof x === "string",
-    (x) => `expected a string but got ${typeDescription(x)}`);
+  return new StringSchema();
 }
 
 export function isinstance<T>(c: Constructor<T>): Schema<any, T> {
@@ -206,7 +227,7 @@ export function matches(r: RegExp): Schema<any, string> {
   return new RegExpSchema(r);
 }
 
-export function match(): ConditionalSchema<any, any> {
+export function conditional(): ConditionalSchema<any, any> {
   return new ConditionalSchema([]);
 }
 
@@ -214,7 +235,7 @@ export function isboolean(): Schema<any, boolean> {
   return new BooleanSchema();
 }
 
-export function isIn<T>(...values: T[]): Schema<any, T> {
+export function isIn<T extends number | string | null>(...values: T[]): Schema<any, T> {
   return new InSchema<T>(values);
 }
 
@@ -226,8 +247,8 @@ export function isuuid(): Schema<any, string> {
   return new UuidSchema();
 }
 
-export function isnumber(): Schema<any, number> {
-  return new NumberSchema();
+export function isnumber(opts: Opts = {}): Schema<any, number> {
+  return new NumberSchema(opts);
 }
 
 const DATE_TIME = new IsoUtcDateSchema(TimeExpectation.ALWAYS);
@@ -266,10 +287,10 @@ export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }
 }
 
 export function map<K, V>(entryPattern: Pattern<{}> | Map<K, Schema<any, V>>): Schema<any, Map<K, V>> {
-  return new MapSchema<K, V>(
-    entryPattern instanceof Map
-      ? entryPattern
-      : toMap(schematizeEntries(entryPattern)));
+  const subSchema = new ObjectSchema<any>(entryPattern instanceof Map
+    ? schematizeEntries(entryPattern)
+    : entryPattern);
+  return new MapSchema<K, V>(subSchema);
 }
 
 export function tuple<A>(a: Schema<any, A>): Schema<any, [A]>;
@@ -289,8 +310,10 @@ export function tuple<T extends any[]>(...s: Schema[]): Schema<any, T> {
   return new TupleSchema(s);
 }
 
-export function schema<IN, OUT>(conform: (value: IN) => Problems | OUT): Schema<IN, OUT> {
-  return new DelegatingSchema<IN, OUT>(conform);
+export function schema<IN, OUT>(
+  conform: (value: IN) => Problems | OUT,
+  toJSON?: () => any): Schema<IN, OUT> {
+  return new DelegatingSchema<IN, OUT>(conform, toJSON);
 }
 
 
@@ -337,7 +360,7 @@ export function select<T>(path: string[], s: Schema<any, T>): Schema<any, T> {
   return new SelectSchema(path, s);
 }
 
-export function oneOf<T>(...items: (T | Schema<any, T>)[]): Schema<any, T> {
+export function anyOf<T>(...items: (T | Schema<any, T>)[]): Schema<any, T> {
   const result: Schema<any, T> | undefined = items.reduce(
     (result: Schema<any, T> | undefined, item: Schema<any, T> | T): Schema<any, T> => {
       const schema = isSchema(item) ? item : eq(item);
@@ -354,8 +377,8 @@ export {LensBehaviour} from './impl/lens'
  *
  * lens(["a", "b"], eq("valid")).conform({a:{b:"valid"}}) returns {a:{b:"valid"}}
  */
-export function lens<T, U>(path: string[], s: Schema<any, U>, behaviour: LensBehaviour): Schema<any, T> {
-  return new LensSchema(path, s, behaviour);
+export function lens<T, U>(path: string[], s: Schema<any, U>): Schema<any, T> {
+  return new LensSchema(path, s);
 }
 
 export function defaultValue<T>(value: () => T, schema: Schema<any, T>): Schema<any, T> {
