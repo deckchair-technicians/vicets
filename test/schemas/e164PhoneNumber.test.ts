@@ -2,6 +2,13 @@ import {expect} from 'chai';
 import {e164PhoneNumber, failure, Schema} from "../../src/vice";
 
 describe('e164PhoneNumber', () => {
+  it('json schema', async () => {
+    const uk: Schema<any, string> = e164PhoneNumber('GBR');
+    expect(uk.toJSON()).deep.eq({
+      description: "Phone number",
+      type: "string"
+    })
+  });
   describe('with a country as argument', () => {
     const uk: Schema<any, string> = e164PhoneNumber('GBR');
 

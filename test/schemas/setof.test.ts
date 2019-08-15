@@ -44,4 +44,13 @@ describe('setof', () => {
       problem("did not match /abc/", [0, "a"]),
       problem("did not match /abc/", [1, "a"])));
   });
+
+  it('json schema', async () => {
+    expect(setof(eq(1)).toJSON())
+      .deep.eq({
+      type: "array",
+      items: {const:1}
+    })
+  });
+
 });

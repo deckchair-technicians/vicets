@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {matches, object, objof, schema} from "../../src/vice";
+import {isstring, matches, object, objof, schema} from "../../src/vice";
 
 
 describe('objof', () => {
@@ -54,5 +54,14 @@ describe('objof', () => {
       ]
     })
   });
-
-})
+  it('json schema', async () => {
+    expect(objof(isstring()).toJSON()).deep.eq({
+      type: "object",
+      patternProperties: {
+        ".*": {
+          type: "string"
+        }
+      }
+    });
+  })
+});

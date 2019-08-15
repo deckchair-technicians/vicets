@@ -11,4 +11,10 @@ describe('isnumber', () => {
   it('rejects non-numbers', () => {
     expect(s.conform("not a number")).deep.equals(failure("expected a number", []));
   });
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "number"
+    });
+  });
+
 });

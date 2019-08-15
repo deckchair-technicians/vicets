@@ -18,4 +18,10 @@ describe('isurl', () => {
     const s: Schema<any, string> = isurl({require_tld: false});
     expect(s.conform("http://localhost/test.html")).to.equal("http://localhost/test.html");
   });
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "string",
+      format: "url",
+    });
+  });
 });

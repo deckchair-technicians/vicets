@@ -10,4 +10,9 @@ describe('matches', () => {
   it('fails if value doesnt match pattern', () => {
     expect(s.conform("does not match")).deep.equals({problems: [{message: 'did not match /.*abc.*/', path: []}]});
   });
-});
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "string",
+      pattern: ".*abc.*",
+    });
+  })});

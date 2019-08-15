@@ -74,17 +74,17 @@ export class EnumValueSchema<T extends object> extends BaseSchema<any, T[keyof T
       case EnumType.InitializedIntegers:
         return {
           type: "number",
-          enum: this.enumValues
+          enum: [...this.enumValues]
         };
       case EnumType.InitializedStrings:
         return {
           type: "string",
-          enum: this.enumValues
+          enum: [...this.enumValues]
         };
       case EnumType.Mixed:
         return {
           type: ["string", "number"],
-          enum: this.enumValues
+          enum: [...this.enumValues]
         };
       default:
         throw new Error(`Enum type ${JSON.stringify(this.enumType)} not supported`);

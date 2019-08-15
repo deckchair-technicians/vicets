@@ -12,13 +12,14 @@ describe('isinstance', () => {
     }
   }
 
+  const s = isinstance(A);
+
   it('works', () => {
     const instance = new A('test');
     const differentType = new B('test');
     const notInstance = Object.assign({}, instance);
     const fakeInstance = Object.create(A.prototype);
 
-    const s = isinstance(A);
 
     expect(s.conform(instance)).to.equal(instance);
     expect(s.conform(fakeInstance)).to.equal(fakeInstance);
@@ -26,5 +27,14 @@ describe('isinstance', () => {
       .deep.equals(failure("expected A but got object"));
     expect(s.conform(differentType))
       .deep.equals(failure("expected A but got B"));
-  })
+  });
+
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      description: "Instance of A",
+      type: "object",
+      additionalProperties: true,
+    });
+  });
+
 });

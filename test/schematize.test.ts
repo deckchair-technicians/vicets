@@ -1,9 +1,8 @@
-import "reflect-metadata";
-import {expect} from 'chai';
 import {fail} from "assert";
-
-import {eq, Schema, schematize} from "../../src/vice";
-import {typeDescription} from "../../src/impl/util/types";
+import {expect} from 'chai';
+import "reflect-metadata";
+import {typeDescription} from "../src/impl/util/types";
+import {eq, Schema, schematize} from "../src/vice";
 
 describe('schematize', () => {
   xit('Returns InstanceOfSchema for classes', () => {

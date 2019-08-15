@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {conform, isstring, conditional, object, problem, problems} from "../src/vice";
+import {conditional, conform, isstring, object, problem, problems} from "../../src/vice";
 
 describe('conditional()', () => {
   const animal = conditional()
@@ -37,4 +37,55 @@ describe('conditional()', () => {
       problem('expected "dog" but got string: "elephant"', ['type']),
     ));
   });
+
+  it('json schema', async () => {
+    expect(animal.toJSON()).deep.eq({
+      if: {
+        properties: {
+          type: {
+            const: "cat"
+          }
+        }
+      },
+      then: {
+        properties: {
+          meaow: {
+            type: "string"
+          },
+          type: {
+            const: "cat"
+          }
+        },
+        required: [
+          "type",
+          "meaow"
+        ],
+        type: "object"
+      },
+      else: {
+        if: {
+          properties: {
+            type: {
+              const: "dog"
+            }
+          }
+        },
+        then: {
+          properties: {
+            type: {
+              const: "dog"
+            },
+            woof: {
+              type: "string"
+            }
+          },
+          required: [
+            "type",
+            "woof"
+          ],
+          type: "object"
+        }
+      }
+    });
+  })
 });

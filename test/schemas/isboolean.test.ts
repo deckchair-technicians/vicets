@@ -21,4 +21,10 @@ describe('isboolean()', () => {
   it('rejects non-booleans', () => {
     expect(s.conform(1)).deep.equals(failure("expected a boolean", []));
   });
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "boolean"
+    });
+
+  });
 });

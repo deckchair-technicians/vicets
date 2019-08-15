@@ -58,4 +58,17 @@ describe('map()', () => {
     expect(nested.conform(validMap))
       .deep.equals(validMap);
   });
+  it('json schema looks just like object', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "object",
+      properties: {
+        a: {
+          "const": 1
+        }
+      },
+      required: [
+        "a"
+      ]
+    });
+  });
 });

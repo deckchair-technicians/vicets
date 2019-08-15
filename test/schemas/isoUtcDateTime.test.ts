@@ -47,4 +47,11 @@ describe('isoUtcDateTime', () => {
   it('gives a useful error message for invalid dates', () => {
     expect(s.conform("not a date")).deep.eq(failure("expected a valid ISO8601 string"));
   });
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "string",
+      format: "date-time",
+    });
+  });
+
 });

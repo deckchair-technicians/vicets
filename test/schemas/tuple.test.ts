@@ -6,7 +6,7 @@ import {
   opt,
   problem,
   problems,
-  Schema,
+  Schema, setof,
   tuple,
   UnexpectedItemBehaviour
 } from "../../src/vice";
@@ -66,5 +66,16 @@ describe('tuple()', () => {
   it('Can specify additional fields should be ignored', () => {
     expect(onUnexpected(s, UnexpectedItemBehaviour.IGNORE).conform(["valid", 1, "should not be here", "should not be here"]))
       .deep.equals(["valid", 1, "should not be here", "should not be here"]);
+  });
+
+  it('json schema', async () => {
+    expect(s.toJSON())
+      .deep.eq({
+      type: "array",
+      items: [
+        {const:"valid"},
+        {const:1}
+      ]
+    })
   });
 });

@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {unique, problem, problems} from "../../src/vice";
+import {problem, problems, unique} from "../../src/vice";
 
 describe('unique', () => {
   it('passes through values', () => {
@@ -13,5 +13,12 @@ describe('unique', () => {
         problem("duplicate at indexes: [0,1,2]", [0]),
         problem("duplicate at indexes: [0,1,2]", [1]),
         problem("duplicate at indexes: [0,1,2]", [2])))
-  })
+  });
+  it('json schema', async () => {
+    expect(unique().toJSON())
+      .deep.eq({
+      type: "array",
+      description: "unique values",
+    })
+  });
 });

@@ -24,6 +24,16 @@ describe('enumvalue', () => {
         ]
       });
     });
+    it('json schema', async () => {
+      expect(s.toJSON()).deep.eq({
+        type: "string",
+        enum: [
+          "a value",
+          "b value",
+        ]
+      });
+;
+    });
   });
 
   describe('Enums with no initializers (numeric enums)', () => {
@@ -48,6 +58,17 @@ describe('enumvalue', () => {
         ]
       });
     });
+    it('json schema', async () => {
+      expect(s.toJSON()).deep.eq({
+        type: "number",
+        enum: [
+          0,
+          1,
+        ]
+      });
+      ;
+    });
+
   });
 
   describe('Enums with mixed initializers', () => {
@@ -74,6 +95,18 @@ describe('enumvalue', () => {
         ]
       });
     });
+    it('json schema', async () => {
+      expect(s.toJSON()).deep.eq({
+        type: ["string","number"],
+        enum: [
+          0,
+          2,
+          'c value',
+        ]
+      });
+      ;
+    });
+
   });
 
   describe('Using artificial enums', () => {

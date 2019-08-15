@@ -21,4 +21,11 @@ describe('isuuid()', () => {
     expect(s.conform(tooShort))
       .deep.equals({problems: [{message: `not a valid uuid: ${tooShort}`, path: []}]});
   });
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "string",
+      format: "uuid",
+      pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    });
+  });
 });

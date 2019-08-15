@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {eq, failure, object, onUnexpected, Schema, UnexpectedItemBehaviour} from "../../src/vice";
+import {eq, failure, object, onUnexpected, opt, Schema, UnexpectedItemBehaviour} from "../../src/vice";
 
 describe('object', () => {
   it('Appends key to path in problems', () => {
@@ -92,4 +92,22 @@ describe('object', () => {
       'expected "undefined" but got string: "not undefined"',
       ['a']));
   });
+  it('json schema', async () => {
+    expect(object({a: eq(1)}).toJSON()).deep.eq({
+      type: "object",
+      properties: {
+        a: {const: 1}
+      },
+      required: ['a']
+    });
+  });
+  it('json schema with opt fields', async () => {
+    expect(object({a: opt(eq(1))}).toJSON()).deep.eq({
+      type: "object",
+      properties: {
+        a: {const: 1}
+      },
+      required: []
+    });
+  })
 });

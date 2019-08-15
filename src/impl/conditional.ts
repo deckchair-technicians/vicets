@@ -7,7 +7,6 @@ import {
   isSuccess,
   ObjectSchema,
   Pattern,
-  predicate,
   Problems,
   Schema,
   UnexpectedItemBehaviour,
@@ -33,12 +32,10 @@ export class ConditionalSchema<IN extends object, OUT, MATCH = any> extends Base
     return problems as Problems;
   }
 
-  case<OTHER extends object>(case_: Pattern<OTHER> | Schema<IN, any> | ((value: IN) => boolean), schema: Schema<IN, OTHER>): ConditionalSchema<IN, OUT | OTHER> {
-    const caseSchema = typeof case_ === 'function'
-      ? predicate(case_)
-      : isSchema(case_)
-        ? case_
-        : new BehaviourSchema({unexpected: UnexpectedItemBehaviour.IGNORE}, new ObjectSchema(case_));
+  case<OTHER extends object>(case_: Pattern<OTHER> | Schema<IN, any>, schema: Schema<IN, OTHER>): ConditionalSchema<IN, OUT | OTHER> {
+    const caseSchema = isSchema(case_)
+      ? case_
+      : new BehaviourSchema({unexpected: UnexpectedItemBehaviour.IGNORE}, new ObjectSchema(case_));
 
     return new ConditionalSchema<IN, OUT | OTHER>(
       [...this.matches, [caseSchema, schema]]);
@@ -47,15 +44,23 @@ export class ConditionalSchema<IN extends object, OUT, MATCH = any> extends Base
   toJSON(toJson?: (s: Schema) => any): any {
     if (this.matches.length === 0)
       return false;
+
+    function subs(schema:Schema):any{
+      const result = subSchemaJson(schema, toJson);
+      delete result['additionalProperties'];
+      delete result['required'];
+      delete result['type'];
+      return result;
+    }
     return this.matches
       .reverse()
       .reduce((result, [condition, schema]) => {
         return {
-          if: subSchemaJson(condition, toJson),
+          if: subs(condition),
           then: subSchemaJson(schema, toJson),
           ...(result ? {else: result} : {})
         };
-      }, {});
+      }, undefined);
   }
 }
 

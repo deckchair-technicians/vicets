@@ -12,6 +12,6 @@ export class UuidSchema extends RegExpSchema {
     return REGEX.test(conformed) ? conformed : failure(`not a valid uuid: ${value}`);
   }
   toJSON(): any {
-    return {...super.toJSON(), description: "uuid"}
+    return {...super.toJSON(), format: "uuid"}
   }
 }

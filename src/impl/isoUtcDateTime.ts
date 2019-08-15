@@ -74,6 +74,12 @@ export class IsoUtcDateSchema extends BaseSchema<any, Date> {
   }
 
   toJSON(): any {
-    return {type: "string", format: "date-time"}
+    return {
+      type: "string", format: this.time === TimeExpectation.ALWAYS
+        ? 'date-time'
+        : this.time === TimeExpectation.NEVER
+          ? 'date'
+          : 'date-time'
+    }
   }
 }

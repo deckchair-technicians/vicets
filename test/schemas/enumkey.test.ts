@@ -2,13 +2,23 @@ import {expect} from 'chai';
 import {enumkey} from "../../src/vice";
 
 describe('enumkey', () => {
-  describe('String enums', () => {
-    enum WithStringValues {
-      a = 'a value',
-      b = 'b value'
-    }
+  enum WithStringValues {
+    a = 'a value',
+    b = 'b value'
+  }
 
-    const s = enumkey(WithStringValues);
+  const s = enumkey(WithStringValues);
+
+  it('json schema', async () => {
+    expect(s.toJSON()).deep.eq({
+      type: "string",
+      enum: [
+        "a",
+        "b",
+      ]
+    });
+  });
+  describe('String enums', () => {
 
     it('works for keys', () => {
       expect(s.conform('a')).to.equals(WithStringValues.a);

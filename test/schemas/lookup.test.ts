@@ -32,6 +32,15 @@ describe('lookup', () => {
         ]
       });
     });
+    it('json schema', async () => {
+      expect(s.toJSON()).deep.eq({
+        type: "string",
+        enum: [
+          "a",
+          "b"
+        ],
+      });
+    });
   });
   describe('Generic signature', () => {
     it('figures out type of output based on shape of class', () => {
