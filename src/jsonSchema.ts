@@ -44,7 +44,7 @@ function definitionsJson(defs: SchemaDefinitions, toJson: (s: Schema) => any): o
 }
 
 export interface JsonSchemaOpts {
-  id: string,
+  id?: string,
   definitions: SchemaDefinitions;
 }
 

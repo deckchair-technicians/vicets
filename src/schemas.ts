@@ -338,6 +338,23 @@ export function predicate<T>(predicate: (value: T) => boolean,
     (x) => predicate(x) === true ? x : failure(messageFn(x)))
 }
 
+/**
+ * Note that when using `defer()` to recursively nest schemas, by default `toJSON()` will
+ * stack overflow.
+ *
+ * You need to make sure that all schemas used in recursion are in the definitions
+ * when calling jsonSchema(), so that they get replaced by $refs.
+ *
+ * ```
+ * const node = object({children: arrayof(defer(() =>node))});
+ *
+ * // this will overflow:
+ * node.toJSON();
+ *
+ * // this will not:
+ * jsonSchema({definitions:{node: node}};
+ * ```
+ */
 export function defer<IN, OUT>(factory: () => Schema<IN, OUT>): Schema<IN, OUT> {
   return new DeferredSchema(factory);
 }
