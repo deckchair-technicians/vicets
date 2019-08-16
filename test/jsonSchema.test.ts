@@ -29,9 +29,11 @@ describe('jsonSchema()', async () => {
     const opts = {
       id: "github.com/deckchairtechnicians/vicets/example",
       definitions: {
-        "user": isUser,
-        "address": isAddress,
-        "postcode": isPostCode,
+        user: isUser,
+        address: isAddress,
+        tinyTypes: {
+          postcode: isPostCode,
+        }
       }
     };
     expect(jsonSchema(opts))
@@ -63,7 +65,7 @@ describe('jsonSchema()', async () => {
             firstLine: {type: "string"},
             secondLine: {type: "string"},
             town: {type: "string"},
-            postcode: {$ref: "#/definitions/postcode"},
+            postcode: {$ref: "#/definitions/tinyTypes/postcode"},
           },
           required: [
             "firstLine",
@@ -73,9 +75,11 @@ describe('jsonSchema()', async () => {
           ]
 
         },
-        postcode: {
-          type: "string",
-          pattern: "([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})"
+        tinyTypes: {
+          postcode: {
+            type: "string",
+            pattern: "([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})"
+          }
         }
       }
     });
