@@ -1,5 +1,3 @@
-import * as os from "os";
-
 export type Path = any[];
 
 export class Problem {
@@ -39,7 +37,7 @@ export class Problems {
   }
 
   toString(): string {
-    return this.problems.map(e => e.toString()).join(os.EOL)
+    return this.problems.map(e => e.toString()).join('\r\n')
   }
 }
 

@@ -1,4 +1,3 @@
-import * as os from "os";
 import {EqualsSchema, Schema, schemaOf} from "../";
 import {first} from "../util/iterables";
 import {mapKeyValue} from "../util/maps";
@@ -81,7 +80,7 @@ export function detectDiscriminator<T extends object>(ctors: Constructor<T>[]): 
   }
 
   const listOfFieldProblems = Array.from(report.problems.entries()).map(([k, problem]) => `${k}: ${problem}`);
-  throw new Error(`No discriminator field found. Considered:${os.EOL}${listOfFieldProblems.join(os.EOL)}`);
+  throw new Error(`No discriminator field found. Considered:\r\n${listOfFieldProblems.join('\r\n')}`);
 }
 
 export function discriminatorReports<T extends object>(ctors: Constructor<T>[]): DiscriminatorReport<T> {
