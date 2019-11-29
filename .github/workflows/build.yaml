@@ -17,24 +17,31 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: install
-        run: npm install
+        run: npm ci
       - name: check circular dependencies
         run: npm run madge:circular
       - name: test
         run: npm test
   publish:
     name: Publish
-    needs: [build]
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
-      - name: Generate build number
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+      - name: generate build number
         uses: einaregilsson/build-number@v2
         with:
           token: ${{ secrets.github_token }}
-      - run: npm --no-git-tag-version version "0.1.$BUILD_NUMBER"
-      - name: Build typescript
+      - name: install
+        run: npm ci
+      - name: build typescript
         run: npm run build
-      - name: Create .npmrc file
+      - run: npm --no-git-tag-version version "0.1.$BUILD_NUMBER"
+      - name: create .npmrc file
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-      - name: Deploy to NPM
+      - name: publish
         run: npm publish --access public
