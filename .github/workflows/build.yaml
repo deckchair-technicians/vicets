@@ -32,16 +32,17 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
-      - name: generate build number
-        uses: einaregilsson/build-number@v2
-        with:
-          token: ${{ secrets.github_token }}
-      - name: install
+      - name: npm ci
         run: npm ci
       - name: build typescript
         run: npm run build
-      - run: npm --no-git-tag-version version "0.1.$BUILD_NUMBER"
-      - name: create .npmrc file
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+      - name: generate build number
+          uses: einaregilsson/build-number@v2
+          with:
+            token: ${{ secrets.github_token }}
+      - name: set version
+        run: npm --no-git-tag-version version "0.1.$BUILD_NUMBER"
       - name: publish
-        run: npm publish --access public
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
