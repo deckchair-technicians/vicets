@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import {like} from "../src/mocha";
 import {problem, problems} from "../src/problems";
-import {arrayof, eq, object, schema} from "../src/schemas";
+import {arrayof, eq, matches, object, schema} from "../src/schemas";
 
 describe('vice mocha integration', () => {
   it('passes', () => {
@@ -40,7 +40,7 @@ describe('vice mocha integration', () => {
         wrong: 'right',
         missing: 'right'
       })),
-      array: ['right', /right/, eq('right')], // can use schemas and regexp as values
+      array: ['right', matches(/right/), eq('right')], // can use schemas and regexp as values
       missing: 'right',
       multipleProblems: schema(() => problems(problem("first problem"), problem("second problem")))
     };

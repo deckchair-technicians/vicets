@@ -20,15 +20,6 @@ describe('object', () => {
     expect(s.conform({a: 1})).deep.equals({a: 1});
   });
 
-  it('Treats regex as matches(value)', () => {
-    const s: Schema<object, object> = object({a: /abc/});
-
-    expect(s.conform({a: 'ab'})).deep.equals(failure(
-      "did not match /abc/",
-      ['a']));
-    expect(s.conform({a: 'abcde'})).deep.equals({a: 'abcde'});
-  });
-
   it('Treats non-schema object values as further Schemas', () => {
     const s: Schema<object, object> = object({a: {b: 1}});
 
@@ -92,7 +83,7 @@ describe('object', () => {
       'expected "undefined" but got string: "not undefined"',
       ['a']));
   });
-  it('json schema', async () => {
+  it('json schema',  () => {
     expect(object({a: eq(1)}).toJSON()).deep.eq({
       type: "object",
       properties: {
@@ -101,7 +92,7 @@ describe('object', () => {
       required: ['a']
     });
   });
-  it('json schema with opt fields', async () => {
+  it('json schema with opt fields',  () => {
     expect(object({a: opt(eq(1))}).toJSON()).deep.eq({
       type: "object",
       properties: {

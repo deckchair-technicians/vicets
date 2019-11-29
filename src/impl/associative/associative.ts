@@ -42,8 +42,7 @@ export function conformInPlace<K, V>(thing: Associative<K, V>,
 
     if (isError(v)) {
       problems = problems.merge((v as Problems).prefixPath([k]));
-    }
-    else if (v !== undefined) {
+    } else if (v !== undefined) {
       thing.set(k, v);
     }
   }
@@ -89,16 +88,8 @@ export function isOptional(schema: Schema): boolean {
   return schema[optional];
 }
 
-export type PrimitivePattern<T> = T extends string ? Schema<any, T> | T | RegExp : Schema<any, T> | T;
+export type StrictPatternItem<T> = StrictPattern<T> | Schema<any, T> | T
+export type StrictPattern<T> = { readonly [K in keyof T]: StrictPatternItem<T[K]> };
 
-export type StrictPatternItem<T> = T extends object
-  ? StrictPattern<T> | Schema<any, T> | T
-  : PrimitivePattern<T>
-
-export type StrictPattern<T extends object> = { readonly [K in keyof T]: StrictPatternItem<T[K]> };
-
-export type PatternItem<T> = T extends object
-  ? Pattern<T> | Schema<any, T> | T
-  : PrimitivePattern<T>
-
-export type Pattern<T extends object> = { readonly [K in keyof T]?: PatternItem<T[K]> };
+export type PatternItem<T> = Pattern<T> | Schema<any, T> | T
+export type Pattern<T> = { readonly [K in keyof T]?: PatternItem<T[K]> };

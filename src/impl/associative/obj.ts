@@ -31,9 +31,6 @@ export function patternItemToSchema<T>(item: PatternItem<T>): Schema {
   if (typeof item !== 'object')
     return new EqualsSchema(item);
 
-  if (item instanceof RegExp)
-    return new RegExpSchema(item);
-
   if (item instanceof Array)
     return new TupleSchema(item.map(v => patternItemToSchema(v)));
 
@@ -46,7 +43,7 @@ export function patternItemToSchema<T>(item: PatternItem<T>): Schema {
   if (typeof item['conform'] === 'function')
     return item as Schema;
 
-  return new ObjectSchema(item);
+  return new ObjectSchema(item as Pattern<T>);
 }
 
 export function patternToSchemas<T extends object>(pattern: Pattern<T>): { [K in keyof T]: Schema<T[K]> } {
