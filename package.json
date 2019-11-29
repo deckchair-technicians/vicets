@@ -1,6 +1,6 @@
 {
   "name": "@deckchair-technicians/vice",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Validation and coercion toolkit",
   "main": "dist/vice.umd.js",
   "module": "dist/vice.es5.js",
