@@ -42,3 +42,4 @@ export * from '../ValidationError';
 export * from '../mocha';
 export * from './conditional';
 export * from "../jsonSchema";
+export {analyseEnum} from "./util/analyseEnum";
