@@ -1,3 +1,4 @@
+import {DataSchema} from "./data";
 import {
   ArrayOfSchema,
   Behaviour,
@@ -50,7 +51,6 @@ import {
 } from "./impl";
 import {identity} from "./impl/util/functions";
 import {Constructor} from "./impl/util/types";
-import {DataSchema} from "./data";
 
 export function __<IN, OUT>(s: Schema<IN, OUT>): OUT {
   return s.__();
@@ -168,6 +168,10 @@ export function isnull(): Schema<any, null> {
   return eq(null);
 }
 
+export function isobject(): Schema<any, object> {
+  return withBehaviour(new ObjectSchema({}), {unexpected: UnexpectedItemBehaviour.IGNORE});
+}
+
 export function isundefined(): Schema<any, undefined> {
   return eq(undefined);
 }
@@ -282,6 +286,9 @@ export function deepPartial<T extends object>(
   return onUnexpected<any, T>(new ObjectSchema<T>(pattern), UnexpectedItemBehaviour.IGNORE);
 }
 
+/**
+ * An object where all values conform to schema
+ */
 export function objof<T>(schema: Schema<any, T>): Schema<any, { [k: string]: T }> {
   return new ObjOfSchema(schema);
 }
