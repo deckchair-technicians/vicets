@@ -44,7 +44,7 @@
     "phone": "^2.3.0",
     "reflect-metadata": "^0.1.12",
     "tslib": "^1.9.3",
-    "validator": "10.4.0"
+    "validator": "13.7.0"
   },
   "sideEffects": false
 }
